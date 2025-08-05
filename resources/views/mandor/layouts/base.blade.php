@@ -123,6 +123,7 @@
                         <div class="col-sm-6">
                             @php
                                 $path = explode('/', request()->path());
+                                $basePath = '';
                             @endphp
                             <ol class="breadcrumb float-sm-end">
                                 @foreach ($path as $p)
@@ -136,9 +137,14 @@
                                         @if ($p == end($path))
                                             {{ ucwords($pathName) }}
                                         @else
-                                            <a href="/{{ $p }}">{{ ucwords($pathName) }}</a>
+                                            <a
+                                                href="/{{ $basePath }}{{ $p }}">{{ ucwords($pathName) }}</a>
                                         @endif
                                     </li>
+
+                                    @php
+                                        $basePath .= $p . '/';
+                                    @endphp
                                 @endforeach
                             </ol>
                         </div>
