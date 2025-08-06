@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Anggota;
 
 use App\Models\Anggota;
-use App\Http\Requests\StoreAnggotaRequest;
-use App\Http\Requests\UpdateAnggotaRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class AnggotaController extends Controller
 {
@@ -14,6 +13,7 @@ class AnggotaController extends Controller
    */
   public function index()
   {
+    $title = 'Data Anggota';
     return view('anggota.index')->with(compact('title'));
   }
 

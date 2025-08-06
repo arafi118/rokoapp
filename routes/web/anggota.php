@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Anggota\AnggotController;
+use App\Http\Controllers\Anggota\AnggotaController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('anggota')->group(function () {
-  Route::get('/', [AnggotController::class, 'index']);
+  Route::get('/', [AnggotaController::class, 'index']);
 });
