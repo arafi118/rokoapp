@@ -11,4 +11,9 @@ class Anggota extends Authenticatable
     use HasApiTokens, HasFactory;
 
     protected $table = "anggota";
+
+    public function level_aktif()
+    {
+        return $this->hasOne(Anggota_level::class, 'anggota_id')->where('status', 'aktif');
+    }
 }

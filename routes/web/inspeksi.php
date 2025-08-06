@@ -4,7 +4,7 @@ use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('inspeksi')->group(function () {
+Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   //Dashboard route
   Route::get('/', [InspeksiController::class, 'index']);
 

@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [AuthController::class, 'index']);
-Route::post('/auth', [AuthController::class, 'auth']);
+Route::get('/', [AuthController::class, 'index'])->middleware('guest');
+Route::post('/auth', [AuthController::class, 'auth'])->middleware('guest');
 
 foreach (glob(base_path('routes/web/*.php')) as $file) {
     require $file;

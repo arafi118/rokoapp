@@ -9,4 +9,9 @@ class Anggota_level extends Model
 {
     use HasFactory;
     protected $table = 'anggota_level';
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
 }
