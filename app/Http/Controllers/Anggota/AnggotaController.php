@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Anggota;
 use App\Http\Requests\StoreAnggotaRequest;
 use App\Http\Requests\UpdateAnggotaRequest;
+use Illuminate\Http\Request;
 
 class AnggotaController extends Controller
 {
@@ -27,7 +28,7 @@ class AnggotaController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(StoreAnggotaRequest $request)
+  public function store(Request $request)
   {
     //
   }
@@ -51,7 +52,7 @@ class AnggotaController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(UpdateAnggotaRequest $request, Anggota $anggota)
+  public function update(Request $request, Anggota $anggota)
   {
     //
   }
