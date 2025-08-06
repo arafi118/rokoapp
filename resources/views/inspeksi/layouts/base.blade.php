@@ -25,8 +25,7 @@
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         crossorigin="anonymous" />
-    <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
-    <link rel="stylesheet" href="dist/css/adminlte.min.css?v=3.2.0">
+    <link rel="stylesheet" href="/assets/css/adminlte.min.css?v=3.2.0">
 </head>
 
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
@@ -108,17 +107,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="/assets/js/adminlte.js"></script>
-    <script src="plugins/jquery/jquery.min.js"></script>
-    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <script src="dist/js/adminlte.js?v=3.2.0"></script>
-    <script src="plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
-    <script src="plugins/raphael/raphael.min.js"></script>
-    <script src="plugins/jquery-mapael/jquery.mapael.min.js"></script>
-    <script src="plugins/jquery-mapael/maps/usa_states.min.js"></script>
-    <script src="plugins/chart.js/Chart.min.js"></script>
-    <script src="dist/js/demo.js"></script>
-    <script src="dist/js/pages/dashboard2.js"></script>
+    <script src="/assets/js/demo.js"></script>
+    <script src="/assets/js/pages/dashboard2.js"></script>
     <script>
         const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper',
             Default = {

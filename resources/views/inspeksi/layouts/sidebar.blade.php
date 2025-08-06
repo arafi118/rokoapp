@@ -2,7 +2,7 @@
     data-accordion="false" id="navigation">
 
     <li class="nav-item">
-        <a href="/" class="nav-link active">
+        <a href="/inspeksi" class="nav-link active">
             <i class="nav-icon bi bi-speedometer2"></i>
             <p>Dashboard</p>
         </a>
