@@ -15,9 +15,35 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <form action="" method="post" id="FormHapusAnggota">
+        @method('DELETE')
+        @csrf
+    </form>
+@endsection
+@section('modal')
+    <div class="modal fade" id="modalDetailAnggota" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Anggota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="kontenDetailAnggota">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -90,6 +116,90 @@
                         }
                     }
                 ]
+            });
+
+            $(document).on('click', '.btn-detail', function(e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                $('#kontenDetailAnggota').html(`
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `);
+                $('#modalDetailAnggota').modal('show');
+
+                $.ajax({
+                    url: `/inspeksi/anggota/${id}/detail`,
+                    type: 'GET',
+                    success: function(res) {
+                        $('#kontenDetailAnggota').html(res);
+                    },
+                    error: function() {
+                        $('#kontenDetailAnggota').html(
+                            '<p class="text-danger">Gagal memuat data.</p>');
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-delete', function(e) {
+                e.preventDefault();
+                let hapus_id = $(this).data('id');
+                let actionUrl = `/inspeksi/anggota/${hapus_id}`;
+
+                Swal.fire({
+                    title: "Apakah Anda yakin?",
+                    text: "Data akan dihapus secara permanen dari aplikasi dan tidak bisa dikembalikan!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Hapus",
+                    cancelButtonText: "Batal",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let form = $('#FormHapusAnggota');
+                        $.ajax({
+                            type: 'POST',
+                            url: actionUrl,
+                            data: form.serialize(),
+                            success: function(result) {
+                                if (result.success) {
+                                    Swal.fire({
+                                        title: "Berhasil!",
+                                        text: result.msg,
+                                        icon: "success",
+                                        confirmButtonText: "OK"
+                                    }).then(() => {
+                                        tableAnggota.ajax.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: "Gagal",
+                                        text: result.msg,
+                                        icon: "info",
+                                        confirmButtonText: "OK"
+                                    });
+                                }
+                            },
+                            error: function(response) {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Terjadi kesalahan pada server. Silakan coba lagi.",
+                                    icon: "error",
+                                    confirmButtonText: "OK"
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Dibatalkan",
+                            text: "Data tidak jadi dihapus.",
+                            icon: "info",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                });
             });
         });
     </script>

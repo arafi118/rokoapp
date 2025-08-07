@@ -40,10 +40,11 @@ class AnggotaController extends Controller
      */
     public function detail($id)
     {
-        $anggota = Anggota::findOrFail($id);
+        $anggota = Anggota::with('level_aktif')->findOrFail($id);
 
         return view('inspeksi.anggota.detail', compact('anggota'));
     }
+
 
     public function create()
     {
@@ -321,13 +322,17 @@ class AnggotaController extends Controller
         ])->orderBy('id_urutan', 'DESC')->first();
         $urutanId = $anggotaLevel ? $anggotaLevel->id_urutan + 1 : 1;
 
-        $anggotaLevel = Anggota_level::updateOrCreate([
-            'anggota_id' => $anggotum->id,
-            'tanggal_masuk' => (string) Tanggal::tglNasional($request->tanggal_lahir),
-            'level_id' => $data['level'],
-            'id_urutan' => $urutanId,
-            'status' => 'aktif',
-        ]);
+        if ($request->level != $anggotum->level_aktif->id) {
+            $anggotaLevel = Anggota_level::where([
+                ['anggota_id', $anggotum->id],
+                ['status', 'aktif']
+            ])->update([
+                'tanggal_masuk' => (string) Tanggal::tglNasional($request->tanggal_lahir),
+                'level_id' => $data['level'],
+                'id_urutan' => $urutanId,
+                'status' => 'aktif',
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -340,6 +345,13 @@ class AnggotaController extends Controller
      */
     public function destroy(Anggota $anggotum)
     {
-        //
+        Anggota_level::where('anggota_id', $anggotum->id)->delete();
+
+        $anggotum->delete();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Anggota dan level terkait berhasil dihapus.',
+        ]);
     }
 }

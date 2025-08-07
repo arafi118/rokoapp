@@ -13,7 +13,7 @@
                         <div class="form-group">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
                             <input type="text" class="form-control date" id="tanggal_masuk" name="tanggal_masuk"
-                                value="{{ $anggotum->level_aktif && $anggotum->level_aktif->tanggal_masuk ? \Carbon\Carbon::parse($anggotum->level_aktif->tanggal_masuk)->format('d/m/Y') : '' }}">
+                                value="{{ \Carbon\Carbon::parse(optional($anggotum->level_aktif)->tanggal_masuk ?? now())->format('d/m/Y') }}">
                             <small class="text-danger" id="msg_tanggal_masuk"></small>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                                 @foreach ($level as $lev)
                                     <option value="{{ $lev->id }}"
                                         {{ optional($anggotum->level_aktif)->id == $lev->id ? 'selected' : '' }}>
-                                        {{ ucwords(strtolower($lev->nama)) }}
+                                        {{ ucwords(strtolower($lev->nama)) }} (( {{ ucwords(strtolower($lev->inisial)) }} ))
                                     </option>
                                 @endforeach
 
@@ -135,7 +135,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row mb-2">
                     <div class="col-md-3">
                         <div class="form-group">
