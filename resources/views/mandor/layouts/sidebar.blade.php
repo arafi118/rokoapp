@@ -9,7 +9,7 @@
 
     <li class="nav-header">Master Data</li>
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="/mandor/anggota" class="nav-link">
             <i class="nav-icon bi bi-person-lines-fill"></i>
             <p>Daftar Anggota</p>
         </a>
@@ -21,7 +21,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="/mandor/validasi-pendataan" class="nav-link">
             <i class="nav-icon bi bi-clipboard-check"></i>
             <p>Validasi Pendataan</p>
         </a>
