@@ -35,8 +35,8 @@ class AuthController extends Controller
             $level = Level::where('id', $anggotaLevel->level_id)->first();
 
             $redirect = '/anggota';
-            if ($level->name == 'inspeksi' || $level->name == 'mandor') {
-                $redirect = '/' . $level->name;
+            if (in_array(strtolower($level->name), ['inspeksi', 'mandor'])) {
+                $redirect = '/' . strtolower($level->name);
             }
 
             return redirect($redirect)->with('success', 'Login Berhasil');

@@ -9,7 +9,12 @@
     </li>
 
     <li class="nav-header">Master Data</li>
-
+    <li class="nav-item">
+        <a href="/" class="nav-link">
+            <i class="nav-icon bi bi-diagram-3-fill"></i>
+            <p>Level</p>
+        </a>
+    </li>
     <li class="nav-item">
         <a href="#" class="nav-link">
             <i class="nav-icon bi bi-person-vcard"></i>
@@ -57,20 +62,6 @@
                 </a>
             </li>
         </ul>
-    </li>
-
-    <li class="nav-item">
-        <a href="/" class="nav-link">
-            <i class="nav-icon bi bi-diagram-3-fill"></i>
-            <p>Level</p>
-        </a>
-    </li>
-
-    <li class="nav-item">
-        <a href="/" class="nav-link">
-            <i class="nav-icon bi bi-person-badge-fill"></i>
-            <p>Anggota Level</p>
-        </a>
     </li>
 
     <li class="nav-item">

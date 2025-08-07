@@ -1,7 +1,7 @@
 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation"
     data-accordion="false" id="navigation">
     <li class="nav-item">
-        <a href="/" class="nav-link active">
+        <a href="/mandor" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Dashboard</p>
         </a>
@@ -12,6 +12,12 @@
         <a href="/" class="nav-link">
             <i class="nav-icon bi bi-person-lines-fill"></i>
             <p>Daftar Anggota</p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="/mandor/absensi-anggota" class="nav-link">
+            <i class="nav-icon bi bi-calendar-check"></i>
+            <p>Absensi Anggota</p>
         </a>
     </li>
     <li class="nav-item">
