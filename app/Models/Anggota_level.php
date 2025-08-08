@@ -23,4 +23,12 @@ class Anggota_level extends Model
     {
         return $this->belongsTo(Level::class);
     }
+        public function anggota()
+    {
+        return $this->belongsTo(Anggota::class, 'anggota_id');
+    }
+    public function anggotaKelompok()
+    {
+        return $this->hasOne(Anggota_kelompok::class, 'anggota_level_id');
+    }
 }
