@@ -234,7 +234,7 @@
                     </div>
                 </div>
                 <div class="col-12 d-flex justify-content-end">
-                    <button class="btn btn-secondary btn-icon-split" id="SimpanAnggota" type="submit">Simpan
+                    <button class="btn btn-primary btn-icon-split" id="SimpanAnggota" type="submit">Simpan
                         Anggota
                     </button>
                 </div>

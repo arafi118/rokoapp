@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="table-responsive">
                 <table id="anggota" class="table table-hover table-striped table-bordered">
-                    <thead>
+                    <thead align="center">
                         <tr>
                             <th>Nama</th>
                             <th>NIK</th>

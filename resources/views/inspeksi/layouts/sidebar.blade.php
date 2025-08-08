@@ -11,7 +11,7 @@
     <li class="nav-header">Master Data</li>
 
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="/inspeksi/level" class="nav-link">
             <i class="nav-icon bi bi-diagram-3-fill"></i>
             <p>Level</p>
         </a>
@@ -69,6 +69,6 @@
             <i class="nav-icon bi bi-box-arrow-right"></i>
             <p>Logout</p>
         </a>
-        
+
     </li>
 </ul>

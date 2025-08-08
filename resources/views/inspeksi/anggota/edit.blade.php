@@ -276,10 +276,12 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-12 d-flex justify-content-end">
-                    <button class="btn btn-primary btn-icon-split" id="SimpanEditAnggota" type="submit">Update
-                        Anggota</button>
+                <br>
+                <div class="col-12 d-flex justify-content-between">
+                    <a href="/inspeksi/anggota" class="btn btn-secondary btn-icon-split">Kembali</a>
+                    <button class="btn btn-primary btn-icon-split" id="SimpanEditAnggota" type="submit">
+                        Update Anggota
+                    </button>
                 </div>
             </div>
         </form>

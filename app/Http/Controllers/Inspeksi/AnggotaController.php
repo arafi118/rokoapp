@@ -214,7 +214,6 @@ class AnggotaController extends Controller
         $level      = Level::all();
         $provinsi   = Wilayah::whereRaw('LENGTH(kode)=2')->get();
 
-
         $title = "Update Anggota";
 
         return view('inspeksi.anggota.edit')->with(compact('title', 'provinsi', 'anggotum', 'level'));
