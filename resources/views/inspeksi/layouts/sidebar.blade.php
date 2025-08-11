@@ -43,14 +43,14 @@
     </li>
 
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="/inspeksi/kelompok" class="nav-link">
             <i class="nav-icon bi bi-people-fill"></i>
             <p>Kelompok</p>
         </a>
     </li>
 
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="/inspeksi/AnggotaKelompok" class="nav-link">
             <i class="nav-icon bi bi-person-lines-fill"></i>
             <p>Anggota Kelompok</p>
         </a>

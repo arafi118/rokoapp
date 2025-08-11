@@ -3,6 +3,8 @@
 use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
 use App\Http\Controllers\Inspeksi\LevelController;
+use App\Http\Controllers\Inspeksi\KelompokController;
+use App\Http\Controllers\Inspeksi\AnggotaKelompokController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
@@ -22,4 +24,11 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('anggota/{id}/detail', [AnggotaController::class, 'detail']);
 
   //Kelompok routes
+  Route::resource('kelompok', KelompokController::class);
+  Route::get('/Kelompok/listAnggota', [KelompokController::class, 'listAnggota']);
+
+  //Anggota Kelompok routes
+  Route::resource('AnggotaKelompok', AnggotaKelompokController::class);
+  Route::get('AnggotaKelompok/listAnggota', [AnggotaKelompokController::class, 'listAnggota']);
+  Route::get('AnggotaKelompok/listKelompok', [AnggotaKelompokController::class, 'listKelompok']);
 });

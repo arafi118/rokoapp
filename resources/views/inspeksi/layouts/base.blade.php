@@ -112,9 +112,8 @@
             </div>
         </main>
         <footer class="app-footer">
-            <div class="float-end d-none d-sm-inline">Anything you want</div>
-            <strong>Copyright &copy; 2014-2025 <a href="https://adminlte.io"
-                    class="text-decoration-none">AdminLTE.io</a>.</strong> All rights reserved.
+            <div class="float-end d-none d-sm-inline">Magelang Jawa Tengah</div>
+            <strong>© 2025 PT. Asta Brata Teknologi - V001.</strong>.
         </footer>
     </div>
     @yield('modal')

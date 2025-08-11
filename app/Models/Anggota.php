@@ -41,4 +41,9 @@ class Anggota extends Authenticatable
     {
         return $this->hasOne(Anggota_level::class, 'anggota_id')->where('status', 'aktif');
     }
+
+    public function kelompok()
+    {
+        return $this->belongsTo(Kelompok::class, 'id', 'anggota_id');
+    }
 }

@@ -10,8 +10,12 @@ class Anggota_kelompok extends Model
     use HasFactory;
     protected $table = 'anggota_kelompok';
     protected $guarded = [];
-    
-     public function level_aktif()
+    protected $fillable = [
+        'kelompok_id',
+        'anggota_level_id',
+    ];
+
+    public function level_aktif()
     {
         return $this->hasOne(Anggota_level::class, 'anggota_id')->where('status', 'aktif');
     }
@@ -24,6 +28,23 @@ class Anggota_kelompok extends Model
     public function absensiAnggota()
     {
         return $this->hasMany(Absensi_anggota::class, 'anggota_kelompok_id');
+    }
+
+    public function kelompok()
+    {
+        return $this->belongsTo(Kelompok::class, 'kelompok_id', 'id');
+    }
+
+    public function anggota()
+    {
+        return $this->hasOneThrough(
+            Anggota::class,
+            Anggota_level::class,
+            'id',
+            'id',
+            'anggota_level_id',
+            'anggota_id'
+        );
     }
 
     // Optional helper method
