@@ -3,48 +3,50 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable; // ini penting
+use Illuminate\Notifications\Notifiable;
 
-class Anggota extends Model
+class Anggota extends Authenticatable
 {
-    use HasApiTokens, HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = "anggota";
 
     protected $fillable = [
         'nama',
-        'no_kk',
         'nik',
+        'no_kk',
         'jenis_kelamin',
         'tempat_lahir',
         'tanggal_lahir',
-        'agama',
-        'kota',
-        'kecamatan',
-        'desa',
         'alamat',
-        'status',
-        'nama_bank',
-        'norek',
-        'tinggi_badan',
-        'berat_badan',
+        'desa',
+        'kecamatan',
+        'kabupaten',
         'ijazah',
-        'jurusan',
-        'tahun_lulus',
-        'nama_ibu_kandung',
         'jabatan_id',
         'username',
         'password',
     ];
 
-    public function level_aktif()
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    public function karyawan()
     {
-        return $this->hasOne(Anggota_level::class, 'anggota_id')->where('status', 'aktif');
+        return $this->hasOne(Karyawan::class, 'anggota_id');
     }
 
-    public function kelompok()
+    public function semua_karyawan()
     {
-        return $this->belongsTo(Kelompok::class, 'id', 'anggota_id');
+        return $this->hasMany(Karyawan::class, 'anggota_id');
+    }
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'jabatan_id');
     }
 }

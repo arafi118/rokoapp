@@ -25,88 +25,74 @@
     </div> --}}
     <div class="container mt-4">
         <div class="row">
-            <!-- KIRI: Info Anggota -->
-            <div class="col-md-4 mb-3" style="padding-left: 2px;">
-                <div class="card h-100">
-                    <div class="card-body text-center">
+            <div class="col-12 mb-3">
+                <div class="card border-0">
+                    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start p-2"
+                        style="background-color: #f0be1d; color: white; border-radius: 6px;">
 
-                        {{-- QR Code dengan background abu-abu --}}
-                        <div style="display: inline-block; background-color: #e9ecef; padding: 6px; border-radius: 4px;">
+                        <!-- QR Code -->
+                        <div class="p-2 mx-auto mx-md-0 d-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px; background-color: white; border-radius: 4px; overflow: hidden; margin-top: 4px;">
                             {!! $qrCode !!}
                         </div>
 
-                        {{-- Nama --}}
-                        <div class="fw-bold mt-2" style="font-size: 1.1rem;">
-                            {{ $anggota->nama }}
+                        <!-- Garis Pembatas (hanya di layar kecil) -->
+                        <div class="d-md-none w-100" style="border-bottom: 1px solid rgba(255,255,255,0.4); margin: 8px 0;">
                         </div>
 
-                        {{-- ID/Kode --}}
-                        <div style="color: #6c757d; font-size: 0.9rem;">
-                            {{ $anggota->kode }}
-                        </div>
-
-                        <hr>
-
-                        {{-- Form info anggota dibuat rata kiri --}}
-                        <div class="text-start px-2">
-                            <label class="form-label" style="font-weight: normal;">Nik</label>
-                            <input type="text" class="form-control mb-2" value="{{ $anggota->nik ?? '-' }}" disabled>
-
-                            <label class="form-label" style="font-weight: normal;">Alamat</label>
-                            <input type="text" class="form-control mb-2" value="{{ $anggota->alamat ?? '-' }}" disabled>
-
-                            <label class="form-label" style="font-weight: normal;">Tempat Lahir</label>
-                            <input type="text" class="form-control mb-2" value="{{ $anggota->tempat_lahir ?? '-' }}"
-                                disabled>
-                        </div>
-                        <div class="card-body d-flex flex-wrap gap-3">
-                            <a href="{{ route('anggota.cetak', $anggota->id) }}" target="_blank"
-                                class="btn flex-fill text-white" style="background-color:#911111; min-width: 120px;">
-                                Cetak
-                            </a>
+                        <!-- Data Anggota -->
+                        <div class="flex-grow-1 mt-2 mt-md-0 ms-md-3">
+                            <div class="row mb-1">
+                                <div class="col-12 col-md-4"><strong>Nama</strong> : {{ $anggota->nama }}</div>
+                                <div class="col-12 col-md-4"><strong>Desa</strong> : </div>
+                                <div class="col-12 col-md-4"><strong>Dusun</strong> : </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-12 col-md-4"><strong>No Induk</strong> : </div>
+                                <div class="col-12 col-md-4"><strong>alamat</strong></div>
+                                <div class="col-12 col-md-4"><strong>Rt</strong> :</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md-4"><strong>Rw</strong> : </div>
+                                <div class="col-12 col-md-4"><strong>No HP</strong> : </div>
+                                <div class="col-12 col-md-4"><strong>Email</strong> : </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
 
-            <!-- KANAN: Form Input Produksi Harian -->
-            <div class="col-md-8">
-                <!-- Form menyelimuti seluruh card -->
+            <div class="col-12">
                 <form action="{{ url('/anggota') }}" method="POST">
                     @csrf
-
-                    <!-- Card Input Produksi Harian -->
                     <div class="card">
-                        <div class="card-header" style="background-color:#e4a908; color:#fff;">
+                        <div class="card-header" style="background-color:#a72d0f; color:#fff;">
                             <h5 class="card-title m-0">Input Produksi Harian</h5>
                         </div>
-
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="tanggal_input" class="form-label">Tanggal Input</label>
                                 <input class="form-control" type="date" name="tanggal_input" id="tanggal_input"
                                     value="{{ date('Y-m-d') }}" required>
                             </div>
-
                             <div class="mb-3">
                                 <label for="jumlah" class="form-label">Jumlah Produksi</label>
                                 <input class="form-control" type="number" name="jumlah" id="jumlah"
                                     placeholder="Masukkan jumlah produksi" required>
                             </div>
-
-                            <!-- Tombol Simpan langsung di dalam card-body -->
                             <div class="text-end">
-                                <button type="submit" class="btn text-white"
-                                    style="background-color:#474747; min-width: 120px;">
-                                    Simpan
-                                </button>
+                                <a href="{{ route('anggota.cetak', $anggota->id) }}" target="_blank"
+                                    class="btn flex-fill text-white" style="background-color:#559111; min-width: 15px;">
+                                    Cetak
+                                </a>
+                                <button type="submit"
+                                    class="btn text-white"style="background-color:#474747; min-width: 10px;">Simpan</button>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 @endsection
