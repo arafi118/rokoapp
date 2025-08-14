@@ -23,7 +23,6 @@ class LevelController extends Controller
                 'id',
                 'nama',
                 'inisial',
-                'kapasitas'
             ]);
             return DataTables::eloquent($data)->toJson();
         }
@@ -47,12 +46,10 @@ class LevelController extends Controller
         $data = $request->only([
             "nama",
             "inisial",
-            "kapasitas"
         ]);
         $rules = [
             'nama'              => 'required',
             'inisial'           => 'required',
-            'kapasitas'         => 'required',
         ];
 
         $validate = Validator::make($data, $rules);
@@ -62,7 +59,6 @@ class LevelController extends Controller
         $Level = Level::create([
             'nama'              => $request->nama,
             'inisial'           => $request->inisial,
-            'kapasitas'         => $request->kapasitas,
         ]);
         return response()->json([
             'success' => true,
@@ -95,12 +91,10 @@ class LevelController extends Controller
         $data = $request->only([
             "nama",
             "inisial",
-            "kapasitas"
         ]);
         $rules = [
             'nama'              => 'required',
             'inisial'           => 'required',
-            'kapasitas'         => 'required',
         ];
 
         $validate = Validator::make($data, $rules);
@@ -122,7 +116,7 @@ class LevelController extends Controller
     public function destroy(Level $level)
     {
         // Cek apakah Level dipakai di tabel anggota
-        $terpakai = DB::table('anggota_level')->where('level_id', $level->id)->exists();
+        $terpakai = DB::table('karyawan')->where('level', $level->id)->exists();
 
         if ($terpakai) {
             return response()->json([

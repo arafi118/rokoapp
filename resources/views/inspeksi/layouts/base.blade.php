@@ -149,6 +149,25 @@
     <script src="/assets/js/adminlte.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).on('click', '#btnLogout', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Yakin mau logout?',
+                text: "Kamu akan keluar dari sistem.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#formLogout').submit();
+                }
+            });
+        });
+    </script>
     @yield('script')
 </body>
 

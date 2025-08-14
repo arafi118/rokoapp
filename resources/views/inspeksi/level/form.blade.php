@@ -7,7 +7,7 @@
         <input type="hidden" id="id_level" name="id_level">
         <div class="card-body">
             <div class="row mb-2">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="nama">Nama Level</label>
                         <input type="text" class="form-control" id="nama" name="nama">
@@ -15,19 +15,11 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="inisial">Inisial Level</label>
                         <input type="text" class="form-control" id="inisial" name="inisial">
                         <small class="text-danger" id="msg_inisial"></small>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="kapasitas">Kapasitas Level</label>
-                        <input type="text" class="form-control" id="kapasitas" name="kapasitas">
-                        <small class="text-danger" id="msg_kapasitas"></small>
                     </div>
                 </div>
             </div>

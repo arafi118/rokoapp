@@ -9,4 +9,8 @@ class Karyawan extends Model
 {
     use HasFactory;
     protected $table = 'karyawan';
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'level');
+    }
 }

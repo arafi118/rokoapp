@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
 use App\Http\Controllers\Inspeksi\LevelController;
-use App\Http\Controllers\Inspeksi\KelompokController;
-use App\Http\Controllers\Inspeksi\AnggotaKelompokController;
+use App\Http\Controllers\Inspeksi\RencanaController;
+use App\Http\Controllers\Inspeksi\KaryawanController;
+use App\Http\Controllers\Inspeksi\GroupController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
@@ -13,6 +15,9 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //Level routes
   Route::resource('level', LevelController::class);
+
+  //Rencana routes
+  Route::resource('rencana', RencanaController::class);
 
   //Anggota routes
   // Route::get('anggota/{anggota}/edit/', [AnggotaController::class, 'edit']);
@@ -23,12 +28,13 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('ambil_desa/{kode}', [AnggotaController::class, 'ambil_desa']);
   Route::get('anggota/{id}/detail', [AnggotaController::class, 'detail']);
 
-  //Kelompok routes
-  Route::resource('kelompok', KelompokController::class);
-  Route::get('/Kelompok/listAnggota', [KelompokController::class, 'listAnggota']);
+  //Karyawan routes
+  Route::resource('karyawan', KaryawanController::class);
 
-  //Anggota Kelompok routes
-  Route::resource('AnggotaKelompok', AnggotaKelompokController::class);
-  Route::get('AnggotaKelompok/listAnggota', [AnggotaKelompokController::class, 'listAnggota']);
-  Route::get('AnggotaKelompok/listKelompok', [AnggotaKelompokController::class, 'listKelompok']);
+  //Group routes
+  Route::resource('group', GroupController::class);
+
+  //Logout route
+
+  Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

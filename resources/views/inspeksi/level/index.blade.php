@@ -16,7 +16,6 @@
                                 <tr>
                                     <th>Nama</th>
                                     <th>Inisial</th>
-                                    <th>Kapasitas</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -62,11 +61,6 @@
                         width: '15%'
                     },
                     {
-                        data: 'kapasitas',
-                        name: 'kapasitas',
-                        width: '15%'
-                    },
-                    {
                         data: null,
                         orderable: false,
                         searchable: false,
@@ -76,8 +70,7 @@
                         <button class="btn btn-sm btn-warning btnEdit"
                             data-id="${data.id}"
                             data-nama="${data.nama}"
-                            data-inisial="${data.inisial}"
-                            data-kapasitas="${data.kapasitas}">
+                            data-inisial="${data.inisial}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete" data-id="${data.id}">
@@ -102,7 +95,6 @@
                 idLevel.val(d.id);
                 $('#nama').val(d.nama);
                 $('#inisial').val(d.inisial);
-                $('#kapasitas').val(d.kapasitas);
                 formLevel.attr('action', `/inspeksi/level/${d.id}`);
                 formLevel.find('input[name="_method"]').remove();
                 formLevel.append('<input type="hidden" name="_method" value="PUT">');
