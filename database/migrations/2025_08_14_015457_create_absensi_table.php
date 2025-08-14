@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('absensi', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('karyawan_id')->constrained('karyawan');
+            $table->foreignId('group_id')->constrained('group');
             $table->string('jadwal')->nullable();
             $table->date('tanggal')->nullable();
             $table->time('jam')->nullable();
