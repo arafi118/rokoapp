@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('tanggal_masuk')->nullable();
             $table->date('tanggal_keluar')->nullable();
             $table->string('level')->nullable();
-            $table->string('status')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->nullable();
             $table->timestamps();
         });
     }

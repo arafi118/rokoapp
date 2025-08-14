@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('jadwal')->nullable();
             $table->date('tanggal')->nullable();
             $table->time('jam')->nullable();
-            $table->string('status')->nullable();
+            $table->enum('status', ['H', 'S', 'I', 'A', 'T'])->nullable();
             $table->timestamps();
         });
     }
