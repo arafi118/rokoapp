@@ -15,11 +15,11 @@ class MandorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->level_aktif->level->nama == 'inspeksi') {
+        if (auth()->user()->jabatan == '2') {
             return redirect('/inspeksi');
         }
 
-        if (auth()->user()->level_aktif->level->nama == 'mandor') {
+        if (auth()->user()->jabatan == '3') {
             return $next($request);
         }
 
