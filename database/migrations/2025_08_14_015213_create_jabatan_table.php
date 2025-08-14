@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pendataan', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->foreignId('anggota_kelompok_id')->constrained('anggota_kelompok');
-            $table->string('jumlah')->nullable();
-            $table->date('tanggal_input')->nullable();
-            $table->string('status')->nullable();
+        Schema::create('jabatan', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pendataan');
+        Schema::dropIfExists('jabatan');
     }
 };

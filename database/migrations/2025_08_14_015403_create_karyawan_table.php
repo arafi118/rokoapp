@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('anggota_level', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('id_urutan')->nullable();
-            $table->foreignId('anggota_id')->constrained('anggota');
-            $table->foreignId('level_id')->constrained('level');
+        Schema::create('karyawan', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('group_id')->nullable()->constrained('group');
+            $table->foreignId('anggota_id')->nullable()->constrained('anggota');
+            $table->string('kode_karyawan')->nullable();
             $table->date('tanggal_masuk')->nullable();
             $table->date('tanggal_keluar')->nullable();
+            $table->string('level')->nullable();
             $table->string('status')->nullable();
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('anggota_level');
+        Schema::dropIfExists('karyawan');
     }
 };

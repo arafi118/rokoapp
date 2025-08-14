@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('anggota_kelompok', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->foreignId('kelompok_id')->constrained('kelompok');
-            $table->foreignId('anggota_level_id')->constrained('anggota_level');
+        Schema::create('group', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mandor')->constrained('anggota');
+            $table->string('nama')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('anggota_kelompok');
+        Schema::dropIfExists('group');
     }
 };

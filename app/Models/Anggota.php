@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-class Anggota extends Authenticatable
+class Anggota extends Model
 {
     use HasApiTokens, HasFactory;
 
@@ -33,6 +33,7 @@ class Anggota extends Authenticatable
         'jurusan',
         'tahun_lulus',
         'nama_ibu_kandung',
+        'jabatan_id',
         'username',
         'password',
     ];

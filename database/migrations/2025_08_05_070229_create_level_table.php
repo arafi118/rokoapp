@@ -15,7 +15,6 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('nama')->nullable();
             $table->string('inisial')->nullable();
-            $table->string('kapasitas')->nullable();
             $table->timestamps();
         });
     }

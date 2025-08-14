@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Validasi_pendataan extends Model
+class Rencana extends Model
 {
     use HasFactory;
+    protected $table = 'rencana';
 }

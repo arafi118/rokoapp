@@ -12,6 +12,5 @@ class Level extends Model
     protected $fillable = [
         'nama',
         'inisial',
-        'kapasitas'
     ];
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no_kk')->nullable();
             $table->string('jenis_kelamin')->nullable();
             $table->string('tempat_lahir')->nullable();
-            $table->string('tanggal_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
             $table->string('alamat')->nullable();
             $table->string('desa')->nullable();
             $table->string('kecamatan')->nullable();
@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('tahun_lulus')->nullable();
             $table->string('tinggi_badan')->nullable();
             $table->string('berat_badan')->nullable();
+            $table->foreignId('jabatan')->constrained('jabatan');
             $table->string('username')->nullable();
             $table->string('password')->nullable();
             $table->string('foto')->nullable();

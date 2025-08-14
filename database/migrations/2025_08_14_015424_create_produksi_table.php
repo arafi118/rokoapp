@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('absensi', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('jadwal_id')->nullable();
+        Schema::create('produksi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('karyawan_id')->constrained('karyawan');
             $table->date('tanggal')->nullable();
+            $table->string('jumlah_baik')->nullable();
+            $table->string('jumlah_buruk')->nullable();
+            $table->string('jumlah_buruk2')->nullable();
             $table->string('status')->nullable();
             $table->timestamps();
         });
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('absensi');
+        Schema::dropIfExists('produksi');
     }
 };

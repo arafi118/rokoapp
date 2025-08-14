@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kelompok', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->foreignId('anggota_id')->constrained('anggota');
-            $table->string('nama')->nullable();
+        Schema::create('rencana', function (Blueprint $table) {
+            $table->id();
+            $table->date('tanggal')->nullable();
+            $table->string('rencana_produksi')->nullable();
+            $table->string('rencana_kehadiran')->nullable();
+            $table->string('rencana_karyawan')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kelompok');
+        Schema::dropIfExists('rencana');
     }
 };
