@@ -5,15 +5,25 @@ namespace App\Http\Controllers\Inspeksi;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
+
 
 class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $data = Group::select('*');
+            return DataTables::eloquent($data)->toJson();
+        }
+
+        return view('inspeksi.group.index', ['title' => 'Data Group']);
     }
 
     /**
@@ -29,7 +39,24 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->only([
+            "name",
+        ]);
+        $rules = [
+            'name'              => 'required',
+        ];
+
+        $validate = Validator::make($data, $rules);
+        if ($validate->fails()) {
+            return response()->json($validate->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        $Group = Group::create([
+            'name'              => $request->name,
+        ]);
+        return response()->json([
+            'success' => true,
+            'msg' => 'Group berhasil ditambahkan!',
+        ]);
     }
 
     /**
@@ -53,7 +80,12 @@ class GroupController extends Controller
      */
     public function update(Request $request, Group $group)
     {
-        //
+        $data = $request->only([
+            "name",
+        ]);
+        $rules = [
+            'name'              => 'required',
+        ];
     }
 
     /**

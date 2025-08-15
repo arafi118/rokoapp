@@ -49,7 +49,7 @@ class AuthController extends Controller
 
                 $redirect = '/' . strtolower($anggota->getjabatan->nama);
                 if (Auth::attempt($request->only('username', 'password'))) {
-                    return redirect($redirect)->with('success', 'Login Berhasil');
+                    return redirect($redirect)->with('success', 'Selamat Datang ' . $anggota->nama);
                 }
             }
         }
