@@ -42,14 +42,16 @@
                 timer: 3000,
                 timerProgressBar: true
             });
+
             const formContainer = $('#formContainer'),
                 formLevel = $('#FormLevel'),
                 idLevel = $('#id_level'),
                 formTitle = $('#formTitle');
+
             const table = $('#level').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ url('/inspeksi/level') }}',
+                ajax: '/inspeksi/level',
                 columns: [{
                         data: 'nama',
                         name: 'nama',
@@ -80,34 +82,42 @@
                     }
                 ]
             });
+
             // Tambah
             $('#btnTambah').click(() => {
                 formLevel.trigger('reset');
                 idLevel.val('');
-                formLevel.attr('action', '{{ route('level.store') }}');
+                formLevel.attr('action', '/inspeksi/level');
                 formLevel.find('input[name="_method"]').remove();
                 formTitle.text("Tambah Level Baru");
                 formContainer.removeClass("card-warning").addClass("card-primary").slideDown();
             });
+
             // Edit
             $(document).on('click', '.btnEdit', function() {
                 let d = $(this).data();
                 idLevel.val(d.id);
+
                 $('#nama').val(d.nama);
                 $('#inisial').val(d.inisial);
+
                 formLevel.attr('action', `/inspeksi/level/${d.id}`);
                 formLevel.find('input[name="_method"]').remove();
                 formLevel.append('<input type="hidden" name="_method" value="PUT">');
+
                 formTitle.text("Edit Level");
                 formContainer.removeClass("card-primary").addClass("card-warning").slideDown();
             });
+
             // Batal
             $('#btnCancel').click(() => formContainer.slideUp());
+
             // Simpan
             $(document).on('click', '#SimpanLevel', function(e) {
                 e.preventDefault();
                 $('small').empty();
                 $('.is-invalid').removeClass('is-invalid');
+
                 let url = formLevel.attr('action');
                 $.post(url, formLevel.serialize())
                     .done(res => {
@@ -130,6 +140,7 @@
                         });
                     });
             });
+
             // Hapus
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();

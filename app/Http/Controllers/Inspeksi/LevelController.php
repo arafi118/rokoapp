@@ -19,11 +19,7 @@ class LevelController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Level::select([
-                'id',
-                'nama',
-                'inisial',
-            ]);
+            $data = Level::select('*');
             return DataTables::eloquent($data)->toJson();
         }
 
