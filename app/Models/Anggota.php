@@ -45,7 +45,7 @@ class Anggota extends Authenticatable
         return $this->hasMany(Karyawan::class, 'anggota_id');
     }
 
-    public function jabatan()
+    public function getjabatan()
     {
         return $this->belongsTo(Jabatan::class, 'jabatan');
     }

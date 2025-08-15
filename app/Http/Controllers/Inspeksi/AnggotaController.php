@@ -22,15 +22,12 @@ class AnggotaController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Anggota::select([
-                'id',
-                'nama',
-                'nik',
-                'desa',
-                'nama_bank',
-                'norek'
-            ]);
-            return DataTables::eloquent($data)->toJson();
+            $data = Anggota::with('getjabatan');
+            return DataTables::eloquent($data)
+                ->editColumn('nama', function ($anggota) {
+                    return $anggota->nama . ' - ' . $anggota->getjabatan->nama;
+                })
+                ->toJson();
         }
 
         return view('inspeksi.anggota.index', ['title' => 'Data Anggota']);
