@@ -25,10 +25,56 @@
     </div> --}}
     <div class="container mt-4">
         <div class="row">
-            <div class="col-12 mb-3">
+
+
+            <div class="col-8">
+                <form action="{{ url('/anggota') }}" method="POST">
+                    @csrf
+                    <div class="card">
+                        <div class="card-header" style="background-color:#535353; color:#fff;">
+                            <h5 class="card-title m-0">Input Produksi Harian</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="tanggal" class="form-label">Tanggal Input</label>
+                                <input class="form-control" type="date" name="tanggal" id="tanggal"
+                                    value="{{ date('Y-m-d') }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="jumlah_baik" class="form-label">Jumlah Produksi Baik</label>
+                                <input class="form-control" type="number" name="jumlah_baik" id="jumlah_baik"
+                                    placeholder="Masukkan jumlah baik" value="0" min="0" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="jumlah_buruk" class="form-label">Jumlah Produksi Buruk</label>
+                                <input class="form-control" type="number" name="jumlah_buruk" id="jumlah_buruk"
+                                    placeholder="Masukkan jumlah buruk" value="0" min="0">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="jumlah_buruk2" class="form-label">Jumlah Produksi Buruk 2</label>
+                                <input class="form-control" type="number" name="jumlah_buruk2" id="jumlah_buruk2"
+                                    placeholder="Masukkan jumlah buruk 2" value="0" min="0">
+                            </div>
+
+                            <div class="text-end">
+                                <a href="{{ route('anggota.cetak', $anggota->id) }}" target="_blank"
+                                    class="btn flex-fill text-white" style="background-color:#f1ad1a; min-width: 15px;">
+                                    Cetak
+                                </a>
+                                <button type="submit" class="btn text-white"
+                                    style="background-color:#474747; min-width: 10px;">Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-4 mb-3">
                 <div class="card border-0">
                     <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start p-2"
-                        style="background-color: #f0be1d; color: white; border-radius: 6px;">
+                        style="background-color: #8a1919; color: white; border-radius: 6px;">
 
                         <!-- QR Code -->
                         <div class="p-2 mx-auto mx-md-0 d-flex align-items-center justify-content-center"
@@ -62,37 +108,6 @@
                 </div>
             </div>
 
-
-            <div class="col-12">
-                <form action="{{ url('/anggota') }}" method="POST">
-                    @csrf
-                    <div class="card">
-                        <div class="card-header" style="background-color:#a72d0f; color:#fff;">
-                            <h5 class="card-title m-0">Input Produksi Harian</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="tanggal_input" class="form-label">Tanggal Input</label>
-                                <input class="form-control" type="date" name="tanggal_input" id="tanggal_input"
-                                    value="{{ date('Y-m-d') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="jumlah" class="form-label">Jumlah Produksi</label>
-                                <input class="form-control" type="number" name="jumlah" id="jumlah"
-                                    placeholder="Masukkan jumlah produksi" required>
-                            </div>
-                            <div class="text-end">
-                                <a href="{{ route('anggota.cetak', $anggota->id) }}" target="_blank"
-                                    class="btn flex-fill text-white" style="background-color:#559111; min-width: 15px;">
-                                    Cetak
-                                </a>
-                                <button type="submit"
-                                    class="btn text-white"style="background-color:#474747; min-width: 10px;">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 @endsection
@@ -100,11 +115,11 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if (session('success_create'))
+    @if (session('berhasil'))
         <script>
             Swal.fire({
                 title: 'Berhasil!',
-                text: @json(session('success_create')),
+                text: @json(session('berhasil')),
                 icon: 'success',
                 showCancelButton: true,
                 confirmButtonText: 'Tambah Data Lagi',

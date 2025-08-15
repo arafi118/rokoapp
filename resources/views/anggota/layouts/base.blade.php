@@ -2,26 +2,23 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>{{ env('APP_NAME') }} | {{ $title }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <meta name="title" content="{{ env('APP_NAME') }} | {{ $title }}" />
-    <meta name="author" content="ColorlibHQ" />
-    <meta name="supported-color-schemes" content="light dark" />
     <link rel="preload" href="/assets/css/adminlte.css" as="style" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-        integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
-        onload="this.media='all'" />
+        crossorigin="anonymous" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
         crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
         crossorigin="anonymous" />
     <link rel="stylesheet" href="/assets/css/adminlte.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
-        integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous" />
+        crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
 </head>
 
@@ -31,9 +28,7 @@
             <div class="container-fluid">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-                            <i class="bi bi-list"></i>
-                        </a>
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#"><i class="bi bi-list"></i></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -61,14 +56,9 @@
                 </a>
             </div>
             <div class="sidebar-wrapper">
-                <nav class="mt-2">
-                    @include('anggota.layouts.sidebar')
-                </nav>
+                <nav class="mt-2">@include('anggota.layouts.sidebar')</nav>
             </div>
-            <!--end::Sidebar Wrapper-->
         </aside>
-        <!--end::Sidebar-->
-        <!--begin::App Main-->
         <main class="app-main">
             <div class="app-content-header">
                 <div class="container-fluid">
@@ -97,10 +87,7 @@
                                                 href="/{{ $basePath }}{{ $p }}">{{ ucwords($pathName) }}</a>
                                         @endif
                                     </li>
-
-                                    @php
-                                        $basePath .= $p . '/';
-                                    @endphp
+                                    @php $basePath .= $p . '/'; @endphp
                                 @endforeach
                             </ol>
                         </div>
@@ -108,52 +95,65 @@
                 </div>
             </div>
             <div class="app-content">
-                <div class="container-fluid">
-                    @yield('content')
-                </div>
+                <div class="container-fluid">@yield('content')</div>
             </div>
         </main>
         <footer class="app-footer">
             <div class="float-end d-none d-sm-inline">Anything you want</div>
-            <strong>
-                Copyright &copy; 2014-2025&nbsp;
-                <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
-            </strong>
-            All rights reserved.
+            <strong>Copyright &copy; 2014-2025 <a href="https://adminlte.io"
+                    class="text-decoration-none">AdminLTE.io</a>.</strong> All rights reserved.
         </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const toastMixin = Swal.mixin({
+            toast: true,
+            position: 'top-right',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+        @if (session('success'))
+            toastMixin.fire({
+                icon: 'success',
+                title: '{{ session('success') }}'
+            });
+        @endif
+        @if (session('error'))
+            toastMixin.fire({
+                icon: 'error',
+                title: '{{ session('error') }}'
+            });
+        @endif
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="/assets/js/adminlte.js"></script>
-
-    <!-- DataTables Bootstrap 4 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
     <script>
-        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-        const Default = {
-            scrollbarTheme: 'os-theme-light',
-            scrollbarAutoHide: 'leave',
-            scrollbarClickScroll: true,
-        };
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-            if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-                OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                    scrollbars: {
-                        theme: Default.scrollbarTheme,
-                        autoHide: Default.scrollbarAutoHide,
-                        clickScroll: Default.scrollbarClickScroll,
-                    },
-                });
-            }
+        $(document).on('click', '#btnLogout', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Yakin mau logout?',
+                text: "Kamu akan keluar dari sistem.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#formLogout').submit();
+                }
+            });
         });
     </script>
-
     @yield('script')
 </body>
 

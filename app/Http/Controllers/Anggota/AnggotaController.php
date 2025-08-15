@@ -77,7 +77,7 @@ class AnggotaController extends Controller
             $produksi->jumlah_buruk2 += $request->jumlah_buruk2 ?? 0;
             $produksi->save();
 
-            return redirect()->route('anggota.dashboard')->with('success', 'Data produksi berhasil diperbarui!');
+            return redirect()->route('anggota.dashboard')->with('berhasil', 'Data produksi berhasil diperbarui!');
         } else {
             // Simpan data baru
             Produksi::create([
@@ -89,7 +89,7 @@ class AnggotaController extends Controller
                 'status_validasi' => 'DRAFT'
             ]);
 
-            return redirect()->route('anggota.dashboard')->with('success', 'Data produksi berhasil disimpan!');
+            return redirect()->route('anggota.dashboard')->with('berhasil', 'Data produksi berhasil disimpan!');
         }
     }
 
@@ -120,6 +120,7 @@ class AnggotaController extends Controller
      */
     public function cetak($id)
     {
+        $title = '';
         $anggota = Anggota::findOrFail($id);
         $karyawan = Karyawan::where('anggota_id', $anggota->id)->first();
 
@@ -130,7 +131,7 @@ class AnggotaController extends Controller
         $produksi = Produksi::where('karyawan_id', $karyawan->id)->get();
         $qrCode = QrCode::size(70)->generate($anggota->id);
 
-        return view('anggota.cetak', compact('anggota', 'produksi', 'qrCode'));
+        return view('anggota.cetak', compact('anggota', 'produksi', 'qrCode','title'));
     }
 
 
