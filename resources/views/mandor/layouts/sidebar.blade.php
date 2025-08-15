@@ -9,15 +9,15 @@
 
     <li class="nav-header">Master Data</li>
     <li class="nav-item">
-        <a href="/mandor/anggota" class="nav-link">
+        <a href="/mandor/karyawan" class="nav-link">
             <i class="nav-icon bi bi-person-lines-fill"></i>
-            <p>Daftar Anggota</p>
+            <p>Daftar Karyawan</p>
         </a>
     </li>
     <li class="nav-item">
-        <a href="/mandor/absensi-anggota" class="nav-link">
+        <a href="/mandor/absensi-karyawan" class="nav-link">
             <i class="nav-icon bi bi-calendar-check"></i>
-            <p>Absensi Anggota</p>
+            <p>Absensi Karyawan</p>
         </a>
     </li>
     <li class="nav-item">

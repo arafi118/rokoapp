@@ -76,8 +76,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -89,7 +88,7 @@
         var table = $('#daftar-anggota').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "/mandor/anggota",
+            ajax: "/mandor/karyawan",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -97,8 +96,8 @@
                     searchable: false
                 },
                 {
-                    data: 'nik',
-                    name: 'nik'
+                    data: 'getanggota.nik',
+                    name: 'getanggota.nik'
                 },
                 {
                     data: 'nama',
@@ -120,12 +119,13 @@
         $('#daftar-anggota').on('click', '.btn-detail', function() {
             var data = table.row($(this).parents('tr')).data();
 
-            $('#namaLevel').text(data.level);
-            $('#namaAnggota').text(data.nama);
-            $('#nikAnggota').text(data.nik);
-            $('#alamatAnggota').text(data.alamat);
-            $('#ttlAnggota').text(data.tempat_lahir);
-            $('#fotoAnggota').attr('src', (data.foto.length > 3) ? '/storage/profil/' + data.foto :
+            $('#namaLevel').text(data.getlevel.nama);
+            $('#namaAnggota').text(data.getanggota.nama);
+            $('#nikAnggota').text(data.getanggota.nik);
+            $('#alamatAnggota').text(data.getanggota.alamat);
+            $('#ttlAnggota').text(data.getanggota.tempat_lahir);
+            $('#fotoAnggota').attr('src', (data.getanggota.foto.length > 3) ? '/storage/profil/' + data.getanggota
+                .foto :
                 '/assets/img/default-150x150.png');
             $('#masaKerja').text(data.masa_kerja);
 
