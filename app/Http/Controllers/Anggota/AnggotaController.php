@@ -26,12 +26,11 @@ class AnggotaController extends Controller
     public function create()
     {
         $user = auth()->user();
-        $title = 'Input Produksi';
+        $title = 'Produksi';
 
         // Ambil data anggota
         $anggota = Anggota::find($user->id);
-
-        // Ambil data karyawan aktif dari anggota
+       
         $karyawan = Karyawan::where('anggota_id', $anggota->id)
             ->where('status', 'aktif')
             ->first();

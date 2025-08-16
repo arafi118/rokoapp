@@ -52,14 +52,16 @@
 
             {{-- Form Info Anggota --}}
             <div class="text-start">
-                <label class="form-label">Nik</label>
+                <label class="form-label">Jabatan</label>
+                <input type="text" class="form-control form-control-sm"
+                    value="{{ $anggota->getjabatan->nama === 'Anggota' ? 'Karyawan' : $anggota->getjabatan->nama }}"
+                    disabled>
+                <label class="form-label">No Induk</label>
                 <input type="text" class="form-control mb-2" value="{{ $anggota->nik ?? '-' }}" disabled>
-
-                <label class="form-label">Alamat</label>
+                <label class="form-label">Tempat Lahir</label>
                 <input type="text" class="form-control mb-2" value="{{ $anggota->alamat ?? '-' }}" disabled>
 
-                <label class="form-label">Tempat Lahir</label>
-                <input type="text" class="form-control mb-2" value="{{ $anggota->tempat_lahir ?? '-' }}" disabled>
+
             </div>
         </div>
 
