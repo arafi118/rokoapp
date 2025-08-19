@@ -142,65 +142,38 @@
                     }
                 });
             });
-
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();
-                let hapus_id = $(this).data('id');
-                let actionUrl = `/inspeksi/anggota/${hapus_id}`;
-
+                let id = $(this).data('id');
                 Swal.fire({
                     title: "Apakah Anda yakin?",
-                    text: "Data akan dihapus secara permanen dari aplikasi dan tidak bisa dikembalikan!",
+                    text: "Data akan dihapus permanen!",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Hapus",
                     cancelButtonText: "Batal",
                     reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let form = $('#FormHapusAnggota');
-                        $.ajax({
-                            type: 'POST',
-                            url: actionUrl,
-                            data: form.serialize(),
-                            success: function(result) {
-                                if (result.success) {
-                                    Swal.fire({
-                                        title: "Berhasil!",
-                                        text: result.msg,
-                                        icon: "success",
-                                        confirmButtonText: "OK"
-                                    }).then(() => {
-                                        tableAnggota.ajax.reload();
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: "Gagal",
-                                        text: result.msg,
-                                        icon: "info",
-                                        confirmButtonText: "OK"
-                                    });
-                                }
-                            },
-                            error: function(response) {
+                }).then((r) => {
+                    if (r.isConfirmed) {
+                        $.post(`/inspeksi/anggota/${id}`, $('#FormHapusAnggota').serialize(),
+                            function(res) {
                                 Swal.fire({
-                                    title: "Error",
-                                    text: "Terjadi kesalahan pada server. Silakan coba lagi.",
-                                    icon: "error",
-                                    confirmButtonText: "OK"
-                                });
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "Dibatalkan",
-                            text: "Data tidak jadi dihapus.",
-                            icon: "info",
-                            confirmButtonText: "OK"
-                        });
+                                        title: res.success ? "Berhasil!" : "Gagal",
+                                        text: res.msg,
+                                        icon: res.success ? "success" : "warning"
+                                    })
+                                    .then(() => {
+                                        if (res.success) tableAnggota.ajax.reload();
+                                    });
+                            }).fail(() => Swal.fire({
+                            title: "Error",
+                            text: "Terjadi kesalahan server.",
+                            icon: "error"
+                        }));
                     }
                 });
             });
+
         });
     </script>
 @endsection

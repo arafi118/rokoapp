@@ -20,7 +20,6 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::resource('rencana', RencanaController::class);
 
   //Anggota routes
-  // Route::get('anggota/{anggota}/edit/', [AnggotaController::class, 'edit']);
   Route::resource('anggota', AnggotaController::class);
   Route::get('detail/{id}', [AnggotaController::class, 'detail']);
   Route::get('ambil_kab/{kode}', [AnggotaController::class, 'ambil_kab']);
@@ -32,6 +31,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::resource('karyawan', KaryawanController::class);
 
   //Group routes
+  Route::get('group/list', [GroupController::class, 'list']);
   Route::resource('group', GroupController::class);
 
   //Logout route

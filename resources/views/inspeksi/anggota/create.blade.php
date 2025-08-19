@@ -6,40 +6,11 @@
             @csrf
             <div class="card-body">
                 <div class="row mb-2">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="tanggal_masuk">Tanggal Masuk</label>
-                            <input type="text" class="form-control date" value="{{ date('d/m/Y') }}" id="tanggal_masuk"
-                                name="tanggal_masuk">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="level">Operator Produksi</label>
-                            <select name="level" id="level" class="form-control select2">
-                                <option value="">- Pilih Level -</option>
-                                @foreach ($level as $lev)
-                                    <option value="{{ $lev->id }}">
-                                        {{ ucwords(strtolower($lev->nama)) }} ( {{ ucwords(strtolower($lev->inisial)) }} )
-                                    </option>
-                                @endforeach
-                            </select><small class="text-danger" id="msg_level"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="nama">Nama Lengkap</label>
                             <input type="text" class="form-control" id="nama" name="nama">
                             <small class="text-danger" id="msg_nama"></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="no_kk">No.KK</label>
-                            <input type="text" maxlength="16" class="form-control" id="no_kk" name="no_kk">
-                            <small class="text-danger" id="msg_no_kk"></small>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -51,46 +22,94 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="status">Status Perkawinan</label>
-                            <select class="form-control select2" id="status" name="status">
-                                <option value="">-- Pilih Status Perkawinan --</option>
-                                <option value="belum menikah">Belum Menikah</option>
-                                <option value="menikah">Menikah</option>
-                                <option value="cerai hidup">Cerai Hidup</option>
-                                <option value="cerai mati">Cerai Mati</option>
-                            </select>
-                            <small class="text-danger" id="msg_status"></small>
+                            <label for="no_kk">No.KK</label>
+                            <input type="text" maxlength="16" class="form-control" id="no_kk" name="no_kk">
+                            <small class="text-danger" id="msg_no_kk"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="tanggal_masuk">Tanggal Masuk</label>
+                            <input type="text" class="form-control date" value="{{ date('d/m/Y') }}" id="tanggal_masuk"
+                                name="tanggal_masuk">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="jabatan">Jabatan</label>
+                                    <select name="jabatan" id="jabatan" class="form-control select2">
+                                        <option value="">- Pilih Nama jabatan -</option>
+                                        @foreach ($jabatan as $jab)
+                                            <option value="{{ $jab->id }}">
+                                                {{ ucwords(strtolower($jab->nama)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-danger" id="msg_provinsi"></small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="level">Operator Produksi</label>
+                                    <select name="level" id="level" class="form-control select2">
+                                        <option value="">- Pilih Level -</option>
+                                        @foreach ($level as $lev)
+                                            <option value="{{ $lev->id }}">
+                                                {{ ucwords(strtolower($lev->nama)) }} (
+                                                {{ ucwords(strtolower($lev->inisial)) }} )
+                                            </option>
+                                        @endforeach
+                                    </select><small class="text-danger" id="msg_level"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="tempat_lahir">Temppat Lahir</label>
-                            <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir">
-                            <small class="text-danger" id="msg_tempat_lahir"></small>
+                            <label for="nama_ibu_kandung">Nama Ibu Kandung</label>
+                            <input type="text" class="form-control" id="nama_ibu_kandung" name="nama_ibu_kandung">
+                            <small class="text-danger" id="msg_nama_ibu_kandung"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="tempat_lahir">Tempat & Tanggal Lahir</label>
+                            <div class="row g-0">
+                                <div class="col-6">
+                                    <input type="text" class="form-control rounded-0 rounded-start" id="tempat_lahir"
+                                        name="tempat_lahir" placeholder="Tempat">
+                                    <small class="text-danger" id="msg_tempat_lahir"></small>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control date rounded-0" id="tanggal_lahir"
+                                        name="tanggal_lahir" value="{{ date('d/m/Y') }}" placeholder="Tanggal">
+                                    <small class="text-danger" id="msg_tanggal_lahir"></small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="tanggal_lahir">Tanggal Lahir</label>
-                            <input type="text" class="form-control date" value="{{ date('d/m/Y') }}" id="tanggal_lahir"
-                                name="tanggal_lahir">
-                            <small class="text-danger" id="msg_tanggal_lahir"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label>Jenis Kelamin</label>
-                            <select class="form-control select2" type="text" id="jenis_kelamin" name="jenis_kelamin">
-                                <option value="">-- Pilih --</option>
-                                <option value="L">laki-laki</option>
-                                <option value="P">Perempuan</option>
-                            </select>
+                            <label for="jenis_kelamin">Jenis Kelamin</label>
+                            <div class="btn-group d-flex" role="group">
+                                <button type="button" class="btn btn-outline-secondary flex-fill" data-value="L">
+                                    Laki-laki
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary flex-fill" data-value="P">
+                                    Perempuan
+                                </button>
+                            </div>
+                            <input type="hidden" name="jenis_kelamin" id="jenis_kelamin" value="L">
                             <small class="text-danger" id="msg_jenis_kelamin"></small>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="agama">Agama</label>
                             <select class="form-control select2" id="agama" name="agama">
@@ -104,6 +123,76 @@
                                 <option value="lainnya">Lainnya</option>
                             </select>
                             <small class="text-danger" id="msg_agama"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="status">Status Perkawinan</label>
+                            <select class="form-control select2" id="status" name="status">
+                                <option value="">-- Pilih Status --</option>
+                                <option value="belum menikah">Belum Menikah</option>
+                                <option value="menikah">Menikah</option>
+                                <option value="cerai hidup">Cerai Hidup</option>
+                                <option value="cerai mati">Cerai Mati</option>
+                            </select>
+                            <small class="text-danger" id="msg_status"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="ijazah">Ijazah</label>
+                            <input type="text" class="form-control" id="ijazah" name="ijazah">
+                            <small class="text-danger" id="msg_ijazah"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="jurusan">Jurusan</label>
+                            <input type="text" class="form-control" id="jurusan" name="jurusan">
+                            <small class="text-danger" id="msg_jurusan"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="tahun_lulus">Tahun Lulus</label>
+                            <input type="text" class="form-control" id="tahun_lulus" name="tahun_lulus">
+                            <small class="text-danger" id="msg_tahun_lulus"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="tinggi_badan">TB</label>
+                                    <input type="text" class="form-control" id="tinggi_badan" name="tinggi_badan">
+                                    <small class="text-danger" id="msg_tinggi_badan"></small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="berat_badan">BB</label>
+                                    <input type="text" class="form-control" id="berat_badan" name="berat_badan">
+                                    <small class="text-danger" id="msg_berat_badan"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="norek">No Rekening</label>
+                            <input type="text" maxlength="20" class="form-control" id="norek" name="norek">
+                            <small class="text-danger" id="msg_norek"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="nama_bank">Nama Bank</label>
+                            <input type="text" class="form-control" id="nama_bank" name="nama_bank">
+                            <small class="text-danger" id="msg_nama_bank"></small>
                         </div>
                     </div>
                 </div>
@@ -151,81 +240,23 @@
                     </div>
                 </div>
                 <div class="row mb-2">
-                    <div class="col-md-5">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label for="alamat">Alamat Dusun/rw/rt</label>
-                            <input type="text" class="form-control" id="alamat" name="alamat">
+                            <textarea class="form-control" id="alamat" name="alamat" rows="2" placeholder="Enter ..."></textarea>
                             <small class="text-danger" id="msg_alamat"></small>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="tinggi_badan">TB</label>
-                            <input type="text" class="form-control" id="tinggi_badan" name="tinggi_badan">
-                            <small class="text-danger" id="msg_tinggi_badan"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="berat_badan">BB</label>
-                            <input type="text" class="form-control" id="berat_badan" name="berat_badan">
-                            <small class="text-danger" id="msg_berat_badan"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="nama_bank">Nama Bank</label>
-                            <input type="text" class="form-control" id="nama_bank" name="nama_bank">
-                            <small class="text-danger" id="msg_nama_bank"></small>
-                        </div>
-                    </div>
                 </div>
-                <div class="row mb-2">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="ijazah">Ijazah</label>
-                            <input type="text" class="form-control" id="ijazah" name="ijazah">
-                            <small class="text-danger" id="msg_ijazah"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="jurusan">Jurusan</label>
-                            <input type="text" class="form-control" id="jurusan" name="jurusan">
-                            <small class="text-danger" id="msg_jurusan"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="tahun_lulus">Tahun Lulus</label>
-                            <input type="text" class="form-control" id="tahun_lulus" name="tahun_lulus">
-                            <small class="text-danger" id="msg_tahun_lulus"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="norek">No Rekening</label>
-                            <input type="text" maxlength="20" class="form-control" id="norek" name="norek">
-                            <small class="text-danger" id="msg_norek"></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="nama_ibu_kandung">Nama Ibu Kandung</label>
-                            <input type="text" class="form-control" id="nama_ibu_kandung" name="nama_ibu_kandung">
-                            <small class="text-danger" id="msg_nama_ibu_kandung"></small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" id="username" name="username">
                             <small class="text-danger" id="msg_username"></small>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="password">Password</label>
                             <input type="text" class="form-control" id="password" name="password">
@@ -243,6 +274,15 @@
     </div>
 @endsection
 @section('script')
+    <script>
+        document.querySelectorAll('.btn-group button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('jenis_kelamin').value = this.dataset.value;
+            });
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $('.select2').select2({

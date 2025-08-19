@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Inspeksi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Anggota;
-use App\Models\Anggota_level;
+use App\Models\Jabatan;
+use App\Models\Karyawan;
 use App\Models\wilayah;
 use App\Models\Level;
 use Illuminate\Http\Request;
@@ -37,19 +38,19 @@ class AnggotaController extends Controller
      */
     public function detail($id)
     {
-        $anggota = Anggota::with('level_aktif')->findOrFail($id);
+        $anggota = Anggota::with('karyawan')->findOrFail($id);
 
         return view('inspeksi.anggota.detail', compact('anggota'));
     }
 
-
     public function create()
     {
         $provinsi   = Wilayah::whereRaw('LENGTH(kode)=2')->get();
+        $jabatan    = Jabatan::all();
         $level      = level::all();
 
         $title = "Register Anggota";
-        return view('inspeksi.anggota.create')->with(compact('title', 'provinsi', 'level'));
+        return view('inspeksi.anggota.create')->with(compact('title', 'jabatan', 'provinsi', 'level'));
     }
 
     public function ambil_kab($kode)
@@ -108,6 +109,7 @@ class AnggotaController extends Controller
             "jurusan",
             "tahun_lulus",
             "nama_ibu_kandung",
+            "jabatan",
             "username",
             "password",
         ]);
@@ -135,6 +137,7 @@ class AnggotaController extends Controller
             'tahun_lulus'       => 'required',
             'nama_ibu_kandung'  => 'required',
             'username'          => 'required',
+            'jabatan'           => 'required',
             'password'          => 'required',
         ];
 
@@ -167,28 +170,11 @@ class AnggotaController extends Controller
             'jurusan'           => $request->jurusan,
             'tahun_lulus'       => $request->tahun_lulus,
             'nama_ibu_kandung'  => $request->nama_ibu_kandung,
+            'jabatan'           => $request->jabatan,
             'username'          => $request->username,
             'password'          => Hash::make($request->password),
         ]);
 
-        $tanggal = explode('/', $data['tanggal_masuk']);
-        $hari = $tanggal[0];
-        $bulan = $tanggal[1];
-        $tahun = $tanggal[2];
-
-        $anggotaLevel = Anggota_level::where([
-            ['tanggal_masuk', 'LIKE', $tahun . '-%'],
-            ['level_id', $data['level']]
-        ])->orderBy('id_urutan', 'DESC')->first();
-        $urutanId = $anggotaLevel ? $anggotaLevel->id_urutan + 1 : 1;
-
-        $anggotaLevel = Anggota_level::create([
-            'anggota_id' => $Anggota->id,
-            'tanggal_masuk' => (string) Tanggal::tglNasional($request->tanggal_lahir),
-            'level_id' => $data['level'],
-            'id_urutan' => $urutanId,
-            'status' => 'aktif',
-        ]);
         return response()->json([
             'success' => true,
             'msg' => 'Anggota berhasil ditambahkan!',
@@ -208,12 +194,13 @@ class AnggotaController extends Controller
      */
     public function edit(Anggota $anggotum)
     {
+        $jabatan    = Jabatan::all();
         $level      = Level::all();
         $provinsi   = Wilayah::whereRaw('LENGTH(kode)=2')->get();
 
         $title = "Update Anggota";
 
-        return view('inspeksi.anggota.edit')->with(compact('title', 'provinsi', 'anggotum', 'level'));
+        return view('inspeksi.anggota.edit')->with(compact('title', 'provinsi', 'anggotum', 'level', 'jabatan'));
     }
 
     /**
@@ -245,6 +232,7 @@ class AnggotaController extends Controller
             "tahun_lulus",
             "nama_ibu_kandung",
             "username",
+            "jabatan",
             "password",
         ]);
 
@@ -269,6 +257,7 @@ class AnggotaController extends Controller
             'berat_badan'       => 'required',
             'ijazah'            => 'required',
             'jurusan'           => 'required',
+            'jabatan'           => 'required',
             'tahun_lulus'       => 'required',
             'nama_ibu_kandung'  => 'required',
         ];
@@ -303,32 +292,10 @@ class AnggotaController extends Controller
             'jurusan'           => $request->jurusan,
             'tahun_lulus'       => $request->tahun_lulus,
             'nama_ibu_kandung'  => $request->nama_ibu_kandung,
+            'jabatan'           => $request->jabatan,
             'username'          => $request->username,
             'password'          => $request->password ? Hash::make($request->password) : $anggotum->password,
         ]);
-
-        $tanggal = explode('/', $data['tanggal_masuk']);
-        $hari = $tanggal[0];
-        $bulan = $tanggal[1];
-        $tahun = $tanggal[2];
-
-        $anggotaLevel = Anggota_level::where([
-            ['tanggal_masuk', 'LIKE', $tahun . '-%'],
-            ['level_id', $data['level']]
-        ])->orderBy('id_urutan', 'DESC')->first();
-        $urutanId = $anggotaLevel ? $anggotaLevel->id_urutan + 1 : 1;
-
-        if ($request->level != $anggotum->level_aktif->id) {
-            $anggotaLevel = Anggota_level::where([
-                ['anggota_id', $anggotum->id],
-                ['status', 'aktif']
-            ])->update([
-                'tanggal_masuk' => (string) Tanggal::tglNasional($request->tanggal_lahir),
-                'level_id' => $data['level'],
-                'id_urutan' => $urutanId,
-                'status' => 'aktif',
-            ]);
-        }
 
         return response()->json([
             'success' => true,
@@ -341,13 +308,10 @@ class AnggotaController extends Controller
      */
     public function destroy(Anggota $anggotum)
     {
-        Anggota_level::where('anggota_id', $anggotum->id)->delete();
-
+        if (Karyawan::where('anggota_id', $anggotum->id)->exists()) {
+            return response()->json(['success' => false, 'msg' => 'Anggota ini tidak dapat dihapus karena sudah terdaftar sebagai karyawan.']);
+        }
         $anggotum->delete();
-
-        return response()->json([
-            'success' => true,
-            'msg' => 'Anggota dan level terkait berhasil dihapus.',
-        ]);
+        return response()->json(['success' => true, 'msg' => 'Anggota berhasil dihapus.']);
     }
 }

@@ -49,4 +49,8 @@ class Anggota extends Authenticatable
     {
         return $this->belongsTo(Jabatan::class, 'jabatan');
     }
+    public function group()
+    {
+        return $this->hasMany(Group::class, 'mandor', 'id');
+    }
 }
