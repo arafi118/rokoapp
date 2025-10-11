@@ -10,4 +10,5 @@ Route::prefix('mandor')->middleware(['auth', 'mandor'])->group(function () {
 
   Route::get('/karyawan', [KaryawanController::class, 'index']);
   Route::get('/absensi-karyawan', [AbsensiController::class, 'index']);
+  Route::post('/absensi-karyawan', [AbsensiController::class, 'store']);
 });
