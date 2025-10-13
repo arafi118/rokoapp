@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('group_id')->constrained('group');
             $table->string('jadwal')->nullable();
             $table->date('tanggal')->nullable();
-            $table->time('jam')->nullable();
+            $table->time('jam_masuk')->nullable();
+            $table->time('jam_keluar')->nullable();
             $table->enum('status', ['H', 'S', 'I', 'A', 'T'])->nullable();
             $table->timestamps();
         });

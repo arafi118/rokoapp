@@ -40,17 +40,23 @@ class AbsensiController extends Controller
         $jadwal = Jadwal::where('hari', $hari)->first();
 
         $presensi = Absensi::where('karyawan_id', $karyawan->id)->where('tanggal', $tanggal)->first();
-        if (!$presensi) {
+        if ($data['absensi'] == 'masuk') {
             $presensi = Absensi::create([
                 'karyawan_id' => $karyawan->id,
                 'group_id' => $karyawan->group_id,
                 'jadwal' => $jadwal->id,
                 'tanggal' => $tanggal,
-                'jam' => $data['waktu'],
+                'jam_masuk' => $data['waktu'],
                 'status' => (strtotime($data['waktu']) > strtotime($jadwal->jam_masuk)) ? "T" : "H",
             ]);
         } else {
-            throw new \Exception("Karyawan sudah absen pada hari ini");
+            $presensi = Absensi::where('karyawan_id', $karyawan->id)->where('tanggal', $tanggal)->first();
+            if (!$presensi) {
+                throw new \Exception("Belum absens masuk");
+            }
+
+            $presensi->jam_keluar = $data['waktu'];
+            $presensi->save();
         }
 
         return response()->json([
