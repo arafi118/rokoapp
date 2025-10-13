@@ -204,6 +204,7 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
     <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/dataTables.rowReorder.js"></script>
     <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/rowReorder.bootstrap5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
@@ -232,6 +233,26 @@
         });
     </script>
     <!--end::OverlayScrollbars Configure-->
+
+    <script>
+        $(document).on('click', '#btnLogout', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Yakin mau logout?',
+                text: "Kamu akan keluar dari sistem.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#formLogout').submit();
+                }
+            });
+        });
+    </script>
 
     @yield('script')
 </body>

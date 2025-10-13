@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Inspeksi\AbsensiController;
 use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
 use App\Http\Controllers\Inspeksi\LevelController;
@@ -34,6 +35,10 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('group/list', [GroupController::class, 'list']);
   Route::resource('group', GroupController::class);
 
+  Route::get('/absensi-karyawan', [AbsensiController::class, 'index']);
+  Route::post('/absensi-karyawan', [AbsensiController::class, 'store']);
+
+  Route::get('/laporan-absensi', [AbsensiController::class, 'laporan']);
   //Logout route
 
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

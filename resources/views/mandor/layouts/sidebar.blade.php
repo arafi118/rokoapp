@@ -29,9 +29,12 @@
 
     <li class="nav-header">Logout</li>
     <li class="nav-item">
-        <a href="/" class="nav-link">
+        <a href="#" id="btnLogout" class="nav-link">
             <i class="nav-icon bi bi-box-arrow-right"></i>
             <p>Logout</p>
         </a>
+        <form id="formLogout" action="{{ route('logout') }}" method="POST" style="display:none;">
+            @csrf
+        </form>
     </li>
 </ul>

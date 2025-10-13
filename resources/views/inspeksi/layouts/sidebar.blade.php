@@ -57,6 +57,21 @@
             <p>Jadwal</p>
         </a>
     </li>
+
+    <li class="nav-header">Absensi</li>
+    <li class="nav-item">
+        <a href="/inspeksi/absensi-karyawan" class="nav-link">
+            <i class="nav-icon bi bi-calendar-check"></i>
+            <p>Absensi Karyawan</p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="/inspeksi/laporan-absensi" class="nav-link">
+            <i class="nav-icon bi bi-file-earmark-spreadsheet"></i>
+            <p>Laporan Kehadiran</p>
+        </a>
+    </li>
+
     <li class="nav-header">Logout</li>
     <li class="nav-item">
         <a href="#" id="btnLogout" class="nav-link">
