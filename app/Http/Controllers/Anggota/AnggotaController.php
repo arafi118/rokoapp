@@ -30,7 +30,7 @@ class AnggotaController extends Controller
 
         // Ambil data anggota
         $anggota = Anggota::find($user->id);
-       
+
         $karyawan = Karyawan::where('anggota_id', $anggota->id)
             ->where('status', 'aktif')
             ->first();
@@ -40,7 +40,7 @@ class AnggotaController extends Controller
                 ->with('error', 'Anda tidak terdaftar sebagai karyawan aktif.');
         }
 
-        $qrCode = QrCode::size(100)->generate($anggota->id);
+        $qrCode = QrCode::size(100)->generate($anggota->nik);
 
         return view('anggota.create', compact('anggota', 'karyawan', 'qrCode', 'title'));
     }
@@ -130,40 +130,40 @@ class AnggotaController extends Controller
         $produksi = Produksi::where('karyawan_id', $karyawan->id)->get();
         $qrCode = QrCode::size(70)->generate($anggota->id);
 
-        return view('anggota.cetak', compact('anggota', 'produksi', 'qrCode','title'));
+        return view('anggota.cetak', compact('anggota', 'produksi', 'qrCode', 'title'));
     }
 
 
 
-  /**
-   * Display the specified resource.
-   */
-  public function show(Anggota $anggota)
-  {
-    //
-  }
+    /**
+     * Display the specified resource.
+     */
+    public function show(Anggota $anggota)
+    {
+        //
+    }
 
-  /**
-   * Show the form for editing the specified resource.
-   */
-  public function edit(Anggota $anggota)
-  {
-    //
-  }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Anggota $anggota)
+    {
+        //
+    }
 
-  /**
-   * Update the specified resource in storage.
-   */
-  public function update(Request $request, Anggota $anggota)
-  {
-    //
-  }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Anggota $anggota)
+    {
+        //
+    }
 
-  /**
-   * Remove the specified resource from storage.
-   */
-  public function destroy(Anggota $anggota)
-  {
-    //
-  }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Anggota $anggota)
+    {
+        //
+    }
 }

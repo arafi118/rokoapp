@@ -124,7 +124,7 @@
             $('#nikAnggota').text(data.getanggota.nik);
             $('#alamatAnggota').text(data.getanggota.alamat);
             $('#ttlAnggota').text(data.getanggota.tempat_lahir);
-            $('#fotoAnggota').attr('src', (data.getanggota.foto.length > 3) ? '/storage/profil/' + data.getanggota
+            $('#fotoAnggota').attr('src', (data.getanggota.foto) ? '/storage/profil/' + data.getanggota
                 .foto :
                 '/assets/img/default-150x150.png');
             $('#masaKerja').text(data.masa_kerja);

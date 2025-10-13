@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Mandor;
 use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use App\Models\Anggota;
+use App\Models\Jadwal;
+use App\Models\Karyawan;
 use Illuminate\Http\Request;
 
 class AbsensiController extends Controller
@@ -25,34 +27,69 @@ class AbsensiController extends Controller
 
         $tanggal = date('Y-m-d');
         $anggota = Anggota::where('nik', $data['nik'])->first();
-
         if (!$anggota) {
+            throw new \Exception("Anggota tidak ditemukan");
+        }
+
+        $karyawan = Karyawan::where('anggota_id', $anggota->id)->first();
+        if (!$karyawan) {
             throw new \Exception("Karyawan tidak ditemukan");
         }
 
-        if ($data['absensi'] == 'masuk') {
+        $hari = $this->namaHari($tanggal);
+        $jadwal = Jadwal::where('hari', $hari)->first();
+
+        $presensi = Absensi::where('karyawan_id', $karyawan->id)->where('tanggal', $tanggal)->first();
+        if (!$presensi) {
             $presensi = Absensi::create([
-                'user_id' => $anggota->id,
+                'karyawan_id' => $karyawan->id,
+                'group_id' => $karyawan->group_id,
+                'jadwal' => $jadwal->id,
                 'tanggal' => $tanggal,
-                'waktu' => $data['waktu'],
-                'jam_masuk' => $data['waktu'],
-                'jam_pulang' => null,
-                'status' => 'masuk',
+                'jam' => $data['waktu'],
+                'status' => (strtotime($data['waktu']) > strtotime($jadwal->jam_masuk)) ? "T" : "H",
             ]);
         } else {
-            $presensi = Absensi::where('user_id', $anggota->id)->where('tanggal', $tanggal)->first();
-
-            if (!$presensi) {
-                throw new \Exception("Belum absens masuk");
-            }
-
-            $presensi->jam_pulang = $data['waktu'];
-            $presensi->save();
+            throw new \Exception("Karyawan sudah absen pada hari ini");
         }
 
         return response()->json([
             'success'  => true,
             'msg' => $anggota->nama . " berhasil absen " . $data['absensi'] . " pada " . $data['waktu'],
         ]);
+    }
+
+    private function namaHari($tanggal)
+    {
+        $hari = date('D', strtotime($tanggal));
+
+        switch ($hari) {
+            case 'Sun':
+                $nama = "Minggu";
+                break;
+            case 'Mon':
+                $nama = "Senin";
+                break;
+            case 'Tue':
+                $nama = "Selasa";
+                break;
+            case 'Wed':
+                $nama = "Rabu";
+                break;
+            case 'Thu':
+                $nama = "Kamis";
+                break;
+            case 'Fri':
+                $nama = "Jumat";
+                break;
+            case 'Sat':
+                $nama = "Sabtu";
+                break;
+            default:
+                $nama = "Tidak diketahui";
+                break;
+        }
+
+        return $nama;
     }
 }

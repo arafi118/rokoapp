@@ -9,7 +9,7 @@
 
                     <input type="hidden" name="nik" id="nik">
                     <input type="hidden" name="waktu" id="waktu">
-                    <div class="mb-6">
+                    <div class="mb-3">
                         <label for="absensi" class="form-label">Jenis Absen</label>
                         <select id="absensi" name="absensi" class="select2 form-select form-select-lg"
                             data-allow-clear="true">
