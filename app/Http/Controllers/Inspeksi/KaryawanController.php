@@ -5,15 +5,24 @@ namespace App\Http\Controllers\Inspeksi;
 use App\Http\Controllers\Controller;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class KaryawanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $data = Karyawan::select('*');
+            return DataTables::eloquent($data)
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        return view('inspeksi.karyawan.index', ['title' => 'Data Karyawan']);
     }
 
     /**

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Inspeksi\AbsensiController;
 use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
+use App\Http\Controllers\Inspeksi\MejaController;
 use App\Http\Controllers\Inspeksi\LevelController;
 use App\Http\Controllers\Inspeksi\RencanaController;
 use App\Http\Controllers\Inspeksi\KaryawanController;
@@ -39,6 +40,10 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::post('/absensi-karyawan', [AbsensiController::class, 'store']);
 
   Route::get('/laporan-absensi', [AbsensiController::class, 'laporan']);
+
+  //Meja routes
+  Route::resource('meja', MejaController::class);
+
   //Logout route
 
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

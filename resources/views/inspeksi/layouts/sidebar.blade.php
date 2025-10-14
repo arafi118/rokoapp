@@ -14,6 +14,13 @@
         </a>
     </li>
     <li class="nav-item">
+        <a href="/inspeksi/meja" class="nav-link">
+            <i class="nav-icon bi bi-table"></i>
+            <p>Meja</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a href="/inspeksi/rencana" class="nav-link">
             <i class="nav-icon bi bi-calendar-check"></i>
             <p>Rencana</p>
