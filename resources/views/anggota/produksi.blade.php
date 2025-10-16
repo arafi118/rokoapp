@@ -1,4 +1,5 @@
 @extends('anggota.layouts.base')
+
 @section('content')
     @php
         use Carbon\Carbon;
@@ -25,28 +26,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($data as $row)
+                    @foreach ($data as $row)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-center">{{ $row->jumlah_baik }}</td>
                             <td class="text-center">{{ $row->jumlah_buruk }}</td>
                             <td class="text-center">{{ $row->jumlah_buruk2 }}</td>
-                            <td class="text-center">{{ $row->jumlah_baik + $row->jumlah_buruk + $row->jumlah_buruk2 }}</td>
+                            <td class="text-center">
+                                {{ $row->jumlah_baik + $row->jumlah_buruk + $row->jumlah_buruk2 }}
+                            </td>
                             <td class="text-center">
                                 {{ \Carbon\Carbon::parse($row->tanggal)->locale('id')->translatedFormat('d F Y') }}
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td class="text-center" colspan="6">Tidak Ada Data</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="">
-
     </div>
 @endsection
 
@@ -57,8 +53,14 @@
                 responsive: true,
                 lengthChange: true,
                 autoWidth: false,
-                pageLength: 10
-                // opsi yang bisa bikin data hilang dihapus
+                pageLength: 10,
+                language: {
+                    emptyTable: "Tidak ada data tersedia"
+                },
+                columnDefs: [{
+                    targets: '_all',
+                    defaultContent: ''
+                }]
             });
         });
     </script>
