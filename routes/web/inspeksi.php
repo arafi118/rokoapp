@@ -5,6 +5,7 @@ use App\Http\Controllers\Inspeksi\AbsensiController;
 use App\Http\Controllers\Inspeksi\InspeksiController;
 use App\Http\Controllers\Inspeksi\AnggotaController;
 use App\Http\Controllers\Inspeksi\MejaController;
+use App\Http\Controllers\Inspeksi\TempatKerjaController;
 use App\Http\Controllers\Inspeksi\LevelController;
 use App\Http\Controllers\Inspeksi\RencanaController;
 use App\Http\Controllers\Inspeksi\KaryawanController;
@@ -31,6 +32,9 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //Karyawan routes
   Route::resource('karyawan', KaryawanController::class);
+
+  //Tempat Kerja routes
+  Route::resource('tempat-kerja', TempatKerjaController::class);
 
   //Group routes
   Route::get('group/list', [GroupController::class, 'list']);

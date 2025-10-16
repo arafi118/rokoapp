@@ -59,6 +59,13 @@
         </a>
     </li>
     <li class="nav-item">
+        <a href="/inspeksi/tempat-kerja" class="nav-link">
+            <i class="nav-icon bi bi-building"></i>
+            <p>Tempat Kerja Karyawan</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a href="/" class="nav-link">
             <i class="nav-icon bi bi-calendar-event"></i>
             <p>Jadwal</p>
