@@ -100,6 +100,7 @@
 
 @section('script')
     <script>
+        var PERPINDAHAN_MEJA_KARYAWAN = [];
         $(document).ready(function() {
             ['touchstart', 'touchmove', 'wheel'].forEach(evt => {
                 document.addEventListener(evt, () => {}, {
@@ -124,7 +125,6 @@
 
             drake.on('drop', (el, container) => {
                 if (!$(el).hasClass('pc-kanban-wrapper')) {
-
                     const item = el;
                     const tujuan = container;
 
@@ -132,6 +132,19 @@
                     var meja_saat_ini = $(item).attr('data-meja-saat-ini');
                     var meja_tujuan = $(tujuan).attr('data-meja');
 
+                    const data = PERPINDAHAN_MEJA_KARYAWAN.find(x => parseInt(x.id) == parseInt(id));
+                    const dataIndex = PERPINDAHAN_MEJA_KARYAWAN.findIndex(x => x.id == id);
+                    if (dataIndex >= 0) {
+                        PERPINDAHAN_MEJA_KARYAWAN.splice(dataIndex, 1);
+                    }
+
+                    PERPINDAHAN_MEJA_KARYAWAN.push({
+                        id: id,
+                        meja_saat_ini: meja_saat_ini,
+                        meja_tujuan: meja_tujuan
+                    })
+
+                    $("[data-id-karyawan='" + id + "']").attr("data-meja-saat-ini", meja_tujuan);
                     return $(el).removeClass('kanban-dragging')
                 }
             });
