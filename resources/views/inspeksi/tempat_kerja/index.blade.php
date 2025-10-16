@@ -2,64 +2,37 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="tab-content">
-                        <div class="tab-pane show active" role="tabpanel">
-                            <div class="pc-kanban-wrapper d-flex flex-wrap gap-3">
-                                <div class="pc-kanban-column col-12" style="min-width: 100%;">
-                                    <div class="pc-kanban-header bg-primary text-white py-3 rounded text-center">
-                                        <span class="fw-bold">KELOMPOK 1</span>
-                                    </div>
-                                    <div class="pc-kanban-body mt-2 mb-0 min-vh-80">
-                                        <div class="pc-kanban-cards row g-0">
-                                            @for ($i = 0; $i < 48; $i++)
-                                                <div class="col-2 p-1">
-                                                    <div class="card shadow-sm text-center draggable mb-0">
-                                                        <div class="card-body py-2">
-                                                            <a href="#" data-bs-toggle="modal"
-                                                                data-bs-target="#ViewKaryawan"
-                                                                class="text-decoration-none text-dark">P. 29880132</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endfor
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="pc-kanban-column col-12" style="min-width: 100%;">
-                                    <div class="pc-kanban-header bg-primary text-white py-3 rounded text-center">
-                                        <span class="fw-bold">KELOMPOK 1</span>
-                                    </div>
-                                    <div class="pc-kanban-body mt-2 mb-0 min-vh-80">
-                                        <div class="pc-kanban-cards row g-0">
-                                            @for ($i = 0; $i < 48; $i++)
-                                                <div class="col-2 p-1">
-                                                    <div class="card shadow-sm text-center draggable mb-0">
-                                                        <div class="card-body py-2">
-                                                            <a href="#" data-bs-toggle="modal"
-                                                                data-bs-target="#ViewKaryawan"
-                                                                class="text-decoration-none text-dark">P. 29880132</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endfor
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="pc-kanban-column col-12" style="min-width: 100%;">
-                                    <div class="pc-kanban-header bg-primary text-white py-3 rounded text-center">
-                                        <span class="fw-bold">KELOMPOK 1</span>
-                                    </div>
-                                    <div class="pc-kanban-body mt-2 mb-0 min-vh-80">
-                                        <div class="pc-kanban-cards row g-0">
-                                            @for ($i = 0; $i < 48; $i++)
-                                                <div class="col-2 p-1">
-                                                    <div class="card shadow-sm text-center draggable mb-0">
-                                                        <div class="card-body py-2">
-                                                            <a href="#" data-bs-toggle="modal"
-                                                                data-bs-target="#ViewKaryawan"
-                                                                class="text-decoration-none text-dark">P. 29880132</a>
+            <div class="tab-content">
+                <div class="tab-pane show active" role="tabpanel">
+                    <div class="row">
+                        @for ($k = 1; $k <= 8; $k++)
+                            <div class="col-md-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                @php
+                                                    $warna = rand(0, 255) . ',' . rand(0, 255) . ',' . rand(0, 255);
+                                                @endphp
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="kanban"
+                                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;"
+                                                            data-meja="{{ $k }}-{{ $m }}">
+                                                            @for ($a = 1; $a <= 4; $a++)
+                                                                <div class="card shadow-sm text-center"
+                                                                    style="background-color: rgb({{ $warna }});"
+                                                                    data-meja-saat-ini="{{ $k }}-{{ $m }}"
+                                                                    data-id-karyawan="{{ $a * $m }}">
+                                                                    <div class="card-body py-2">
+                                                                        <a href="#" data-bs-toggle="modal"
+                                                                            data-bs-target="#ViewKaryawan"
+                                                                            class="text-decoration-none text-dark"
+                                                                            style="font-size: 10px;">P.
+                                                                            {{ $a * $m }}</a>
+                                                                    </div>
+                                                                </div>
+                                                            @endfor
                                                         </div>
                                                     </div>
                                                 </div>
@@ -68,7 +41,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endfor
                     </div>
                 </div>
             </div>
@@ -134,17 +107,33 @@
                 });
             });
 
-            const drake = dragula($('.pc-kanban-cards').toArray(), {
+            const drake = dragula($('.kanban').toArray(), {
                 mirrorContainer: document.body,
                 revertOnSpill: true,
-                moves: (el, src, handle) => !$(handle).closest('.dropdown').length
+                moves: (el, src, handle) => {
+                    return !($(handle).closest('.dropdown').length || $(el).hasClass(
+                        'pc-kanban-wrapper'))
+                }
             });
 
-            drake.on('drag', el => $(el).addClass('kanban-dragging'));
-            drake.on('dragend', el => $(el).removeClass('kanban-dragging'));
+            drake.on('drag', (el, src, handle) => {
+                if (!$(el).hasClass('pc-kanban-wrapper')) {
+                    return $(el).addClass('kanban-dragging')
+                }
+            });
 
-            $('.pc-kanban-body').each(function() {
-                new SimpleBar(this);
+            drake.on('drop', (el, container) => {
+                if (!$(el).hasClass('pc-kanban-wrapper')) {
+
+                    const item = el;
+                    const tujuan = container;
+
+                    var id = $(item).attr('data-id-karyawan');
+                    var meja_saat_ini = $(item).attr('data-meja-saat-ini');
+                    var meja_tujuan = $(tujuan).attr('data-meja');
+
+                    return $(el).removeClass('kanban-dragging')
+                }
             });
         });
     </script>

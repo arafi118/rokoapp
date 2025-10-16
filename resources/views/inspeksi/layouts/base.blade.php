@@ -20,26 +20,12 @@
     <meta name="supported-color-schemes" content="light dark" />
 
     <!-- Favicon -->
-    <link rel="icon" href="https://berrydashboard.io/codeignitor/default/public/assets/images/favicon.svg"
-        type="image/x-icon">
-
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
     <!-- Icons -->
-    <link rel="stylesheet"
-        href="https://berrydashboard.io/codeignitor/default/public/assets/fonts/phosphor/duotone/style.css">
-    <link rel="stylesheet"
-        href="https://berrydashboard.io/codeignitor/default/public/assets/fonts/tabler-icons.min.css">
-    <link rel="stylesheet" href="https://berrydashboard.io/codeignitor/default/public/assets/fonts/feather.css">
-    <link rel="stylesheet" href="https://berrydashboard.io/codeignitor/default/public/assets/fonts/fontawesome.css">
-    <link rel="stylesheet" href="https://berrydashboard.io/codeignitor/default/public/assets/fonts/material.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-        crossorigin="anonymous" />
-
-    <!-- Plugin CSS -->
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css"
         integrity="sha512-f0tzWhCwVFS3WeYaofoLWkTP62ObhewQ1EZn65oSYDZUg1+CyywGKkWzm8BxaJj5HGKI72PnMH9jYyIFz+GH7g=="
@@ -57,10 +43,6 @@
     <!-- Template CSS -->
     <link rel="preload" href="/assets/css/adminlte.css" as="style" />
     <link rel="stylesheet" href="/assets/css/adminlte.min.css?v=3.2.0">
-    <link rel="stylesheet" href="https://berrydashboard.io/codeignitor/default/public/assets/css/style.css"
-        id="main-style-link">
-    <link rel="stylesheet" href="https://berrydashboard.io/codeignitor/default/public/assets/css/style-preset.css">
-
     <!-- Inline custom -->
     <style>
         .modal-backdrop.show {
@@ -213,16 +195,12 @@
     <script src="/assets/js/adminlte.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/plugins/popper.min.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/plugins/simplebar.min.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/icon/custom-font.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/script.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/theme.js"></script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/plugins/feather.min.js"></script>
     <script>
         layout_change('light');
     </script>
-    <script src="https://berrydashboard.io/codeignitor/default/public/assets/js/plugins/dragula.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js"
+        integrity="sha512-MrA7WH8h42LMq8GWxQGmWjrtalBjrfIzCQ+i2EZA26cZ7OBiBd/Uct5S3NP9IBqKx5b+MMNH1PhzTsk6J9nPQQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         $(document).ready(function() {
             $('.select2').select2({
