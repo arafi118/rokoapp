@@ -131,4 +131,26 @@ class AbsensiController extends Controller
 
         return $nama;
     }
+    
+    private function namaBulan($tanggal)
+    {
+        $bulanList = [
+            1 => '01. JANUARI',
+            2 => '02. FEBRUARI',
+            3 => '03. MARET',
+            4 => '04. APRIL',
+            5 => '05. MEI',
+            6 => '06. JUNI',
+            7 => '07. JULI',
+            8 => '08. AGUSTUS',
+            9 => '09. SEPTEMBER',
+            10 => '10. OKTOBER',
+            11 => '11. NOVEMBER',
+            12 => '12. DESEMBER',
+        ];
+
+        $bulan = date('n', strtotime($tanggal));
+        return $bulanList[$bulan] ?? 'Tidak diketahui';
+    }
+
 }
