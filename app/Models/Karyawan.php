@@ -19,4 +19,14 @@ class Karyawan extends Model
     {
         return $this->belongsTo(Anggota::class, 'anggota_id');
     }
+
+    public function getabsensi()
+    {
+        return $this->hasMany(Absensi::class, 'karyawan_id');
+    }
+
+    public function getproduksi()
+    {
+        return $this->hasMany(Produksi::class, 'karyawan_id');
+    }
 }

@@ -40,6 +40,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::post('/absensi-karyawan', [AbsensiController::class, 'store']);
 
   Route::get('/laporan-absensi', [AbsensiController::class, 'laporan']);
+  Route::post('/laporan-absensi', [AbsensiController::class, 'cetak']);
 
   //Meja routes
   Route::resource('meja', MejaController::class);

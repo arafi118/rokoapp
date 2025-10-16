@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Inspeksi;
 use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use App\Models\Anggota;
+use App\Models\Group;
 use App\Models\Jadwal;
 use App\Models\Karyawan;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class AbsensiController extends Controller
@@ -65,7 +67,36 @@ class AbsensiController extends Controller
         ]);
     }
 
-    public function laporan() {}
+    public function laporan()
+    {
+        $groups = Group::all();
+
+        $title = 'Laporan Kehadiran';
+        return view('inspeksi.absensi.laporan')->with(compact('title', 'groups'));
+    }
+
+    public function cetak(Request $request)
+    {
+        $data = $request->only([
+            "minggu_ke",
+            "kelompok",
+        ]);
+
+        $minggu_ke = explode('#', $data['minggu_ke']);
+        $tanggal_awal = $minggu_ke[0];
+        $tanggal_akhir = $minggu_ke[1];
+
+        $kelompok = Group::where('id', $data['kelompok'])->first();
+
+        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])->where('group_id', $data['kelompok'])->with([
+            'getkaryawan.getanggota',
+            'getkaryawan.getproduksi' => function ($query) use ($tanggal_awal, $tanggal_akhir) {
+                $query->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir]);
+            },
+        ])->get();
+
+        return Pdf::loadView('inspeksi.absensi.cetak', compact('kelompok', 'absensi', 'tanggal_awal', 'tanggal_akhir'))->setPaper('a4', 'landscape')->stream();
+    }
 
     private function namaHari($tanggal)
     {

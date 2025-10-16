@@ -11,4 +11,9 @@ class Absensi extends Model
     protected $table = 'absensi';
 
     protected $guarded = ['id'];
+
+    public function getkaryawan()
+    {
+        return $this->belongsTo(Karyawan::class, 'karyawan_id');
+    }
 }
