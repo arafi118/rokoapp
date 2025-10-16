@@ -144,10 +144,16 @@
                         meja_tujuan: meja_tujuan
                     })
 
+                    // Request auto update
+                    // ------------------
+
                     $("[data-id-karyawan='" + id + "']").attr("data-meja-saat-ini", meja_tujuan);
                     return $(el).removeClass('kanban-dragging')
                 }
             });
+
+            // Request update banyak data
+            // --------------------------
         });
     </script>
 @endsection

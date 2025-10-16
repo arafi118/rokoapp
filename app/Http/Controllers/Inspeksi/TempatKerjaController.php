@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inspeksi;
 
 use App\Http\Controllers\Controller;
+use App\Models\Absensi;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,6 +16,11 @@ class TempatKerjaController extends Controller
      */
     public function index(Request $request)
     {
+        $statusAbsen = Absensi::where('tanggal', date('Y-m-d'))->where('status_absensi', 'close')->first();
+        if ($statusAbsen) {
+            return "Web tidak bisa dibuka";
+        }
+
         if ($request->ajax()) {
             $data = Karyawan::select('*');
             return DataTables::eloquent($data)
