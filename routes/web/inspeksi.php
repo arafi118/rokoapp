@@ -10,6 +10,8 @@ use App\Http\Controllers\Inspeksi\LevelController;
 use App\Http\Controllers\Inspeksi\RencanaController;
 use App\Http\Controllers\Inspeksi\KaryawanController;
 use App\Http\Controllers\Inspeksi\GroupController;
+use App\Http\Controllers\Inspeksi\LaporanController;
+use App\Http\Controllers\Inspeksi\PelaporanController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
@@ -46,6 +48,11 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('/laporan-absensi', [AbsensiController::class, 'laporan']);
   Route::post('/laporan-absensi', [AbsensiController::class, 'cetak']);
 
+  //Pelaporan
+  Route::get('/laporan', [PelaporanController::class, 'index']);
+  Route::get('/pelaporan/preview', [PelaporanController::class, 'preview']);
+  Route::get('/pelaporan/sub_laporan/{file}', [PelaporanController::class, 'subLaporan']);
+  
   //Meja routes
   Route::resource('meja', MejaController::class);
 
