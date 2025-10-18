@@ -36,7 +36,9 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::resource('karyawan', KaryawanController::class);
 
   //Tempat Kerja routes
-  Route::resource('tempat-kerja', TempatKerjaController::class);
+  Route::get('tempat-kerja', [TempatKerjaController::class, 'index']);
+  Route::put('tempat-kerja/update-banyak', [TempatKerjaController::class, 'updateBanyak']);
+  Route::put('tempat-kerja/{id}', [TempatKerjaController::class, 'update']);
 
   //Group routes
   Route::get('group/list', [GroupController::class, 'list']);
@@ -52,7 +54,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('/laporan', [PelaporanController::class, 'index']);
   Route::get('/pelaporan/preview', [PelaporanController::class, 'preview']);
   Route::get('/pelaporan/sub_laporan/{file}', [PelaporanController::class, 'subLaporan']);
-  
+
   //Meja routes
   Route::resource('meja', MejaController::class);
 

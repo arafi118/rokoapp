@@ -16,4 +16,14 @@ class Absensi extends Model
     {
         return $this->belongsTo(Karyawan::class, 'karyawan_id');
     }
+
+    public function getmeja()
+    {
+        return $this->belongsTo(Meja::class, 'meja_id');
+    }
+
+    public function getgroup()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
 }
