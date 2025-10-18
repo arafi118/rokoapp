@@ -15,4 +15,9 @@ class Group extends Model
     {
         return $this->belongsTo(Anggota::class, 'mandor');
     }
+
+    public function getkaryawan()
+    {
+        return $this->hasMany(Karyawan::class, 'group_id');
+    }
 }

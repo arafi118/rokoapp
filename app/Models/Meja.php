@@ -9,7 +9,5 @@ class Meja extends Model
 {
     use HasFactory;
     protected $table = 'meja';
-    protected $fillable = [
-        'nama_meja',
-    ];
+    protected $guarded = ['id'];
 }

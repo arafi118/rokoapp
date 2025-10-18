@@ -29,4 +29,14 @@ class Karyawan extends Model
     {
         return $this->hasMany(Produksi::class, 'karyawan_id');
     }
+
+    public function getgroup()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+
+    public function getmeja()
+    {
+        return $this->belongsTo(Meja::class, 'meja_id');
+    }
 }
