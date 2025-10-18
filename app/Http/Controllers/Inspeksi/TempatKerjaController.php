@@ -135,38 +135,38 @@ class TempatKerjaController extends Controller
 
         DB::beginTransaction();
 
-        try {
-            foreach ($data as $item) {
-                $groupId = null;
-                $mejaId = null;
-                if (isset($item['meja_tujuan'])) {
-                    $parts = explode('-', $item['meja_tujuan']);
-                    if (count($parts) >= 2) {
-                        [$groupId, $mejaId] = $parts;
-                    }
-                }
-                Absensi::where('karyawan_id', $item['id'])
-                    ->whereDate('tanggal', now()->format('Y-m-d'))
-                    ->update([
-                        'group_id'     => $groupId,
-                        'meja_id'      => $mejaId,
-                        'status_absen' => 'close',
-                    ]);
+        foreach ($data as $item) {
+            // Tentukan meja yang akan digunakan
+            $mejaFinal = $item['meja_tujuan'] ?? $item['meja_saat_ini'];
+
+            // Jika meja_tujuan sama dengan meja_saat_ini, tetap pakai meja_saat_ini
+            if (isset($item['meja_tujuan']) && $item['meja_tujuan'] === $item['meja_saat_ini']) {
+                $mejaFinal = $item['meja_saat_ini'];
             }
 
-            DB::commit();
+            $groupId = null;
+            $mejaId = null;
+            if ($mejaFinal) {
+                $parts = explode('-', $mejaFinal);
+                if (count($parts) >= 2) {
+                    [$groupId, $mejaId] = $parts;
+                }
+            }
 
-            return response()->json([
-                'success' => true,
-                'msg' => 'Semua karyawan berhasil disimpan dan status diubah menjadi close!'
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'msg' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
-            ], 500);
+            Absensi::where('karyawan_id', $item['id'])
+                ->whereDate('tanggal', now()->format('Y-m-d'))
+                ->update([
+                    'group_id'     => $groupId,
+                    'meja_id'      => $mejaId,
+                    'status_absen' => 'close',
+                ]);
         }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Semua karyawan berhasil disimpan dan status diubah menjadi close!'
+        ]);
     }
 }
