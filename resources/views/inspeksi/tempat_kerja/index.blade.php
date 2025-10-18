@@ -162,29 +162,28 @@
                     }
                 });
             });
+
             $(document).on('click', '#SimpanTempatKerja', function(e) {
                 e.preventDefault();
 
-                let dataKirim = PERPINDAHAN_MEJA_KARYAWAN;
+                let dataKirim = [];
 
-                if (dataKirim.length === 0) {
-                    dataKirim = [];
-                    $('.kanban .card').each(function() {
-                        const el = $(this);
-                        const id = el.data('id-karyawan');
-                        const mejaSaatIni = el.data('meja-saat-ini');
-                        const mejaTujuan = el.data(
-                            'meja-saat-ini');
-
-                        dataKirim.push({
-                            id: id,
-                            meja_saat_ini: mejaSaatIni,
-                            meja_tujuan: mejaTujuan
-                        });
+                $('.kanban .card').each(function() {
+                    const el = $(this);
+                    dataKirim.push({
+                        id: el.data('id-karyawan'),
+                        meja_saat_ini: el.data('meja-saat-ini'),
+                        meja_tujuan: el.data('meja-tujuan')
+                    });
+                });
+                if (Array.isArray(PERPINDAHAN_MEJA_KARYAWAN) && PERPINDAHAN_MEJA_KARYAWAN.length > 0) {
+                    PERPINDAHAN_MEJA_KARYAWAN.forEach((ubah) => {
+                        const index = dataKirim.findIndex(d => d.id === ubah.id);
+                        if (index !== -1) {
+                            dataKirim[index].meja_tujuan = ubah.meja_tujuan;
+                        }
                     });
                 }
-
-                console.log('Data yang dikirim:', dataKirim);
 
                 const formData = new FormData();
                 formData.append('_method', 'PUT');
@@ -204,8 +203,7 @@
                             confirmButtonText: 'Kembali ke Dashboard'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href =
-                                    '/';
+                                window.location.href = '/';
                             }
                         });
                     },
@@ -218,7 +216,6 @@
                         });
                     }
                 });
-
             });
 
         });

@@ -137,50 +137,35 @@ class TempatKerjaController extends Controller
 
         try {
             foreach ($data as $item) {
-                $validator = Validator::make($item, [
-                    'id' => 'required|integer|exists:karyawan,id',
-                    'meja_saat_ini' => 'required|string',
-                    'meja_tujuan' => 'required|string',
-                ]);
-
-                if ($validator->fails()) {
-                    continue;
+                $groupId = null;
+                $mejaId = null;
+                if (isset($item['meja_tujuan'])) {
+                    $parts = explode('-', $item['meja_tujuan']);
+                    if (count($parts) >= 2) {
+                        [$groupId, $mejaId] = $parts;
+                    }
                 }
-
-                $groupTujuan = explode('-', $item['meja_tujuan'])[0] ?? null;
-                $mejaTujuan  = explode('-', $item['meja_tujuan'])[1] ?? null;
-
-                if (!$groupTujuan || !$mejaTujuan) {
-                    continue;
-                }
-
-                $absensi = Absensi::where('karyawan_id', $item['id'])
-                    ->whereDate('tanggal', date('Y-m-d'))
-                    ->first();
-
-                if (!$absensi) {
-                    continue;
-                }
-
-                $absensi->update([
-                    'group_id'      => $groupTujuan,
-                    'meja_id'       => $mejaTujuan,
-                    'status_absen'  => 'close',
-                ]);
+                Absensi::where('karyawan_id', $item['id'])
+                    ->whereDate('tanggal', now()->format('Y-m-d'))
+                    ->update([
+                        'group_id'     => $groupId,
+                        'meja_id'      => $mejaId,
+                        'status_absen' => 'close',
+                    ]);
             }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'msg' => 'Semua perpindahan berhasil disimpan!'
+                'msg' => 'Semua karyawan berhasil disimpan dan status diubah menjadi close!'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
                 'success' => false,
-                'msg' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'msg' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
             ], 500);
         }
     }
