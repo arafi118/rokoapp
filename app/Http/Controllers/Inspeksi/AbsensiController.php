@@ -87,7 +87,6 @@ class AbsensiController extends Controller
         $tanggal_akhir = $minggu_ke[1];
 
         $kelompok = Group::where('id', $data['kelompok'])->first();
-
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])->where('group_id', $data['kelompok'])->with([
             'getkaryawan.getanggota',
             'getkaryawan.getproduksi' => function ($query) use ($tanggal_awal, $tanggal_akhir) {
@@ -95,7 +94,34 @@ class AbsensiController extends Controller
             },
         ])->get();
 
-        return Pdf::loadView('inspeksi.absensi.cetak', compact('kelompok', 'absensi', 'tanggal_awal', 'tanggal_akhir'))->setPaper('a4', 'landscape')->stream();
+        $absenMingguan = [];
+        foreach ($absensi as $a) {
+            if (!isset($absenMingguan[$a->getkaryawan->id])) {
+                $absenMingguan[$a->getkaryawan->id] = [
+                    'kode_karyawan' => $a->getkaryawan->kode_karyawan,
+                    "nama" => $a->getkaryawan->getanggota->nama,
+                    "absensi" => [
+                        $a->tanggal => [
+                            'tanggal' => $a->tanggal,
+                            'status' => $a->status,
+                            'produksi' => $a->getkaryawan->getproduksi,
+                            'jam_masuk' => $a->jam_masuk,
+                            'jam_keluar' => $a->jam_keluar
+                        ]
+                    ]
+                ];
+            } else {
+                $absenMingguan[$a->getkaryawan->id]['absensi'][$a->tanggal] = [
+                    'tanggal' => $a->tanggal,
+                    'status' => $a->status,
+                    'produksi' => $a->getkaryawan->getproduksi,
+                    'jam_masuk' => $a->jam_masuk,
+                    'jam_keluar' => $a->jam_keluar
+                ];
+            }
+        }
+
+        return Pdf::loadView('inspeksi.absensi.cetak', compact('kelompok', 'absenMingguan', 'tanggal_awal', 'tanggal_akhir'))->setPaper('a4', 'landscape')->stream();
     }
 
     private function namaHari($tanggal)
@@ -131,7 +157,7 @@ class AbsensiController extends Controller
 
         return $nama;
     }
-    
+
     private function namaBulan($tanggal)
     {
         $bulanList = [
@@ -152,5 +178,4 @@ class AbsensiController extends Controller
         $bulan = date('n', strtotime($tanggal));
         return $bulanList[$bulan] ?? 'Tidak diketahui';
     }
-
 }
