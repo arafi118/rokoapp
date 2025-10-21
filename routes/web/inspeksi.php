@@ -37,7 +37,6 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //Tempat Kerja routes
   Route::get('tempat-kerja', [TempatKerjaController::class, 'index']);
-  Route::get('tempat-kerja/update-banyak-karyawan', [TempatKerjaController::class, 'updateBanyakKaryawan']);
   Route::put('tempat-kerja/update-banyak', [TempatKerjaController::class, 'updateBanyak']);
   Route::put('tempat-kerja/{id}', [TempatKerjaController::class, 'update']);
 
@@ -63,3 +62,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+Route::get('/cron/update-banyak-karyawan', [TempatKerjaController::class, 'updateBanyakKaryawan'])
+  ->withoutMiddleware(['auth', 'inspeksi'])
+  ->name('cron.updateBanyakKaryawan');
