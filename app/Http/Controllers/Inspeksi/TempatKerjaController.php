@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Utils\Tanggal;
 
 class TempatKerjaController extends Controller
@@ -136,10 +137,8 @@ class TempatKerjaController extends Controller
         DB::beginTransaction();
 
         foreach ($data as $item) {
-            // Tentukan meja yang akan digunakan
             $mejaFinal = $item['meja_tujuan'] ?? $item['meja_saat_ini'];
 
-            // Jika meja_tujuan sama dengan meja_saat_ini, tetap pakai meja_saat_ini
             if (isset($item['meja_tujuan']) && $item['meja_tujuan'] === $item['meja_saat_ini']) {
                 $mejaFinal = $item['meja_saat_ini'];
             }
@@ -168,5 +167,41 @@ class TempatKerjaController extends Controller
             'success' => true,
             'msg' => 'Semua karyawan berhasil disimpan dan status diubah menjadi close!'
         ]);
+    }
+
+    public function updateBanyakKaryawan()
+    {
+        DB::beginTransaction();
+
+        try {
+            $latestDate = Absensi::max('tanggal');
+
+            if (!$latestDate) {
+                Log::info('Tidak ada data absensi untuk diperbarui.');
+                DB::rollBack();
+                return;
+            }
+
+            $absensi = Absensi::where('tanggal', $latestDate)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            foreach ($absensi as $absen) {
+                DB::table('karyawan')
+                    ->where('id', $absen->karyawan_id)
+                    ->update([
+                        'group_id'   => $absen->group_id,
+                        'meja_id'    => $absen->meja_id,
+                        'updated_at' => now(),
+                    ]);
+            }
+
+            DB::commit();
+
+            Log::info("Update banyak karyawan berhasil pada tanggal: {$latestDate}");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal update banyak karyawan: ' . $e->getMessage());
+        }
     }
 }

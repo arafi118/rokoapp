@@ -37,6 +37,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //Tempat Kerja routes
   Route::get('tempat-kerja', [TempatKerjaController::class, 'index']);
+  Route::get('tempat-kerja/update-banyak-karyawan', [TempatKerjaController::class, 'updateBanyakKaryawan']);
   Route::put('tempat-kerja/update-banyak', [TempatKerjaController::class, 'updateBanyak']);
   Route::put('tempat-kerja/{id}', [TempatKerjaController::class, 'update']);
 
