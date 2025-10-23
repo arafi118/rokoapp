@@ -37,16 +37,16 @@ class RencanaController extends Controller
                             data-rencana_produksi="' . $row->rencana_produksi . '"
                             data-rencana_kehadiran="' . $row->rencana_kehadiran . '"
                             data-rencana_karyawan="' . $row->rencana_karyawan . '">
-                            <i class="fas fa-edit"></i>
+                            <i class="bi bi-pencil-square"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">
-                            <i class="fas fa-trash-alt"></i>
+                            <i class="bi bi-trash"></i>
                         </button>
                     ';
                     }
                     return '
                         <button class="btn btn-sm btn-secondary" disabled title="Hanya data terbaru yang bisa diubah">
-                            <i class="fas fa-lock"></i> Terkunci
+                            <i class="bi bi-lock"></i> Terkunci
                         </button>';
                 })
                 ->rawColumns(['action'])
