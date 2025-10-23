@@ -71,13 +71,22 @@ class PelaporanController extends Controller
         $laporan = $request->get('laporan');
         $data = $request->all();
 
+        $data['tahun'] = $data['tahun'] ?? date('Y');
+        $data['bulan'] = $data['bulan'] ?? date('m');
+        $data['hari']  = $data['hari'] ?? null;
+
         if (method_exists($this, $laporan)) {
             return $this->$laporan($data);
         }
 
         if (view()->exists("inspeksi.pelaporan.laporan.{$laporan}")) {
-            return view("inspeksi.pelaporan.laporan.{$laporan}", compact('data'));
-        }
+        return view("inspeksi.pelaporan.laporan.{$laporan}", [
+            'data' => $data,
+            'tahun' => $data['tahun'],
+            'bulan' => $data['bulan'],
+            'hari' => $data['hari'],
+        ]);
+    }
 
         abort(404, 'Laporan tidak ditemukan');
     }

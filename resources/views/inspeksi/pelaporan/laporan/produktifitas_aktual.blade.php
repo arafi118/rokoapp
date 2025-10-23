@@ -56,7 +56,7 @@
 <table class="header-info" style="margin: 20px auto;">
     <tr>
         <td width="13%">BULAN</td>
-        <td>: Oktober 2025</td>
+        <td>: {{ App\Utils\Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
     </tr>
     <tr>
         <td>LOKASI</td>
