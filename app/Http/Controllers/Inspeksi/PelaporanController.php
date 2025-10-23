@@ -230,19 +230,20 @@ class PelaporanController extends Controller
 
     private function komposisi_karyawan(array $data)
     {
-        $data['title'] = 'Volume Produksi';
+       $data['title'] = 'Komposisi Karyawan';
 
         $view = view('inspeksi.pelaporan.laporan.komposisi_karyawan', $data)->render();
 
-        $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+       $pdf = PDF::loadHTML($view)
+       ->setPaper('a3', 'landscape')
+       ->setOptions([
+        'margin-top'    => 10,
+        'margin-bottom' => 10,
+        'margin-left'   => 10,
+        'margin-right'  => 10,
+        'enable-local-file-access' => true,
+       ]);
+
 
         return $pdf->stream();
     }

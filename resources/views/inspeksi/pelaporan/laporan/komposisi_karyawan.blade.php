@@ -53,7 +53,7 @@
         text-align: center;
     }
 </style>
-
+<title>{{ $title }}</title>
 <div class="title">KOMPOSISI KARYAWAN</div>
 
 <table class="header-info">
@@ -76,15 +76,43 @@
 <table>
     <thead>
         <tr>
-            <th rowspan="2" width="5%">WEEK</th>
-            <th rowspan="2" width="10%">TANGGAL</th>
-            <th rowspan="2" width="8%">HARI</th>
+            <th rowspan="2" width="2%">WEEK</th>
+            <th rowspan="2" width="3%">TANGGAL</th>
+            <th rowspan="2" width="3%">HARI</th>
             <th colspan="6">GILING</th>
             <th colspan="6">GUNTING</th>
             <th colspan="6">PACKING</th>
             <th colspan="6">BANDEROL</th>
+            <th colspan="6">OPP</th>
+            <th colspan="6">MOP</th>
+            <th colspan="6">TOTAL KARYAWAN</th>
+            <th colspan="6">%KOMPOSISI KARYAWAN</th>
         </tr>
         <tr>
+            <th>E</th>
+            <th>D</th>
+            <th>C</th>
+            <th>B</th>
+            <th>A</th>
+            <th>TOTAL</th>
+            <th>E</th>
+            <th>D</th>
+            <th>C</th>
+            <th>B</th>
+            <th>A</th>
+            <th>TOTAL</th>
+            <th>E</th>
+            <th>D</th>
+            <th>C</th>
+            <th>B</th>
+            <th>A</th>
+            <th>TOTAL</th>
+            <th>E</th>
+            <th>D</th>
+            <th>C</th>
+            <th>B</th>
+            <th>A</th>
+            <th>TOTAL</th>
             <th>E</th>
             <th>D</th>
             <th>C</th>
@@ -114,6 +142,30 @@
     <tbody>
         <tr class="yellow center">
             <td colspan="3">Terdaftar Bulan Lalu</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -168,16 +220,111 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr class="yellow">
             <td colspan="3">Total</td>
-            <td colspan="24"></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
 
         <tr>
             <td>36</td>
             <td>06-Oct-25</td>
             <td>Senin</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -231,11 +378,59 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr>
             <td></td>
             <td>08-Oct-25</td>
             <td>Rabu</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -289,11 +484,59 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr>
             <td></td>
             <td>10-Oct-25</td>
             <td>Jumat</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -347,6 +590,30 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr class="minggu">
             <td></td>
@@ -376,9 +643,57 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr class="yellow">
             <td colspan="3">Total</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -433,11 +748,59 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr>
             <td></td>
             <td>14-Oct-25</td>
             <td>Selasa</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -491,11 +854,59 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr>
             <td></td>
             <td>16-Oct-25</td>
             <td>Kamis</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -549,11 +960,59 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr>
             <td></td>
             <td>18-Oct-25</td>
             <td>Sabtu</td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
             <td> </td>
             <td></td>
             <td></td>
@@ -607,9 +1066,57 @@
             <td></td>
             <td></td>
             <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
         </tr>
         <tr class="yellow">
             <td colspan="3">Total</td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td> </td>
+            <td> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td> </td>
             <td></td>
             <td></td>
