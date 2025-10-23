@@ -97,17 +97,17 @@
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a href="#" class="dropdown-item text-info d-flex align-items-center gap-2 btn-detail" data-id="${data}">
-                                            <i class="fas fa-eye text-info"></i> Detail
+                                            <i class="bi bi-info-circle text-info"></i> Detail
                                         </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item text-warning d-flex align-items-center gap-2" href="/inspeksi/anggota/${data}/edit">
-                                            <i class="fas fa-edit text-warning"></i> Edit
+                                            <i class="bi bi-pencil-square text-warning"></i> Edit
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#" class="dropdown-item text-danger d-flex align-items-center gap-2 btn-delete" data-id="${data}">
-                                            <i class="fas fa-trash-alt text-danger"></i> Hapus
+                                            <i class="bi bi-trash text-danger"></i> Hapus
                                         </a>
                                     </li>
                                 </ul>

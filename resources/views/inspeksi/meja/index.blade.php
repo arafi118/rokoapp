@@ -77,10 +77,10 @@
                                     data-id="${data.id}"
                                     data-nama="${data.nama}"
                                     data-kode="${data.kode}">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="bi bi-pencil-square"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger btn-delete" data-id="${data.id}">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="bi bi-trash"></i>
                                 </button>
                             </div>`
                     }
