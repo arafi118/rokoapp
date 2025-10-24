@@ -36,7 +36,7 @@
                         <small class="text-danger" id="msg_tanggal_masuk"></small>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 tanggal-keluar-wrapper">
                     <div class="form-group">
                         <label for="tanggal_keluar">Tanggal Keluar</label>
                         <input type="text" class="form-control date" id="tanggal_keluar" name="tanggal_keluar"

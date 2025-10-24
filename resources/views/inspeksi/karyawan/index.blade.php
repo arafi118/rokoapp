@@ -178,7 +178,7 @@
                     cache: true
                 }
             });
-
+            // Tombol Tambah
             $('#btnTambah').click(() => {
                 formKaryawan.trigger('reset');
                 idKaryawan.val('');
@@ -187,21 +187,20 @@
                 formKaryawan.find('input[name="_method"]').remove();
                 formTitle.text("Tambah Karyawan Baru");
                 formContainer.removeClass("card-warning").addClass("card-primary").slideDown();
+                $('.tanggal-keluar-wrapper').hide();
 
-                $('#tanggal_keluar').closest('.col-md-4').hide();
                 $('#tanggal_masuk').prop('disabled', false);
                 $('#anggota_id').prop('disabled', false);
             });
 
+            // Tombol Edit
             $(document).on('click', '.btnEdit', function() {
                 let d = $(this).data();
                 idKaryawan.val(d.id);
                 $('#tanggal_masuk').val(d.tanggal).prop('disabled', true);
 
-                formContainer.slideDown(() => {
-                    $('#tanggal_keluar').closest('.col-md-2')
-                        .show();
-                });
+                formContainer.slideDown();
+                $('.tanggal-keluar-wrapper').show();
 
                 $('#group_id').empty().append(new Option(d.group_nama, d.group, true, true)).trigger(
                     'change');
