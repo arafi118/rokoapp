@@ -10,8 +10,7 @@ use App\Http\Controllers\Inspeksi\LevelController;
 use App\Http\Controllers\Inspeksi\RencanaController;
 use App\Http\Controllers\Inspeksi\KaryawanController;
 use App\Http\Controllers\Inspeksi\GroupController;
-use App\Http\Controllers\Inspeksi\LaporanController;
-use App\Http\Controllers\Inspeksi\PelaporanController;
+use App\Http\Controllers\PelaporanController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {

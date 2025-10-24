@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Inspeksi;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\JenisLaporan;
@@ -15,8 +15,8 @@ class PelaporanController extends Controller
         $laporan = JenisLaporan::where('file', '!=', '0')
             ->orderBy('urut', 'ASC')
             ->get();
-
-        return view('inspeksi.pelaporan.index', compact('title', 'laporan'));
+        
+        return view('pelaporan.index', compact('title', 'laporan'));
     }
 
     public function subLaporan($file)
@@ -59,7 +59,7 @@ class PelaporanController extends Controller
             ];
         }
 
-        return view('inspeksi.pelaporan.partials.sub_laporan', [
+        return view('pelaporan.partials.sub_laporan', [
             'type' => 'select',
             'sub_laporan' => $sub_laporan
         ]);
@@ -79,8 +79,8 @@ class PelaporanController extends Controller
             return $this->$laporan($data);
         }
 
-        if (view()->exists("inspeksi.pelaporan.laporan.{$laporan}")) {
-        return view("inspeksi.pelaporan.laporan.{$laporan}", [
+        if (view()->exists("pelaporan.laporan.{$laporan}")) {
+        return view("pelaporan.laporan.{$laporan}", [
             'data' => $data,
             'tahun' => $data['tahun'],
             'bulan' => $data['bulan'],
@@ -94,7 +94,7 @@ class PelaporanController extends Controller
     private function karyawan(array $data)
     {
         $sub = $data['sub_laporan'] ?? 'terdaftar';
-        $viewPath = "inspeksi.pelaporan.laporan.karyawan_{$sub}";
+        $viewPath = "pelaporan.laporan.karyawan_{$sub}";
 
         if (!view()->exists($viewPath)) {
             abort(404, "View untuk sub laporan {$sub} tidak ditemukan");
@@ -131,7 +131,7 @@ class PelaporanController extends Controller
     {
         $data['title'] = 'Volume Produksi';
 
-        $view = view('inspeksi.pelaporan.laporan.volume_produksi', $data)->render();
+        $view = view('pelaporan.laporan.volume_produksi', $data)->render();
 
         $pdf = PDF::loadHTML($view)
         ->setPaper('a4', 'landscape')
@@ -151,9 +151,9 @@ class PelaporanController extends Controller
         $sub = $data['sub_laporan'] ?? 'jam_kerja_aktual';
 
         if (str_starts_with($sub, 'jam_kerja_')) {
-        $viewPath = "inspeksi.pelaporan.laporan.{$sub}";
+        $viewPath = "pelaporan.laporan.{$sub}";
         } else {
-            $viewPath = "inspeksi.pelaporan.laporan.jam_kerja_{$sub}";
+            $viewPath = "pelaporan.laporan.jam_kerja_{$sub}";
         }
 
         if (!view()->exists($viewPath)) {
@@ -181,7 +181,7 @@ class PelaporanController extends Controller
     private function kapasitas(array $data)
     {
         $sub = $data['sub_laporan'] ?? 'stick_hours';
-        $viewPath = "inspeksi.pelaporan.laporan.kapasitas_{$sub}";
+        $viewPath = "pelaporan.laporan.kapasitas_{$sub}";
 
         if (!view()->exists($viewPath)) {
             abort(404, "View untuk sub laporan {$sub} tidak ditemukan");
@@ -211,7 +211,7 @@ class PelaporanController extends Controller
     private function produktifitas(array $data)
     {
         $sub = $data['sub_laporan'] ?? 'produktifitas_aktual';
-        $viewPath = "inspeksi.pelaporan.laporan.{$sub}";
+        $viewPath = "pelaporan.laporan.{$sub}";
 
         if (!view()->exists($viewPath)) {
             abort(404, "View untuk sub laporan {$sub} tidak ditemukan");
@@ -241,7 +241,7 @@ class PelaporanController extends Controller
     {
        $data['title'] = 'Komposisi Karyawan';
 
-        $view = view('inspeksi.pelaporan.laporan.komposisi_karyawan', $data)->render();
+        $view = view('pelaporan.laporan.komposisi_karyawan', $data)->render();
 
        $pdf = PDF::loadHTML($view)
        ->setPaper('a3', 'landscape')

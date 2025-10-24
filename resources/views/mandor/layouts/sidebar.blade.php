@@ -26,7 +26,13 @@
             <p>Validasi Pendataan</p>
         </a>
     </li>
-
+    <li class="nav-header">Pelaporan</li>
+    <li class="nav-item">
+        <a href="/inspeksi/laporan" class="nav-link">
+            <i class="nav-icon bi bi-calendar-check"></i>
+            <p>Laporan</p>
+        </a>
+    </li>
     <li class="nav-header">Logout</li>
     <li class="nav-item">
         <a href="#" id="btnLogout" class="nav-link">
