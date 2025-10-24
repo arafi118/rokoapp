@@ -28,7 +28,7 @@
     </li>
     <li class="nav-header">Pelaporan</li>
     <li class="nav-item">
-        <a href="/inspeksi/laporan" class="nav-link">
+        <a href="/mandor/laporan" class="nav-link">
             <i class="nav-icon bi bi-calendar-check"></i>
             <p>Laporan</p>
         </a>
