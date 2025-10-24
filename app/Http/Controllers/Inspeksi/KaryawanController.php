@@ -26,7 +26,7 @@ class KaryawanController extends Controller
                 'getlevel',
                 'getgroup',
                 'getmeja'
-            )->select('karyawan.*');
+            )->select('karyawan.*')->where('karyawan.status', 'Aktif');
             return DataTables::eloquent($data)
                 ->addIndexColumn()
                 ->addColumn('status_karyawan', function ($row) {
@@ -38,7 +38,7 @@ class KaryawanController extends Controller
                 ->toJson();
         }
 
-        return view('inspeksi.karyawan.index', ['title' => 'Data Karyawan']);
+        return view('inspeksi.karyawan.index', ['title' => 'Karyawan Aktif']);
     }
 
     public function getgroup(Request $request)

@@ -31,7 +31,7 @@ class AnggotaController extends Controller
                 ->toJson();
         }
 
-        return view('inspeksi.anggota.index', ['title' => 'Data Anggota']);
+        return view('inspeksi.anggota.index', ['title' => 'Data Calon Karyawan']);
     }
     /**
      * Show the form for creating a new resource.

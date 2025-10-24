@@ -70,6 +70,10 @@
         .gu-transit {
             opacity: .3;
         }
+
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            gap: 8px;
+        }
     </style>
 
     @yield('style')

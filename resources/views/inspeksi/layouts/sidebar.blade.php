@@ -29,19 +29,19 @@
     <li class="nav-item">
         <a href="#" class="nav-link">
             <i class="nav-icon bi bi-person-badge"></i>
-            <p>Anggota<i class="nav-arrow bi bi-chevron-right"></i></p>
+            <p>Calon Karyawan<i class="nav-arrow bi bi-chevron-right"></i></p>
         </a>
         <ul class="nav nav-treeview">
             <li class="nav-item">
                 <a href="/inspeksi/anggota/create" class="nav-link">
                     <i class="nav-icon bi bi-dot"></i>
-                    <p>Register Anggota</p>
+                    <p>Register</p>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="/inspeksi/anggota" class="nav-link">
                     <i class="nav-icon bi bi-dot"></i>
-                    <p>Data Anggota</p>
+                    <p>Data Calon Karyawan</p>
                 </a>
             </li>
         </ul>
