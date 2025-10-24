@@ -74,6 +74,27 @@
         div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             gap: 8px;
         }
+
+        .select2-container--bootstrap4 .select2-results__option {
+            background-color: #fff !important;
+            color: #333 !important;
+        }
+
+        .select2-container--bootstrap4 .select2-results__option--highlighted {
+            background-color: #61a7f7 !important;
+            /* warna oranye aktif */
+            color: #fff !important;
+        }
+
+        .select2-dropdown {
+            background-color: #fff !important;
+            border-color: #ccc !important;
+        }
+
+        .select2-search__field {
+            background-color: #fff !important;
+            color: #333 !important;
+        }
     </style>
 
     @yield('style')
