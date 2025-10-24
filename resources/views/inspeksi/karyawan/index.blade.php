@@ -1,21 +1,25 @@
 @extends('inspeksi.layouts.base')
+
 @section('content')
-    @include('inspeksi.group.form')
+    @include('inspeksi.karyawan.form')
     <div class="row mb-2">
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <button id="btnTambah" class="btn btn-success btn-sm">
-                            <i class="bi bi-plus-circle"></i> Tambah Group
+                            <i class="bi bi-plus-circle"></i> Tambah Karyawan
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="group" class="table table-hover table-striped table-bordered">
+                        <table id="karyawan" class="table table-hover table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Mandor</th>
-                                    <th>Nama Kelompok</th>
+                                    <th>Nama Karyawan</th>
+                                    <th>Kode Karyawan</th>
+                                    <th>Group Karyawan</th>
+                                    <th>Tanggal Masuk</th>
+                                    <th>Level</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -26,7 +30,7 @@
         </div>
     </div>
 
-    <form id="FormHapusGroup" method="post">
+    <form id="FormHapusKaryawan" method="post">
         @method('DELETE')
         @csrf
     </form>
@@ -44,21 +48,49 @@
             });
 
             const formContainer = $('#formContainer'),
-                formGroup = $('#FormGroup'),
-                idGroup = $('#id_group'),
+                formKaryawan = $('#FormKaryawan'),
+                idKaryawan = $('#id_karyawan'),
                 formTitle = $('#formTitle');
 
-            const table = $('#group').DataTable({
+            const table = $('#karyawan').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '/inspeksi/group',
+                ajax: '/inspeksi/karyawan',
                 columns: [{
-                        data: 'getmandor.nama',
-                        name: 'getmandor.nama'
+                        data: 'getanggota.nama',
+                        name: 'getanggota.nama',
+                        render: function(data, type, row) {
+                            let badge = '';
+                            let status = (row.status_karyawan || '').toLowerCase();
+
+                            if (status === 'aktif') {
+                                badge = '<span class="badge bg-success ms-2">Aktif</span>';
+                            } else if (status === 'nonaktif') {
+                                badge = '<span class="badge bg-danger ms-2">Nonaktif</span>';
+                            } else {
+                                badge =
+                                    '<span class="badge bg-secondary ms-2">Tidak Diketahui</span>';
+                            }
+
+                            return `${data} ${badge}`;
+                        }
                     },
                     {
-                        data: 'nama',
-                        name: 'nama'
+                        data: 'kode_karyawan',
+                        name: 'kode_karyawan'
+                    },
+                    {
+                        data: 'getgroup.nama',
+                        name: 'getgroup.nama',
+                        defaultContent: '-'
+                    },
+                    {
+                        data: 'tanggal_masuk',
+                        name: 'tanggal_masuk'
+                    },
+                    {
+                        data: 'getlevel.nama',
+                        name: 'getlevel.nama'
                     },
                     {
                         data: null,
@@ -68,88 +100,158 @@
                             <div class="d-inline-flex gap-1">
                                 <button class="btn btn-sm btn-warning btnEdit"
                                     data-id="${data.id}"
-                                    data-nama="${data.nama}"
-                                    data-mandor="${data.getmandor ? data.getmandor.id : ''}"
-                                    data-mandor_nama="${data.getmandor ? data.getmandor.nama : ''}">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                                    data-nama="${data.getanggota?.nama || ''}"
+                                    data-nama_karyawan="${data.getanggota?.nama || ''}"
+                                    data-group="${data.getgroup ? data.getgroup.id : ''}"
+                                    data-group_nama="${data.getgroup ? data.getgroup.nama : ''}"
+                                    data-level="${data.getlevel ? data.getlevel.id : ''}"
+                                    data-level_nama="${data.getlevel ? data.getlevel.nama : ''}"
+                                    data-meja="${data.getmeja ? data.getmeja.id : ''}"
+                                    data-meja_nama="${data.getmeja ? data.getmeja.nama_meja : ''}"
+                                    data-tanggal="${data.tanggal_masuk || ''}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
                                 <button class="btn btn-sm btn-danger btn-delete" data-id="${data.id}">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="bi bi-trash"></i>
                                 </button>
                             </div>`
                     }
                 ]
             });
 
-            // Inisialisasi Select2 untuk Mandor
-            $('#mandor').select2({
+            $('#group_id').select2({
                 theme: 'bootstrap4',
-                placeholder: '-- Pilih Mandor --',
+                placeholder: '-- Pilih Group --',
                 allowClear: true,
                 ajax: {
-                    url: '/inspeksi/group/list',
+                    url: '/inspeksi/karyawan/list-group',
                     dataType: 'json',
                     delay: 250,
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
+                    processResults: data => ({
+                        results: data
+                    }),
                     cache: true
                 }
             });
 
-            // Tambah
-            $('#btnTambah').click(() => {
-                formGroup.trigger('reset');
-                idGroup.val('');
-                formGroup.attr('action', '/inspeksi/group');
-                formGroup.find('input[name="_method"]').remove();
-                formTitle.text("Tambah Group Baru");
-                formContainer.removeClass("card-warning").addClass("card-primary").slideDown();
+            $('#meja_id').select2({
+                theme: 'bootstrap4',
+                placeholder: '-- Pilih Posisi Meja --',
+                allowClear: true,
+                ajax: {
+                    url: '/inspeksi/karyawan/list-meja',
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: data => ({
+                        results: data
+                    }),
+                    cache: true
+                }
             });
 
-            // Edit
+            $('#anggota_id').select2({
+                theme: 'bootstrap4',
+                placeholder: '-- Pilih Anggota --',
+                allowClear: true,
+                ajax: {
+                    url: '/inspeksi/karyawan/list-anggota',
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: data => ({
+                        results: data
+                    }),
+                    cache: true
+                }
+            });
+
+            $('#level_id').select2({
+                theme: 'bootstrap4',
+                placeholder: '-- Pilih Level --',
+                allowClear: true,
+                ajax: {
+                    url: '/inspeksi/karyawan/list-level',
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: data => ({
+                        results: data
+                    }),
+                    cache: true
+                }
+            });
+
+            $('#btnTambah').click(() => {
+                formKaryawan.trigger('reset');
+                idKaryawan.val('');
+                $('#group_id, #meja_id, #anggota_id, #level_id').val(null).trigger('change');
+                formKaryawan.attr('action', '/inspeksi/karyawan');
+                formKaryawan.find('input[name="_method"]').remove();
+                formTitle.text("Tambah Karyawan Baru");
+                formContainer.removeClass("card-warning").addClass("card-primary").slideDown();
+
+                $('#tanggal_keluar').closest('.col-md-4').hide();
+                $('#tanggal_masuk').prop('disabled', false);
+                $('#anggota_id').prop('disabled', false);
+            });
+
             $(document).on('click', '.btnEdit', function() {
                 let d = $(this).data();
+                idKaryawan.val(d.id);
+                $('#tanggal_masuk').val(d.tanggal).prop('disabled', true);
 
-                $('#id_group').val(d.id);
-                $('#nama').val(d.nama);
+                formContainer.slideDown(() => {
+                    $('#tanggal_keluar').closest('.col-md-2')
+                        .show();
+                });
 
-                $('#mandor').find('option').remove();
-                if (d.mandor) {
-                    let option = new Option(d.mandor_nama, d.mandor, true, true);
-                    $('#mandor').append(option).trigger('change');
-                } else {
-                    $('#mandor').val(null).trigger('change');
-                }
+                $('#group_id').empty().append(new Option(d.group_nama, d.group, true, true)).trigger(
+                    'change');
+                $('#anggota_id').empty().append(new Option(d.nama_karyawan, d.anggota, true, true))
+                    .trigger('change').prop('disabled', true);
+                $('#meja_id').empty().append(new Option(d.meja_nama, d.meja, true, true)).trigger('change');
+                $('#level_id').empty().append(new Option(d.level_nama, d.level, true, true)).trigger(
+                    'change');
 
-                $('#FormGroup').attr('action', `/inspeksi/group/${d.id}`);
-                $('#FormGroup').find('input[name="_method"]').remove();
-                $('#FormGroup').append('<input type="hidden" name="_method" value="PUT">');
+                formKaryawan.attr('action', `/inspeksi/karyawan/${d.id}`);
+                formKaryawan.find('input[name="_method"]').remove();
+                formKaryawan.append('<input type="hidden" name="_method" value="PUT">');
 
-                $('#formTitle').text("Edit Group");
-                $('#formContainer').removeClass("card-primary").addClass("card-warning").slideDown();
+                formTitle.text("Edit Karyawan");
+                formContainer.removeClass("card-primary").addClass("card-warning");
             });
 
-            // Batal
+
+            jQuery.datetimepicker.setLocale('de');
+            $('.date').datetimepicker({
+                i18n: {
+                    id: {
+                        months: [
+                            'Januari', 'Februari', 'Maret', 'April',
+                            'Mei', 'Juni', 'Juli', 'Agustus',
+                            'September', 'Oktober', 'November', 'Desember'
+                        ],
+                        dayOfWeekShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                        dayOfWeek: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
+                    }
+                },
+                timepicker: false,
+                format: 'd/m/Y'
+            });
+
             $('#btnCancel').click(() => formContainer.slideUp());
 
-            // Simpan
-            $(document).on('click', '#SimpanGroup', function(e) {
+            $(document).on('click', '#SimpanKaryawan', function(e) {
                 e.preventDefault();
                 $('small').empty();
                 $('.is-invalid').removeClass('is-invalid');
-
-                let url = formGroup.attr('action');
-                $.post(url, formGroup.serialize())
+                let url = formKaryawan.attr('action');
+                $.post(url, formKaryawan.serialize())
                     .done(res => {
                         toast.fire({
                             icon: 'success',
                             title: res.msg
                         });
                         formContainer.slideUp();
-                        table.ajax.reload();
+                        table.ajax.reload(null, false);
                     })
                     .fail(err => {
                         let r = err.responseJSON || {};
@@ -164,11 +266,9 @@
                     });
             });
 
-            // Hapus
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();
                 let id = $(this).data('id');
-
                 Swal.fire({
                     title: "Apakah Anda yakin?",
                     text: "Data akan dihapus permanen!",
@@ -180,7 +280,7 @@
                 }).then(res => {
                     if (res.isConfirmed) {
                         $.ajax({
-                            url: `/inspeksi/group/${id}`,
+                            url: `/inspeksi/karyawan/${id}`,
                             type: 'POST',
                             data: {
                                 _method: 'DELETE',
@@ -190,7 +290,8 @@
                                 Swal.fire(r.success ? "Berhasil!" : "Gagal", r.msg, r
                                         .success ? "success" : "info")
                                     .then(() => {
-                                        if (r.success) table.ajax.reload();
+                                        if (r.success) table.ajax.reload(null,
+                                            false);
                                     });
                             },
                             error: function(xhr) {

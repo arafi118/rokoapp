@@ -9,6 +9,7 @@ class Karyawan extends Model
 {
     use HasFactory;
     protected $table = 'karyawan';
+    protected $guarded = ['id'];
 
     public function getlevel()
     {
