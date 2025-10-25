@@ -99,6 +99,10 @@
         .table-middle tr td {
             vertical-align: middle !important;
         }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 
     @yield('style')

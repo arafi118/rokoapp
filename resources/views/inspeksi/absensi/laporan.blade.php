@@ -90,6 +90,133 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalAbsenKaryawan" tabindex="-1" aria-labelledby="modalAbsenKaryawanLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalAbsenKaryawanLabel">
+                        Edit Absen Karyawan
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body row align-items-center">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="/assets/img/user.png" alt="Foto Profil" class="rounded-circle img-fluid"
+                                    style="max-width: 180px;">
+                                <h5 class="mt-3 fw-bold mb-0">
+                                    <span id="nama-anggota"></span>
+                                </h5>
+                                <h6 class="text-muted">(<span id="nik-anggota"></span>)</h6>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-birthday-cake text-danger me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="tempat-lahir"></span>,
+                                                        <span id="tanggal-lahir"></span>
+                                                    </div>
+                                                    <small class="text-muted">Tempat & Tanggal Lahir</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-graduation-cap text-primary me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="ijazah"></span> - <span
+                                                            id="jurusan"></span>
+                                                        (<span id="tahun-lulus"></span>)</div>
+                                                    <small class="text-muted">Pendidikan Terakhir</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-university text-success me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="nama-bank"></span> - <span
+                                                            id="norek"></span>
+                                                    </div>
+                                                    <small class="text-muted">Informasi Bank</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-venus-mars text-secondary me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold">
+                                                        <span id="jenis-kelamin"></span>
+                                                    </div>
+                                                    <small class="text-muted">Jenis Kelamin</small>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-praying-hands text-warning me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="agama"></span></div>
+                                                    <small class="text-muted">Agama</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-heart text-danger me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="status"></span></div>
+                                                    <small class="text-muted">Status</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-female text-pink me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="nama-ibu"></span></div>
+                                                    <small class="text-muted">Nama Ibu Kandung</small>
+                                                </div>
+                                            </li>
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-ruler-vertical text-dark me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="tinggi-badan"></span> cm /
+                                                        <span id="berat-badan"></span> kg
+                                                    </div>
+                                                    <small class="text-muted">Tinggi & Berat Badan</small>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <ul class="list-unstyled">
+                                            <li class="d-flex align-items-start mb-2">
+                                                <i class="fas fa-map-marker-alt text-info me-2 mt-1 fs-5"></i>
+                                                <div>
+                                                    <div class="fw-bold"><span id="alamat"></span>, <span
+                                                            id="desa"></span>,
+                                                        <span id="kecamatan"></span>, <span id="kota"></span>
+                                                    </div>
+                                                    <small class="text-muted">Alamat Lengkap</small>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="SimpanAbsenKaryawan">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -149,7 +276,10 @@
                         searchable: false
                     }, {
                         data: 'kode_karyawan',
-                        name: 'kode_karyawan'
+                        name: 'kode_karyawan',
+                        render: (data, type, row) => {
+                            return `<span class="detail cursor-pointer">${data}</span>`;
+                        }
                     }, {
                         data: 'getanggota.nama',
                         name: 'getanggota.nama'
@@ -186,27 +316,6 @@
             }
         })
 
-        $(document).on('click', '#SimpanAbsenKaryawan', function(e) {
-            e.preventDefault()
-
-            var form = $('#formEditAbsenKaryawan')
-            $.ajax({
-                url: '/inspeksi/absensi-karyawan/edit',
-                type: 'POST',
-                data: form.serialize(),
-                success: function(response) {
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: response.msg,
-                        icon: 'success',
-                    }).then((res) => {
-                        $('#modalAbsenKaryawan').modal('hide')
-                        table.ajax.reload()
-                    })
-                }
-            })
-        })
-
         $(document).on('change', '.input-select', function(e) {
             e.preventDefault()
 
@@ -237,6 +346,37 @@
                     })
                 }
             })
+        })
+
+        $(document).on('click', '.detail', function(e) {
+            e.preventDefault()
+
+            var data = table.row($(this).parents('tr')).data();
+
+            $('#nama-anggota').text(data.getanggota.nama)
+            $('#nik-anggota').text(data.getanggota.nik)
+
+            $('#tempat-lahir').text(data.getanggota.tempat_lahir)
+            $('#tanggal-lahir').text(data.getanggota.tanggal_lahir)
+            $('#ijazah').text(data.getanggota.ijazah)
+            $('#jurusan').text(data.getanggota.jurusan)
+            $('#tahun-lulus').text(data.getanggota.tahun_lulus)
+            $('#nama-bank').text(data.getanggota.nama_bank)
+            $('#norek').text(data.getanggota.norek)
+            $('#jenis-kelamin').text(data.getanggota.jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan')
+
+            $('#agama').text(data.getanggota.agama)
+            $('#status').text(data.getanggota.status)
+            $('#nama-ibu').text(data.getanggota.nama_ibu)
+            $('#tinggi-badan').text(data.getanggota.tinggi_badan)
+            $('#berat-badan').text(data.getanggota.berat_badan)
+
+            $('#alamat').text(data.getanggota.alamat)
+            $('#desa').text(data.getanggota.desa)
+            $('#kecamatan').text(data.getanggota.kecamatan)
+            $('#kota').text(data.getanggota.kota)
+
+            $('#modalAbsenKaryawan').modal('show')
         })
 
         $(document).on('click', '#cetakLaporan', function(e) {
