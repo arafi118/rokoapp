@@ -30,6 +30,8 @@ class PelaporanController extends Controller
                 ['value' => 'keluar', 'title' => 'Karyawan Keluar'],
                 ['value' => 'dimutasi', 'title' => 'Karyawan Dimutasi'],
                 ['value' => 'kehadiran', 'title' => 'Kehadiran'],
+                ['value' => 'komposisi_karyawan', 'title' => 'Komposisi Karyawan'],
+
             ];
         } 
         elseif ($file == 'jam_kerja') {
@@ -38,13 +40,13 @@ class PelaporanController extends Controller
                 ['value' => 'manhours', 'title' => 'Man Hours'],
             ];
         }
-          elseif ($file == 'produktifitas') {
+        elseif ($file == 'produktifitas') {
             $sub_laporan = [
                 ['value' => 'produktifitas_aktual', 'title' => 'Produktifitas'],
                 ['value' => 'produktifitas_index', 'title' => 'Index Produktifitas'],
             ];
         }
-          elseif ($file == 'kapasitas') {
+        elseif ($file == 'kapasitas') {
             $sub_laporan = [
                 ['value' => 'stick_hours', 'title' => 'Stick / Hours'],
                 ['value' => 'balance_prosses', 'title' => 'Balance Prosses'],
@@ -91,7 +93,7 @@ class PelaporanController extends Controller
         abort(404, 'Laporan tidak ditemukan');
     }
 
-    private function karyawan(array $data)
+   private function karyawan(array $data)
     {
         $sub = $data['sub_laporan'] ?? 'terdaftar';
         $viewPath = "pelaporan.laporan.karyawan_{$sub}";
@@ -107,25 +109,36 @@ class PelaporanController extends Controller
         $data['title_keluar'] = 'Karyawan Keluar';
         $data['title_dimutasi'] = 'Karyawan Dimutasi';
         $data['title_kehadiran'] = 'Kehadiran';
-
-
+        $data['title_komposisi_karyawan'] = 'Komposisi Karyawan';
 
         $data['data_karyawan'] = [];
         $data['judul'] = ucfirst(str_replace('_', ' ', $sub));
 
         $view = view($viewPath, $data)->render();
 
-        $pdf = Pdf::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top' => 20,
-            'margin-bottom' => 20,
-            'margin-left' => 15,
-            'margin-right' => 15,
-        ]);
+        if ($sub === 'komposisi_karyawan') {
+            $pdf = Pdf::loadHTML($view)
+                ->setPaper('a3', 'landscape')
+                ->setOptions([
+                    'margin-top'    => 10,
+                    'margin-bottom' => 10,
+                    'margin-left'   => 10,
+                    'margin-right'  => 10,
+                ]);
+        } else {
+            $pdf = Pdf::loadHTML($view)
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'margin-top'    => 20,
+                    'margin-bottom' => 20,
+                    'margin-left'   => 15,
+                    'margin-right'  => 15,
+                ]);
+        }
 
         return $pdf->stream($data['judul'] . '.pdf');
     }
+
 
     private function volume(array $data)
     {
@@ -237,25 +250,7 @@ class PelaporanController extends Controller
         return $pdf->stream($data['judul'] . '.pdf');
     }
 
-    private function komposisi_karyawan(array $data)
-    {
-       $data['title'] = 'Komposisi Karyawan';
-
-        $view = view('pelaporan.laporan.komposisi_karyawan', $data)->render();
-
-       $pdf = PDF::loadHTML($view)
-       ->setPaper('a3', 'landscape')
-       ->setOptions([
-        'margin-top'    => 10,
-        'margin-bottom' => 10,
-        'margin-left'   => 10,
-        'margin-right'  => 10,
-        'enable-local-file-access' => true,
-       ]);
-
-
-        return $pdf->stream();
-    }
+    
 
 
 
