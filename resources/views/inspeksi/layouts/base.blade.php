@@ -95,6 +95,10 @@
             background-color: #fff !important;
             color: #333 !important;
         }
+
+        .table-middle tr td {
+            vertical-align: middle !important;
+        }
     </style>
 
     @yield('style')

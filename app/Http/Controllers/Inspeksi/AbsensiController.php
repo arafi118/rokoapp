@@ -76,38 +76,35 @@ class AbsensiController extends Controller
         return view('inspeksi.absensi.laporan')->with(compact('title', 'groups'));
     }
 
-    public function absenMingguan()
+    public function absenHarian()
     {
         if (request()->ajax()) {
             $data = [
-                "minggu_ke" => request()->get('minggu_ke'),
+                "tanggal" => request()->get('tanggal'),
                 "kelompok" => request()->get('kelompok'),
             ];
 
-            $minggu_ke = explode('_', $data['minggu_ke']);
-            $tanggal_awal = $minggu_ke[0];
-            $tanggal_akhir = $minggu_ke[1];
+            $tanggal = $data['tanggal'];
 
-            $karyawan = Karyawan::with([
+            $karyawan = Karyawan::select(
+                'karyawan.*',
+                'absensi.status as absen',
+                'absensi.tanggal as tgl_absen',
+                'absensi.group_id as kelompok'
+            )->with([
                 'getlevel',
                 'getanggota',
-                'getabsensi' => function ($query) use ($tanggal_awal, $tanggal_akhir) {
-                    $query->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir]);
-                }
-            ]);
+            ])->leftJoin('absensi', 'karyawan.id', '=', 'absensi.karyawan_id')
+                ->where('absensi.tanggal', $tanggal);
 
-            if ($data['kelompok']) {
-                $karyawan = $karyawan->where('group_id', $data['kelompok']);
+            if ($data['kelompok'] != '') {
+                $karyawan = $karyawan->where('absensi.group_id', $data['kelompok']);
             }
 
-            return DataTables::eloquent($karyawan)
+            $karyawan = $karyawan->get();
+
+            return datatables()->of($karyawan)
                 ->addIndexColumn()
-                ->addColumn('aksi', function ($karyawan) {
-                    return
-                        '<div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-primary text-light btn-detail" data-id="' . $karyawan->id . '"><i class="bi bi-eye"></i></button>
-                        </div>';
-                })
                 ->rawColumns(['aksi'])
                 ->make(true);
         }
@@ -117,43 +114,25 @@ class AbsensiController extends Controller
     {
         $data = $request->only([
             'id_karyawan',
+            'tanggal',
             'absen'
         ]);
 
-        $tanggalAbsen = array_keys($data['absen']);
+
         $absensi = Absensi::where('karyawan_id', $data['id_karyawan'])
-            ->whereIn('tanggal', $tanggalAbsen)->get();
+            ->where('tanggal', $data['tanggal'])->first();
 
-        $tanggalSisa = [];
-        foreach ($tanggalAbsen as $tanggal) {
-            foreach ($absensi as $absen) {
-                if ($absen->tanggal == $tanggal) {
-                    Absensi::where('id', $absen->id)->update([
-                        'status' => $data['absen'][$tanggal]
-                    ]);
-                    break;
-                }
-
-                $tanggalSisa[] = $tanggal;
-            }
-        }
-
-        $dataAbsenBaru = [];
-        foreach ($tanggalSisa as $tanggal) {
-            if ($data['absen'][$tanggal] == 'A') {
-                continue;
-            }
-
-            $dataAbsenBaru[] = [
+        if ($absensi) {
+            Absensi::where('id', $absensi->id)->update([
+                'status' => $data['absen']
+            ]);
+        } else {
+            Absensi::create([
                 'karyawan_id' => $data['id_karyawan'],
                 'group_id' => Karyawan::where('id', $data['id_karyawan'])->first()->group_id,
-                'tanggal' => $tanggal,
-                'status' => $data['absen'][$tanggal],
-            ];
-        }
-
-        if (count($dataAbsenBaru) > 0) {
-            Absensi::insert($dataAbsenBaru);
+                'tanggal' => $data['tanggal'],
+                'status' => $data['absen'],
+            ]);
         }
 
         return response()->json([
