@@ -43,8 +43,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="minggu" class="form-label">Pilih Minggu</label>
-                            <select id="minggu" name="minggu" class="select2 form-select form-select-lg"
+                            <label for="tanggal" class="form-label">Pilih Tanggal</label>
+                            <select id="tanggal" name="tanggal" class="select2 form-select form-select-lg"
                                 style="width: 100%" data-allow-clear="true">
                                 <option value="">-- Select Value --</option>
                             </select>
@@ -116,19 +116,19 @@
 
             const dates = [];
             var newOption = new Option("Pilih Tanggal", "", false, false);
-            $('#minggu').append(newOption);
+            $('#tanggal').append(newOption);
             while (currentDate <= endDate) {
                 const formatted = currentDate.toISOString().split('T')[0];
 
                 var newOption = new Option(formatted, formatted, false, false);
-                $('#minggu').append(newOption);
+                $('#tanggal').append(newOption);
 
                 currentDate.setDate(currentDate.getDate() + 1);
             }
         })
 
-        $(document).on('change', '#minggu,#kelompok', function() {
-            var value = $('#minggu').val()
+        $(document).on('change', '#tanggal,#kelompok', function() {
+            var value = $('#tanggal').val()
             var kelompok = $('#kelompok').val()
 
             if (value) {
