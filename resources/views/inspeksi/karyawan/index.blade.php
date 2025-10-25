@@ -12,7 +12,7 @@
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="karyawan" class="table table-hover table-striped table-bordered">
+                        <table id="karyawan" class="table table-hover table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th>Nama Karyawan</th>

@@ -11,7 +11,7 @@
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table id="group" class="table table-hover table-striped table-bordered">
+                        <table id="group" class="table table-hover table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th>Mandor</th>

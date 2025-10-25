@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="anggota" class="table table-hover table-striped table-bordered">
+                <table id="anggota" class="table table-hover table-striped table-bordered" style="width: 100%;">
                     <thead align="center">
                         <tr>
                             <th>Nama</th>
