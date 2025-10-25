@@ -48,7 +48,9 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::resource('group', GroupController::class);
 
   Route::get('/absensi-karyawan', [AbsensiController::class, 'index']);
+  Route::get('/absensi-karyawan/absensi_mingguan', [AbsensiController::class, 'absenMingguan']);
   Route::post('/absensi-karyawan', [AbsensiController::class, 'store']);
+  Route::post('/absensi-karyawan/edit', [AbsensiController::class, 'update']);
 
   Route::get('/laporan-absensi', [AbsensiController::class, 'laporan']);
   Route::post('/laporan-absensi', [AbsensiController::class, 'cetak']);

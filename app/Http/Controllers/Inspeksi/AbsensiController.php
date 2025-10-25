@@ -10,6 +10,7 @@ use App\Models\Jadwal;
 use App\Models\Karyawan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class AbsensiController extends Controller
 {
@@ -73,6 +74,92 @@ class AbsensiController extends Controller
 
         $title = 'Laporan Kehadiran';
         return view('inspeksi.absensi.laporan')->with(compact('title', 'groups'));
+    }
+
+    public function absenMingguan()
+    {
+        if (request()->ajax()) {
+            $data = [
+                "minggu_ke" => request()->get('minggu_ke'),
+                "kelompok" => request()->get('kelompok'),
+            ];
+
+            $minggu_ke = explode('_', $data['minggu_ke']);
+            $tanggal_awal = $minggu_ke[0];
+            $tanggal_akhir = $minggu_ke[1];
+
+            $karyawan = Karyawan::with([
+                'getlevel',
+                'getanggota',
+                'getabsensi' => function ($query) use ($tanggal_awal, $tanggal_akhir) {
+                    $query->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir]);
+                }
+            ]);
+
+            if ($data['kelompok']) {
+                $karyawan = $karyawan->where('group_id', $data['kelompok']);
+            }
+
+            return DataTables::eloquent($karyawan)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($karyawan) {
+                    return
+                        '<div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary text-light btn-detail" data-id="' . $karyawan->id . '"><i class="bi bi-eye"></i></button>
+                        </div>';
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->only([
+            'id_karyawan',
+            'absen'
+        ]);
+
+        $tanggalAbsen = array_keys($data['absen']);
+        $absensi = Absensi::where('karyawan_id', $data['id_karyawan'])
+            ->whereIn('tanggal', $tanggalAbsen)->get();
+
+        $tanggalSisa = [];
+        foreach ($tanggalAbsen as $tanggal) {
+            foreach ($absensi as $absen) {
+                if ($absen->tanggal == $tanggal) {
+                    Absensi::where('id', $absen->id)->update([
+                        'status' => $data['absen'][$tanggal]
+                    ]);
+                    break;
+                }
+
+                $tanggalSisa[] = $tanggal;
+            }
+        }
+
+        $dataAbsenBaru = [];
+        foreach ($tanggalSisa as $tanggal) {
+            if ($data['absen'][$tanggal] == 'A') {
+                continue;
+            }
+
+            $dataAbsenBaru[] = [
+                'karyawan_id' => $data['id_karyawan'],
+                'group_id' => Karyawan::where('id', $data['id_karyawan'])->first()->group_id,
+                'tanggal' => $tanggal,
+                'status' => $data['absen'][$tanggal],
+            ];
+        }
+
+        if (count($dataAbsenBaru) > 0) {
+            Absensi::insert($dataAbsenBaru);
+        }
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Berhasil update absensi'
+        ]);
     }
 
     public function cetak(Request $request)
