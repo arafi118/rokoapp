@@ -53,7 +53,7 @@
         text-align: center;
     }
 </style>
-<title>{{ $title }}</title>
+<title>{{ $title_komposisi_karyawan }}</title>
 <div class="title">KOMPOSISI KARYAWAN</div>
 
 <table class="header-info">
