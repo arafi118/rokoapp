@@ -229,7 +229,7 @@
         let table;
 
         $(document).on('change', '#minggu_ke', function() {
-            $('#minggu').empty().trigger("change");
+            $('#tanggal').empty().trigger("change");
             var minggu_ke = $('#minggu_ke').val().replace('#', '_')
 
             if (minggu_ke) {
