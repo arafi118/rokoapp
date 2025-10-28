@@ -47,7 +47,7 @@
     }
 </style>
 <h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
-    DATA KARYAWAN DIREKRUT
+    LAPORAN KARYAWAN DIREKRUT
 </h2>
 
 <table class="header-info" style="margin-bottom:10px;">

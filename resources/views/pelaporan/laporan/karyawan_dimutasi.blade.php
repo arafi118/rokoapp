@@ -45,7 +45,7 @@
 </style>
 
 <h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
-    DATA KARYAWAN DIMUTASI
+    LAPORAN KARYAWAN DIMUTASI
 </h2>
 
 <table class="header-info" style="margin-bottom:10px;">
