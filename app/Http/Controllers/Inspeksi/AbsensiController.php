@@ -8,6 +8,7 @@ use App\Models\Anggota;
 use App\Models\Group;
 use App\Models\Jadwal;
 use App\Models\Karyawan;
+use App\Models\Produksi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -90,10 +91,14 @@ class AbsensiController extends Controller
                 'karyawan.*',
                 'absensi.status as absen',
                 'absensi.tanggal as tgl_absen',
-                'absensi.group_id as kelompok'
+                'absensi.group_id as kelompok',
+                'absensi.target_harian as plan'
             )->with([
                 'getlevel',
                 'getanggota',
+                'getproduksi' => function ($query) use ($tanggal) {
+                    $query->where('tanggal', $tanggal);
+                }
             ])->leftJoin('absensi', 'karyawan.id', '=', 'absensi.karyawan_id')
                 ->where('absensi.tanggal', $tanggal);
 
@@ -138,6 +143,68 @@ class AbsensiController extends Controller
         return response()->json([
             'success' => true,
             'msg' => 'Berhasil update absensi'
+        ]);
+    }
+
+    public function inputPlan(Request $request)
+    {
+        $data = $request->only([
+            'id',
+            'tanggal',
+            'plan'
+        ]);
+
+        $absensi = Absensi::where('karyawan_id', $data['id'])
+            ->where('tanggal', $data['tanggal'])->first();
+
+        if ($absensi) {
+            Absensi::where('id', $absensi->id)->update([
+                'target_harian' => $data['plan']
+            ]);
+        } else {
+            Absensi::create([
+                'karyawan_id' => $data['id'],
+                'group_id' => Karyawan::where('id', $data['id'])->first()->group_id,
+                'tanggal' => $data['tanggal'],
+                'target_harian' => $data['plan'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Target harian berhasil diinput'
+        ]);
+    }
+
+    public function inputActual(Request $request)
+    {
+        $data = $request->only([
+            'id',
+            'tanggal',
+            'actual'
+        ]);
+
+        $produksi = Produksi::where('karyawan_id', $data['id'])
+            ->where('tanggal', $data['tanggal'])->first();
+
+        if ($produksi) {
+            Produksi::where('id', $produksi->id)->update([
+                'jumlah_baik' => $data['actual']
+            ]);
+        } else {
+            Produksi::create([
+                'karyawan_id' => $data['id'],
+                'tanggal' => $data['tanggal'],
+                'jumlah_baik' => $data['actual'],
+                'jumlah_buruk' => 0,
+                'jumlah_buruk2' => 0,
+                'status_validasi' => 'DRAFT',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Actual berhasil diinput'
         ]);
     }
 

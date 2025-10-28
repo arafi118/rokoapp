@@ -83,6 +83,8 @@
                             <th>ID</th>
                             <th>Nama</th>
                             <th>Absen Hari Ini</th>
+                            <th>Plan</th>
+                            <th>Actual</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -306,6 +308,27 @@
                         },
                         orderable: false,
                         searchable: false
+                    }, {
+                        data: 'id',
+                        name: 'id',
+                        render: (data, type, row) => {
+                            return `<input type="number" data-id="${data}" data-tanggal="${row.tgl_absen}" class="form-control input-plan" value="${row.plan}">`
+                        },
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'id',
+                        name: 'id',
+                        render: (data, type, row) => {
+                            var jumlahProduksi = 0;
+                            row.getproduksi.forEach(produksi => {
+                                jumlahProduksi += parseInt(produksi.jumlah_baik);
+                            })
+
+                            return `<input type="number" data-id="${data}" data-tanggal="${row.tgl_absen}" class="form-control input-actual" value="${jumlahProduksi}">`
+                        },
+                        orderable: false,
+                        searchable: false
                     }],
                     "createdRow": function(row, data, dataIndex) {
                         if (data.group_id != data.kelompok) {
@@ -314,6 +337,64 @@
                     }
                 });
             }
+        })
+
+        $(document).on('change', '.input-plan', function(e) {
+            e.preventDefault()
+
+            var data = table.row($(this).parents('tr')).data();
+            var id = $(this).data('id')
+            var tanggal = $(this).data('tanggal')
+            var plan = $(this).val()
+
+            $.ajax({
+                url: '/inspeksi/absensi-karyawan/input-plan',
+                type: 'POST',
+                data: {
+                    id: id,
+                    tanggal: tanggal,
+                    plan: plan,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: response.msg,
+                        icon: 'success',
+                    }).then((res) => {
+                        table.ajax.reload()
+                    })
+                }
+            })
+        })
+
+        $(document).on('change', '.input-actual', function(e) {
+            e.preventDefault()
+
+            var data = table.row($(this).parents('tr')).data();
+            var id = $(this).data('id')
+            var tanggal = $(this).data('tanggal')
+            var actual = $(this).val()
+
+            $.ajax({
+                url: '/inspeksi/absensi-karyawan/input-actual',
+                type: 'POST',
+                data: {
+                    id: id,
+                    tanggal: tanggal,
+                    actual: actual,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: response.msg,
+                        icon: 'success',
+                    }).then((res) => {
+                        table.ajax.reload()
+                    })
+                }
+            })
         })
 
         $(document).on('change', '.input-select', function(e) {
