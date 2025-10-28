@@ -1,3 +1,12 @@
+@php
+    use App\Utils\Tanggal;
+
+    $tahun = date('Y');
+
+    $date = new DateTime();
+    $date->setISODate($tahun, 53);
+    $jumlahMinggu = $date->format('W') === '53' ? 53 : 52;
+@endphp
 @extends(Request::segment(1) . '.layouts.base')
 
 @section('content')
@@ -67,7 +76,7 @@
                     <div class="row g-3">
                         {{-- Tahun --}}
                         <div class="col-md-4">
-                            <label class="form-label">Tahunan</label>
+                            <label class="form-label">Pilih Tahun</label>
                             <select name="tahun" class="form-select select2">
                                 @for ($i = 2020; $i <= date('Y'); $i++)
                                     <option value="{{ $i }}" {{ $i == date('Y') ? 'selected' : '' }}>
@@ -78,7 +87,7 @@
 
                         {{-- Bulan --}}
                         <div class="col-md-4">
-                            <label class="form-label">Bulanan</label>
+                            <label class="form-label"> Pilih Bulan</label>
                             <select name="bulan" class="form-select select2">
                                 @foreach ([
             '01' => 'JANUARI',
@@ -101,7 +110,28 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3" style="padding-right: 10px;">
-                            <label class="form-label">Harian</label>
+                            <label for="minggu_ke" class="form-label">Pilih Minggu</label>
+                            <select id="minggu_ke" name="minggu_ke" class="form-select select2">
+                                <option value="">---</option>
+                                @for ($i = 1; $i <= $jumlahMinggu; $i++)
+                                    @php
+                                        $monday = new DateTime();
+                                        $monday->setISODate($tahun, $i, 1);
+                                        $sunday = clone $monday;
+                                        $sunday->modify('+6 days');
+
+                                        $tanggal = $monday->format('Y-m-d') . '#' . $sunday->format('Y-m-d');
+                                        $minggu_ke = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                    @endphp
+                                    <option value="{{ $tanggal }}">
+                                        {{ "Minggu ke-$minggu_ke: " . Tanggal::tglLatin($monday->format('Y-m-d')) . ' s/d ' . Tanggal::tglLatin($sunday->format('Y-m-d')) }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3" style="padding-right: 10px;">
+                            <label class="form-label">Pilih Hari</label>
                             <select name="hari" class="form-select select2">
                                 <option value="">---</option>
                                 @for ($i = 1; $i <= 31; $i++)
@@ -110,9 +140,8 @@
                             </select>
                         </div>
 
-                        {{-- Nama Laporan --}}
-                        <div id="colLaporan" class="col-md-6 mb-3" style="padding-left: 10px;">
-                            <label class="form-label">Nama Laporan</label>
+                        <div id="colLaporan" class="col-md-4 mb-3" style="padding-left: 10px;">
+                            <label class="form-label"> Pilih Nama Laporan</label>
                             <select id="laporan" name="laporan" class="form-select select2">
                                 <option value="">---</option>
                                 @foreach ($laporan as $item)
@@ -125,8 +154,8 @@
                         </div>
 
                         {{-- Sub Laporan --}}
-                        <div id="subLaporan" class="col-md-6">
-                            <label class="form-label">Nama Sub Laporan</label>
+                        <div id="subLaporan" class="col-md-4">
+                            <label class="form-label"> Pilih Nama Sub Laporan</label>
                             <select name="sub_laporan" id="sub_laporan" class="form-select select2">
                                 <option value="">---</option>
                             </select>
@@ -168,6 +197,54 @@
                     </select>
                 `);
                 }
+            });
+        });
+        // === FILTER MINGGU BERDASARKAN BULAN ===
+        $(document).ready(function() {
+            const $bulan = $('select[name="bulan"]');
+            const $minggu = $('#minggu_ke');
+
+            // Simpan semua opsi minggu awal (karena nanti mau difilter)
+            const semuaOpsiMinggu = $minggu.find('option').clone();
+
+            function filterMinggu() {
+                const bulanDipilih = $bulan.val();
+                $minggu.empty().append('<option value="">---</option>');
+
+                semuaOpsiMinggu.each(function() {
+                    const val = $(this).val();
+                    if (!val.includes('#')) return; // skip opsi kosong
+                    const [start, end] = val.split('#');
+                    const startDate = new Date(start);
+                    const endDate = new Date(end);
+
+                    let adaDiBulan = false;
+                    const temp = new Date(startDate);
+                    while (temp <= endDate) {
+                        if ((temp.getMonth() + 1).toString().padStart(2, '0') === bulanDipilih) {
+                            adaDiBulan = true;
+                            break;
+                        }
+                        temp.setDate(temp.getDate() + 1);
+                    }
+
+                    if (adaDiBulan) {
+                        $minggu.append($(this).clone());
+                    }
+                });
+
+                // refresh select2 setelah diubah
+                $minggu.select2({
+                    width: '100%'
+                });
+            }
+
+            // panggil awal sesuai bulan berjalan
+            filterMinggu();
+
+            // jalankan setiap kali bulan diganti
+            $bulan.on('change', function() {
+                filterMinggu();
             });
         });
     </script>

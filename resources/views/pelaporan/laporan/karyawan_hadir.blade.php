@@ -1,3 +1,17 @@
+@php
+    use App\Utils\Tanggal;
+    use Carbon\CarbonPeriod;
+
+    //     BERHENTI 1 HARI SEBELEUM TANGGAL AKHIR
+    // $start = new DateTime($tanggal_awal);
+    // $end = new DateTime($tanggal_akhir);
+    // $period = new DatePeriod($start, new DateInterval('P1D'), $end);
+
+    $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
+    $weekly_total = array_fill(1, 8, 0);
+    $last_week = null;
+@endphp
+<title>{{ $title }}</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -31,13 +45,7 @@
         text-align: left;
         padding: 2px 0;
     }
-
-    .minggu {
-        color: red;
-        font-weight: bold;
-    }
 </style>
-<title>{{ $title_hadir }}</title>
 <h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
     DATA KARYAWAN HADIR
 </h2>
@@ -45,7 +53,7 @@
 <table class="header-info" style="margin-bottom:10px;">
     <tr>
         <td width="15%">BULAN</td>
-        <td>: {{ App\Utils\Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
+        <td>: {{ Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
     </tr>
     <tr>
         <td>LOKASI</td>
@@ -57,7 +65,9 @@
     </tr>
 </table>
 
-<table>
+
+
+<table border="1" cellspacing="0" cellpadding="4" width="100%">
     <thead>
         <tr>
             <th rowspan="2" width="5%">WEEK</th>
@@ -77,315 +87,56 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td colspan="3" class="title">Terdaftar Bulan Lalu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        @foreach ($period as $date)
+            @php
+                $week = $date->format('W');
+                $tgl = $date->format('Y-m-d');
+                $tgl_tampil = $date->format('d-M-y');
+                $hari = Tanggal::namaHari($tgl);
 
-        <tr class="minggu">
-            <td></td>
-            <td>05-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+                $harian = $karyawan[$tgl] ?? collect([]);
 
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+                $row = [];
+                for ($i = 1; $i <= 8; $i++) {
+                    $row[$i] = $harian[$i] ?? 0;
+                    $weekly_total[$i] += $row[$i];
+                }
+            @endphp
 
-        {{-- Minggu 36 --}}
-        <tr>
-            <td>36</td>
-            <td>06-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>07-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>08-Oct-25</td>
-            <td>Rabu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>12-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            <tr class="{{ $hari == 'Minggu' ? 'minggu' : '' }}">
+                <td>{{ $last_week !== $week ? $week : '' }}</td>
+                <td>{{ $tgl_tampil }}</td>
+                <td>{{ $hari }}</td>
+                @foreach ($row as $val)
+                    <td>{{ $val }}</td>
+                @endforeach
+            </tr>
 
-        {{-- Minggu 37 --}}
-        <tr>
-            <td>37</td>
-            <td>13-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>14-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>19-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            {{-- total tiap akhir minggu --}}
+            @if ($hari == 'Minggu')
+                <tr style="font-weight:bold; background-color:#f0f0f0;">
+                    <td colspan="3">Total</td>
+                    @foreach ($weekly_total as $val)
+                        <td>{{ $val }}</td>
+                    @endforeach
+                </tr>
+                @php
+                    $weekly_total = array_fill(1, 8, 0); // reset minggu berikutnya
+                @endphp
+            @endif
 
-        {{-- Minggu 38 --}}
-        <tr>
-            <td>38</td>
-            <td>20-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>21-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>26-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            @php $last_week = $week; @endphp
+        @endforeach
 
-        {{-- Minggu 39 --}}
-        <tr>
-            <td>39</td>
-            <td>27-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>28-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>02-Nov-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        {{-- total untuk minggu terakhir (jika tidak berakhir di Minggu) --}}
+        @if (array_sum($weekly_total) > 0)
+            <tr style="font-weight:bold; background-color:#f0f0f0;">
+                <td colspan="3">Total</td>
+                @foreach ($weekly_total as $val)
+                    <td>{{ $val }}</td>
+                @endforeach
+            </tr>
+        @endif
 
-        {{-- Minggu 40 --}}
-        <tr>
-            <td>40</td>
-            <td>03-Nov-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>04-Nov-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>09-Nov-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
     </tbody>
 </table>
