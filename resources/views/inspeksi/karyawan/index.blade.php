@@ -7,6 +7,9 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
+                        <button id="btnCetakSP" class="btn btn-info btn-sm">
+                            <i class="bi bi-plus-circle"></i> Cetak SP
+                        </button>
                         <button id="btnTambah" class="btn btn-success btn-sm">
                             <i class="bi bi-plus-circle"></i> Tambah Karyawan
                         </button>
@@ -15,6 +18,13 @@
                         <table id="karyawan" class="table table-hover table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
+                                    <th>
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="checkAll">
+                                            <label for="checkAll">
+                                            </label>
+                                        </div>
+                                    </th>
                                     <th>Nama Karyawan</th>
                                     <th>Kode Karyawan</th>
                                     <th>Group Karyawan</th>
@@ -57,6 +67,19 @@
                 serverSide: true,
                 ajax: '/inspeksi/karyawan',
                 columns: [{
+                        data: 'id',
+                        name: 'id',
+                        orderable: false,
+                        searchable: false,
+                        render: (data, type, row) => {
+                            return `
+                                <div class="icheck-primary d-inline">
+                                    <input type="checkbox" name="id[]" id="id-${data}" class="id" value="${data}">
+                                    <label for="id-${data}">
+                                    </label>
+                                </div>`
+                        }
+                    }, {
                         data: 'getanggota.nama',
                         name: 'getanggota.nama',
                         render: function(data, type, row) {
@@ -116,8 +139,19 @@
                                 </button>
                             </div>`
                     }
+                ],
+                order: [
+                    [1, 'asc']
                 ]
             });
+
+            $(document).on('change', '#checkAll', function() {
+                if ($(this).is(':checked')) {
+                    $('.id').prop('checked', true);
+                } else {
+                    $('.id').prop('checked', false);
+                }
+            })
 
             $('#group_id').select2({
                 theme: 'bootstrap4',
@@ -178,6 +212,20 @@
                     cache: true
                 }
             });
+
+            $(document).on('click', '#btnCetakSP', function(e) {
+                e.preventDefault();
+
+                var checkbox = $('.id:checked');
+                var id = [];
+                checkbox.each(function() {
+                    id.push($(this).val());
+                });
+
+                paramsId = id.join(',');
+                window.open(`/inspeksi/karyawan/cetak-sp?id_karyawan=${paramsId}`, '_blank');
+            })
+
             // Tombol Tambah
             $('#btnTambah').click(() => {
                 formKaryawan.trigger('reset');
@@ -217,7 +265,6 @@
                 formTitle.text("Edit Karyawan");
                 formContainer.removeClass("card-primary").addClass("card-warning");
             });
-
 
             jQuery.datetimepicker.setLocale('de');
             $('.date').datetimepicker({

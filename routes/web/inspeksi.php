@@ -36,6 +36,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('/karyawan/list-anggota', [KaryawanController::class, 'getanggota']);
   Route::get('/karyawan/list-meja', [KaryawanController::class, 'getmeja']);
   Route::get('/karyawan/list-level', [KaryawanController::class, 'getlevel']);
+  Route::get('/karyawan/cetak-sp', [KaryawanController::class, 'cetak']);
   Route::resource('karyawan', KaryawanController::class);
 
   //Tempat Kerja routes

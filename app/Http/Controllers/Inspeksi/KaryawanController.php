@@ -8,6 +8,7 @@ use App\Models\Anggota;
 use App\Models\Meja;
 use App\Models\Level;
 use App\Models\Group;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -249,5 +250,17 @@ class KaryawanController extends Controller
             'success'   => true,
             'msg'       => 'Karyawan berhasil dihapus'
         ], Response::HTTP_OK);
+    }
+
+    public function cetak()
+    {
+        $paramIdKaryawan = request()->get('id_karyawan');
+        $idKaryawan = explode(',', $paramIdKaryawan);
+
+        $karyawan = Karyawan::with([
+            'getanggota'
+        ])->whereIn('id', $idKaryawan)->get();
+
+        return Pdf::loadView('inspeksi.karyawan.cetak', compact('karyawan'))->setPaper('a4', 'portrait')->stream();
     }
 }
