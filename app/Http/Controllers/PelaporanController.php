@@ -7,6 +7,7 @@ use App\Models\JenisLaporan;
 use App\Models\Absensi;
 use App\Models\Karyawan;
 use App\Models\Produksi;
+use App\Models\Level;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -431,67 +432,132 @@ class PelaporanController extends Controller
         return $pdf->stream('Karyawan Dimutasi.pdf');
     }
 
-private function karyawan_komposisi_karyawan(array $data)
-{
-    $minggu_ke = explode('#', request()->get('minggu_ke'));
-    $tanggal_awal = trim($minggu_ke[0]);
-    $tanggal_akhir = trim($minggu_ke[1]);
+    private function karyawan_komposisi_karyawan(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-    // Ambil semua data produksi di rentang tanggal
-    $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-        ->with(['karyawan.getlevel', 'karyawan.getgroup']) // ✅ gunakan relasi yang benar
-        ->get();
+        // Ambil semua data produksi di rentang tanggal
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['karyawan.getlevel', 'karyawan.getgroup']) // ✅ gunakan relasi yang benar
+            ->get();
 
-    // Debug dulu untuk memastikan ada data
-    if ($produksi->isEmpty()) {
-        dd('Data produksi kosong untuk rentang tanggal tersebut', $tanggal_awal, $tanggal_akhir);
-    }
-
-    $komposisi = []; // [tanggal][bagian][kategori] = jumlah
-
-    foreach ($produksi as $p) {
-        $tanggal = $p->tanggal;
-
-        // Ambil nama group dari relasi karyawan
-        $group_nama = strtolower($p->karyawan->getgroup->nama ?? '-');
-        $bagian = 'Lainnya';
-
-        if (str_contains($group_nama, 'giling')) {
-            $bagian = 'Giling';
-        } elseif (str_contains($group_nama, 'gunting')) {
-            $bagian = 'Gunting';
-        } elseif (str_contains($group_nama, 'packing')) {
-            $bagian = 'Packing';
-        } elseif (str_contains($group_nama, 'banderol')) {
-            $bagian = 'Banderol';
-        } elseif (str_contains($group_nama, 'opp')) {
-            $bagian = 'OPP';
-        } elseif (str_contains($group_nama, 'mop')) {
-            $bagian = 'MOP';
+        // Debug dulu untuk memastikan ada data
+        if ($produksi->isEmpty()) {
+            dd('Data produksi kosong untuk rentang tanggal tersebut', $tanggal_awal, $tanggal_akhir);
         }
 
-        // Ambil kode level (E/D/C/B/A)
-        $level_kode = strtoupper($p->karyawan->getlevel->kode ?? 'D');
+        $komposisi = []; // [tanggal][bagian][kategori] = jumlah
 
-        // Hitung jumlah per tanggal, bagian, dan level
-        $komposisi[$tanggal][$bagian][$level_kode] =
-            ($komposisi[$tanggal][$bagian][$level_kode] ?? 0) + 1;
+        foreach ($produksi as $p) {
+            $tanggal = $p->tanggal;
+
+            // Ambil nama group dari relasi karyawan
+            $group_nama = strtolower($p->karyawan->getgroup->nama ?? '-');
+            $bagian = 'Lainnya';
+
+            if (str_contains($group_nama, 'giling')) {
+                $bagian = 'Giling';
+            } elseif (str_contains($group_nama, 'gunting')) {
+                $bagian = 'Gunting';
+            } elseif (str_contains($group_nama, 'packing')) {
+                $bagian = 'Packing';
+            } elseif (str_contains($group_nama, 'banderol')) {
+                $bagian = 'Banderol';
+            } elseif (str_contains($group_nama, 'opp')) {
+                $bagian = 'OPP';
+            } elseif (str_contains($group_nama, 'mop')) {
+                $bagian = 'MOP';
+            }
+
+            // Ambil kode level (E/D/C/B/A)
+            $level_kode = strtoupper($p->karyawan->getlevel->kode ?? 'D');
+
+            // Hitung jumlah per tanggal, bagian, dan level
+            $komposisi[$tanggal][$bagian][$level_kode] =
+                ($komposisi[$tanggal][$bagian][$level_kode] ?? 0) + 1;
+        }
+        // Siapkan data untuk Blade
+        $data['komposisi'] = $komposisi;
+        $data['tanggal_awal'] = $tanggal_awal;
+        $data['tanggal_akhir'] = $tanggal_akhir;
+        $data['title'] = 'Komposisi Karyawan';
+
+        $view = view('pelaporan.laporan.karyawan_komposisi_karyawan', $data)->render();
+
+        $pdf = Pdf::loadHTML($view)
+            ->setPaper('a3', 'landscape')
+            ->setOptions(['margin' => 10]);
+
+        return $pdf->stream('Komposisi Karyawan.pdf');
     }
-    // Siapkan data untuk Blade
-    $data['komposisi'] = $komposisi;
-    $data['tanggal_awal'] = $tanggal_awal;
-    $data['tanggal_akhir'] = $tanggal_akhir;
-    $data['title'] = 'Komposisi Karyawan';
 
-    $view = view('pelaporan.laporan.karyawan_komposisi_karyawan', $data)->render();
+    public function monitoring_karyawan(array $data)
+    {
+        $tahun = $data['tahun'];
+        $bulan = $data['bulan'];
+        $minggu_ke = $data['minggu_ke'] ?? null;
 
-    $pdf = Pdf::loadHTML($view)
-        ->setPaper('a3', 'landscape')
-        ->setOptions(['margin' => 10]);
+        if ($minggu_ke) {
+            $rentang = explode('#', $minggu_ke);
+            $tanggal_awal = $rentang[0];
+            $tanggal_akhir = $rentang[1];
+            $periode_label = 'Mingguan';
+        } else {
+            $tanggal_awal = "{$tahun}-{$bulan}-01";
+            $tanggal_akhir = date("Y-m-t", strtotime($tanggal_awal));
+            $periode_label = 'Bulanan';
+        }
 
-    return $pdf->stream('Komposisi Karyawan.pdf');
-}
+        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['getkaryawan.getlevel'])
+            ->get();
 
+                
+        $kategori_list = ['Giling', 'Gunting', 'Pack', 'OPP', 'Banderol', 'MOP', 'Multi Skill'];
+
+        // Daftar peringkat tetap
+        $peringkat_list = ['Resmi', 'Mahir', 'Terampil', 'Pemula'];
+
+        // Bangun struktur kategori => peringkat
+        $kategori = [];
+        foreach ($kategori_list as $bagian) {
+            $kategori[$bagian] = collect();
+            foreach ($peringkat_list as $lvl) {
+                $kategori[$bagian]->push([
+                    'peringkat' => $lvl,
+                    'bagian' => $bagian,
+                    'nama' => "Operator {$bagian} - {$lvl}",
+                ]);
+            }
+        }
+        
+        $title = "Data Monitoring Karyawan Periode {$periode_label}";
+
+        $view = view('pelaporan.laporan.monitoring_karyawan', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'absensi'       => $absensi,
+            'kategori'      => $kategori, 
+            'title'         => $title,
+            'bulan'         => $bulan,
+            'tahun'         => $tahun,
+            'periode_label' => $periode_label,
+        ])->render();
+
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('Monitoring Karyawan.pdf');
+    }
 
 
     private function volume(array $data)
