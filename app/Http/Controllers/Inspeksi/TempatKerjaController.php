@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use App\Models\Group;
 use App\Models\Karyawan;
+use App\Models\Meja;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
@@ -63,8 +64,10 @@ class TempatKerjaController extends Controller
                     'kode_karyawan' => $karyawan->kode_karyawan,
                     'nama'          => $karyawan->getanggota->nama,
                     'level'         => $karyawan->getlevel->nama ?? '-',
+                    'inisial'       => $karyawan->getlevel->inisial ?? '-',
                     'nik'           => $karyawan->getanggota->nik ?? '-',
                     'jabatan'       => $karyawan->getanggota->getjabatan->nama ?? '-',
+                    'warna'         => $karyawan->getlevel->warna ?? '#5b5a5cff',
                 ];
             }
 
@@ -74,6 +77,48 @@ class TempatKerjaController extends Controller
         $title = "Tempat Karyawan Bekerja";
 
         return view('inspeksi.tempat_kerja.index', compact('dataKaryawan', 'title'));
+    }
+
+    public function listgroup(Request $request)
+    {
+        $search = $request->get('q');
+        $query = Group::select('id', 'nama');
+
+        if ($search) {
+            $query->where('nama', 'like', "%{$search}%");
+        }
+
+        $anggota = $query->get();
+
+        $results = $anggota->map(function ($a) {
+            return [
+                'id' => $a->id,
+                'text' => $a->nama
+            ];
+        });
+
+        return response()->json($results);
+    }
+
+    public function listmeja(Request $request)
+    {
+        $search = $request->get('q');
+        $query = Meja::select('id', 'nama_meja');
+
+        if ($search) {
+            $query->where('nama_meja', 'like', "%{$search}%");
+        }
+
+        $anggota = $query->get();
+
+        $results = $anggota->map(function ($a) {
+            return [
+                'id' => $a->id,
+                'text' => $a->nama_meja
+            ];
+        });
+
+        return response()->json($results);
     }
 
     /**
@@ -86,6 +131,8 @@ class TempatKerjaController extends Controller
             'meja_saat_ini',
             'id_karyawan',
         ]);
+
+        dd($data);
 
         $validate = Validator::make($data, [
             'meja_tujuan'   => 'required|string',

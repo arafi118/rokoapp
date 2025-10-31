@@ -1,48 +1,89 @@
 @extends('inspeksi.layouts.base')
 @section('content')
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu>.dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+            position: absolute;
+        }
+
+        .dropdown.open>.dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu {
+            min-width: 220px;
+            font-size: 13px;
+        }
+
+        .dropdown-menu li>a {
+            padding: 6px 12px;
+            display: block;
+        }
+
+        .dropdown-submenu>a::after {
+            content: "▸";
+            float: right;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        #kanbanDropdown {
+            top: 0;
+        }
+    </style>
+
     <div class="row">
         <div class="col-md-12">
             <div class="tab-content">
                 <div class="tab-pane show active" role="tabpanel">
                     <div class="row">
                         @foreach ($dataKaryawan as $groupId => $group)
-                            <div class="col-md-12 mb-3">
-                                <div class="card shadow-sm">
-                                    {{-- <div class="card-header bg-primary text-white fw-bold">
+                            <div class="col-md-6 mb-3">
+                                <div class="card shadow-sm bg-info">
+                                    <div class="card-header bg-secondary text-white fw-bold text-center">
                                         {{ $group['group_name'] }}
-                                    </div> --}}
+                                    </div>
                                     <div class="card-body">
-                                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                                             @foreach ($group['meja'] as $mejaId => $mejaGroup)
-                                                @php
-                                                    $warna =
-                                                        rand(100, 255) . ',' . rand(100, 255) . ',' . rand(100, 255);
-                                                @endphp
                                                 <div class="card border">
-                                                    {{-- <div class="card-header bg-light fw-semibold">
-                                                        Meja {{ $mejaGroup['meja_id'] }}
-                                                    </div> --}}
-                                                    <div class="card-body">
+                                                    <div class="card-body p-2">
                                                         <div class="kanban" data-group="{{ $groupId }}"
                                                             data-meja="{{ $mejaGroup['meja_id'] }}"
-                                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
                                                             @foreach ($mejaGroup['karyawan'] as $karyawan)
                                                                 <div class="card shadow-sm text-center"
-                                                                    style="background-color: rgb({{ $warna }}); color: #fff;"
+                                                                    style="background-color: {{ $karyawan['warna'] }}; color: #fff;"
                                                                     data-meja-saat-ini="{{ $groupId }}-{{ $mejaId }}"
                                                                     data-id-karyawan="{{ $karyawan['id'] }}"
-                                                                    data-level="{{ $karyawan['level'] }}"
+                                                                    data-Level="{{ $karyawan['level'] }}"
+                                                                    data-inisiallevel="{{ $karyawan['inisial'] }}"
                                                                     data-nik="{{ $karyawan['nik'] }}"
                                                                     data-kode="{{ $karyawan['kode_karyawan'] }}"
                                                                     data-jabatan="{{ $karyawan['jabatan'] }}"
                                                                     data-nama="{{ $karyawan['nama'] }}">
-                                                                    <div class="card-body py-2">
-                                                                        <a href="#" data-bs-toggle="modal"
+                                                                    <div class="card-body py-2 position-relative">
+                                                                        <a href="#"
+                                                                            class="text-decoration-none text-white ViewKaryawan dropdown-toggle"
+                                                                            data-bs-toggle="modal"
                                                                             data-bs-target="#ViewKaryawan"
-                                                                            class="text-decoration-none text-white"
                                                                             style="font-size: 12px;">
                                                                             {{ $karyawan['kode_karyawan'] }}
                                                                         </a>
+                                                                        <div
+                                                                            class="kanban-dropdown dropdown position-absolute">
+                                                                            <ul
+                                                                                class="dropdown-menu shadow rounded dropdown-container">
+                                                                            </ul>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             @endforeach
@@ -60,6 +101,7 @@
             </div>
         </div>
     </div>
+
     <div class="card p-2 pt-2">
         <div class="d-flex justify-content-end">
             <button type="button" class="btn btn-success" id="SimpanTempatKerja">Simpan Data Tempat Kerja</button>
@@ -68,7 +110,6 @@
 @endsection
 
 @section('modal')
-    <!-- MODAL VIEW KARYAWAN -->
     <div class="modal fade" id="ViewKaryawan" tabindex="-1" aria-labelledby="ViewKaryawanLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
@@ -113,111 +154,264 @@
         </div>
     </div>
 @endsection
+
 @section('script')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
-        $(document).on('click', '[data-bs-target="#ViewKaryawan"]', function() {
-            const parentCard = $(this).closest('.card');
-            $('#modalNama').text(parentCard.data('nama'));
-            $('#modalKode').text(parentCard.data('kode'));
-            $('#modallevel').text(parentCard.data('level'));
-            $('#modalNik').text(parentCard.data('nik'));
-            $('#modaljabatan').text(parentCard.data('jabatan'));
+        let PERPINDAHAN_MEJA_KARYAWAN = [];
+
+        $(document).on("click", ".ViewKaryawan", function() {
+            const parentCard = $(this).closest(".card");
+            $("#modalNama").text(parentCard.data("nama"));
+            $("#modalKode").text(parentCard.data("kode"));
+            $("#modallevel").text(parentCard.data("level"));
+            $("#modalNik").text(parentCard.data("nik"));
+            $("#modaljabatan").text(parentCard.data("jabatan"));
+            $("#ViewKaryawan").modal("show");
         });
 
-        var PERPINDAHAN_MEJA_KARYAWAN = [];
+        const drake = dragula($(".kanban").toArray(), {
+            mirrorContainer: document.body,
+            revertOnSpill: true,
+        });
 
-        $(document).ready(function() {
-            const drake = dragula($('.kanban').toArray(), {
-                mirrorContainer: document.body,
-                revertOnSpill: true,
+        drake.on("drag", (el) => $(el).addClass("kanban-dragging"));
+        drake.on("drop", function(el, container, source) {
+            $(el).removeClass("kanban-dragging");
+            if (!container) return;
+
+            const id = $(el).data("id-karyawan");
+            const mejaSaatIni = $(el).data("meja-saat-ini");
+            const groupTujuan = $(container).data("group");
+            const mejaTujuan = $(container).data("meja");
+            const mejaTujuanLabel = `${groupTujuan}-${mejaTujuan}`;
+            const inisialBaru = $(el).data("inisiallevel");
+            const countInTarget = $(container).find(".card").length;
+            const jumlahGT = $(container).find('.card[data-inisiallevel="GT"]').length;
+
+            if ((inisialBaru === 'GT' || inisialBaru === 'GL') && countInTarget > 4) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Tidak boleh lebih dari 4 karyawan!",
+                    text: "Karyawan dengan level GT atau GL hanya boleh maksimal 4 per meja.",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+
+                source.appendChild(el);
+                return;
+            }
+
+            if (inisialBaru === "GT" && jumlahGT > 1) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Duplikasi GT-(Gunting) tidak diperbolehkan!",
+                    text: "Setiap meja hanya boleh memiliki 1 karyawan dengan inisial GT.",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                if (source) source.appendChild(el);
+                return;
+            }
+
+            const idx = PERPINDAHAN_MEJA_KARYAWAN.findIndex(x => x.id == id);
+            if (idx >= 0) PERPINDAHAN_MEJA_KARYAWAN.splice(idx, 1);
+            PERPINDAHAN_MEJA_KARYAWAN.push({
+                id,
+                meja_saat_ini: mejaSaatIni,
+                meja_tujuan: mejaTujuanLabel
             });
 
-            drake.on('drag', (el) => $(el).addClass('kanban-dragging'));
+            $(el).attr("data-meja-saat-ini", mejaTujuanLabel);
+            kirimKeServer(id, mejaSaatIni, mejaTujuanLabel);
+        });
 
-            drake.on('drop', (el, container) => {
-                $(el).removeClass('kanban-dragging');
+        $(document).on("contextmenu", ".dropdown-toggle", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                const id = $(el).data('id-karyawan');
-                const mejaSaatIni = $(el).data('meja-saat-ini');
-                const groupTujuan = $(container).data('group');
-                const mejaTujuan = $(container).data('meja');
-                const mejaTujuanLabel = `${groupTujuan}-${mejaTujuan}`;
-                const idx = PERPINDAHAN_MEJA_KARYAWAN.findIndex(x => x.id == id);
-                if (idx >= 0) PERPINDAHAN_MEJA_KARYAWAN.splice(idx, 1);
-                PERPINDAHAN_MEJA_KARYAWAN.push({
-                    id: id,
-                    meja_saat_ini: mejaSaatIni,
-                    meja_tujuan: mejaTujuanLabel
+            const parentCard = $(this).closest(".card");
+            const dropdown = parentCard.find(".kanban-dropdown");
+            const container = dropdown.find(".dropdown-container");
+
+            $(".kanban-dropdown").removeClass("open");
+
+            const rect = parentCard[0].getBoundingClientRect();
+            const isNearRight = rect.right > window.innerWidth - 250;
+            dropdown.css(isNearRight ? {
+                left: "auto",
+                right: "292%"
+            } : {
+                left: "100%",
+                right: "auto"
+            });
+            dropdown.addClass("open");
+
+            container.html(`
+            <li class="text-center fw-bold text-primary py-2 border-bottom bg-light">Pindahkan Kanban</li>
+            <li class="text-center text-muted py-1">Memuat data...</li>
+        `);
+
+            $.getJSON("/inspeksi/tempat-kerja/group/list", function(groups) {
+                let html = `
+            <li class="text-center fw-bold text-primary py-2 border-bottom bg-light">Pindahkan Kanban</li>
+            ${groups.map(g => `
+                                                    <li class="dropdown-submenu">
+                                                        <a href="#" class="test d-flex justify-content-between align-items-center" data-group-id="${g.id}">
+                                                            <span>${g.text}</span>
+                                                        </a>
+                                                    <ul class="dropdown-menu submenu" id="submenu-${g.id}"></ul>
+                                                            </li>
+                                                    `).join("")}
+        `;
+                container.html(html);
+            });
+        });
+
+        $(document).on("click", ".dropdown-submenu a.test", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const groupId = $(this).data("group-id");
+            const dropdown = $(this).closest(".kanban-dropdown");
+            const submenu = dropdown.find(`#submenu-${groupId}`);
+
+            dropdown.find(".submenu").hide().removeData("loaded");
+            submenu.show().html(`<li class="text-center text-muted py-1">Memuat meja...</li>`);
+
+            $.getJSON("/inspeksi/tempat-kerja/meja/list", {
+                group_id: groupId
+            }, function(list) {
+                submenu.html(list.map(m =>
+                    `<li><a href="#" class="meja-item" data-group-id="${groupId}" data-meja-id="${m.id}">${m.text}</a></li>`
+                ).join(""));
+            });
+        });
+
+        $(document).on("click", ".meja-item", function(e) {
+            e.preventDefault();
+
+            const groupTujuan = $(this).data("group-id");
+            const mejaTujuan = $(this).data("meja-id");
+            const mejaTujuanLabel = `${groupTujuan}-${mejaTujuan}`;
+
+            const parentCard = $(".kanban-dropdown.open").closest(".card");
+            const el = parentCard[0];
+            const id = $(el).data("id-karyawan");
+            const mejaSaatIni = $(el).data("meja-saat-ini");
+            const inisialBaru = $(el).data("inisiallevel");
+            const targetContainer = $(`.kanban[data-group="${groupTujuan}"][data-meja="${mejaTujuan}"]`);
+            const countInTarget = targetContainer.find(".card").length;
+            const jumlahGT = targetContainer.find('.card[data-inisiallevel="GT"]').length;
+
+            if ((inisialBaru === 'GT' || inisialBaru === 'GL') && countInTarget >= 4) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Tidak boleh lebih dari 4 karyawan!",
+                    text: "Karyawan dengan level GT atau GL hanya boleh maksimal 4 per meja.",
+                    timer: 2000,
+                    showConfirmButton: false
                 });
-                $(el).attr('data-meja-saat-ini', mejaTujuanLabel);
 
-                $.ajax({
-                    url: '/inspeksi/tempat-kerja/' + id,
-                    method: 'PUT',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        id_karyawan: id,
-                        meja_saat_ini: mejaSaatIni,
-                        meja_tujuan: mejaTujuanLabel
-                    }
+                source.appendChild(el);
+                return;
+            }
+
+            if (inisialBaru === "GT" && jumlahGT >= 1) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Duplikasi GT-(Gunting) tidak diperbolehkan!",
+                    text: "Setiap meja hanya boleh memiliki 1 karyawan dengan inisial GT.",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (targetContainer.length) {
+                $(el).fadeOut(150, function() {
+                    $(this).appendTo(targetContainer).fadeIn(150);
+                });
+            }
+
+            const idx = PERPINDAHAN_MEJA_KARYAWAN.findIndex(x => x.id == id);
+            if (idx >= 0) PERPINDAHAN_MEJA_KARYAWAN.splice(idx, 1);
+            PERPINDAHAN_MEJA_KARYAWAN.push({
+                id,
+                meja_saat_ini: mejaSaatIni,
+                meja_tujuan: mejaTujuanLabel
+            });
+
+            $(el).attr("data-meja-saat-ini", mejaTujuanLabel);
+            $(".kanban-dropdown").removeClass("open");
+            kirimKeServer(id, mejaSaatIni, mejaTujuanLabel);
+        });
+
+        $(document).on("click", () => $(".kanban-dropdown").removeClass("open"));
+
+        $(document).on("click", "#SimpanTempatKerja", function(e) {
+            e.preventDefault();
+
+            let dataKirim = [];
+            $(".kanban .card").each(function() {
+                const el = $(this);
+                dataKirim.push({
+                    id: el.data("id-karyawan"),
+                    meja_saat_ini: el.data("meja-saat-ini"),
+                    meja_tujuan: el.data("meja-tujuan")
                 });
             });
 
-            $(document).on('click', '#SimpanTempatKerja', function(e) {
-                e.preventDefault();
+            if (Array.isArray(PERPINDAHAN_MEJA_KARYAWAN) && PERPINDAHAN_MEJA_KARYAWAN.length > 0) {
+                PERPINDAHAN_MEJA_KARYAWAN.forEach(ubah => {
+                    const index = dataKirim.findIndex(d => d.id === ubah.id);
+                    if (index !== -1) dataKirim[index].meja_tujuan = ubah.meja_tujuan;
+                });
+            }
 
-                let dataKirim = [];
+            const formData = new FormData();
+            formData.append("_method", "PUT");
+            formData.append("_token", $('meta[name="csrf-token"]').attr("content"));
+            formData.append("perpindahan_data", JSON.stringify(dataKirim));
 
-                $('.kanban .card').each(function() {
-                    const el = $(this);
-                    dataKirim.push({
-                        id: el.data('id-karyawan'),
-                        meja_saat_ini: el.data('meja-saat-ini'),
-                        meja_tujuan: el.data('meja-tujuan')
+            $.ajax({
+                url: "/inspeksi/tempat-kerja/update-banyak",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: res => {
+                    Swal.fire({
+                        icon: "success",
+                        title: res.msg,
+                        confirmButtonText: "Kembali ke Dashboard"
+                    }).then(r => {
+                        if (r.isConfirmed) window.location.href = "/";
                     });
-                });
-                if (Array.isArray(PERPINDAHAN_MEJA_KARYAWAN) && PERPINDAHAN_MEJA_KARYAWAN.length > 0) {
-                    PERPINDAHAN_MEJA_KARYAWAN.forEach((ubah) => {
-                        const index = dataKirim.findIndex(d => d.id === ubah.id);
-                        if (index !== -1) {
-                            dataKirim[index].meja_tujuan = ubah.meja_tujuan;
-                        }
+                },
+                error: err => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal menyimpan data",
+                        text: err.responseJSON?.msg || "",
+                        confirmButtonText: "Tutup"
                     });
                 }
-
-                const formData = new FormData();
-                formData.append('_method', 'PUT');
-                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
-                formData.append('perpindahan_data', JSON.stringify(dataKirim));
-
-                $.ajax({
-                    url: '/inspeksi/tempat-kerja/update-banyak',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: res.msg,
-                            confirmButtonText: 'Kembali ke Dashboard'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/';
-                            }
-                        });
-                    },
-                    error: function(err) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal menyimpan data',
-                            text: err.responseJSON?.msg || '',
-                            confirmButtonText: 'Tutup'
-                        });
-                    }
-                });
             });
-
         });
+
+        function kirimKeServer(id, mejaSaatIni, mejaTujuanLabel) {
+            $.ajax({
+                url: "/inspeksi/tempat-kerja/" + id,
+                method: "PUT",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    id_karyawan: id,
+                    meja_saat_ini: mejaSaatIni,
+                    meja_tujuan: mejaTujuanLabel
+                }
+            });
+        }
     </script>
 @endsection
