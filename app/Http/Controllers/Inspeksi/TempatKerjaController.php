@@ -132,8 +132,6 @@ class TempatKerjaController extends Controller
             'id_karyawan',
         ]);
 
-        dd($data);
-
         $validate = Validator::make($data, [
             'meja_tujuan'   => 'required|string',
             'meja_saat_ini' => 'required|string',
