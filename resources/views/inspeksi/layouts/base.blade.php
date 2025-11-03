@@ -107,6 +107,18 @@
         .cursor-pointer {
             cursor: pointer;
         }
+
+        .btn-icon {
+            padding: .4rem .6rem !important;
+        }
+
+        .rotate-45 {
+            transform: rotate(45deg);
+        }
+
+        .-rotate-45 {
+            transform: rotate(-45deg);
+        }
     </style>
 
     @yield('style')
