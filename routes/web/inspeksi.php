@@ -9,6 +9,7 @@ use App\Http\Controllers\Inspeksi\TempatKerjaController;
 use App\Http\Controllers\Inspeksi\LevelController;
 use App\Http\Controllers\Inspeksi\RencanaController;
 use App\Http\Controllers\Inspeksi\KaryawanController;
+use App\Http\Controllers\Inspeksi\ProfilController;
 use App\Http\Controllers\Inspeksi\GroupController;
 use App\Http\Controllers\PelaporanController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,9 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //Level routes
   Route::resource('level', LevelController::class);
+
+  //profil routes
+  Route::resource('profile', ProfilController::class);
 
   //Rencana routes
   Route::resource('rencana', RencanaController::class);
@@ -45,6 +49,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::put('tempat-kerja/{id}', [TempatKerjaController::class, 'update']);
   Route::get('tempat-kerja/group/list', [TempatKerjaController::class, 'listgroup']);
   Route::get('tempat-kerja/meja/list', [TempatKerjaController::class, 'listmeja']);
+  Route::post('tempat-kerja/aktif-kembali', [TempatKerjaController::class, 'aktifKembali']);
 
   //Group routes
   Route::get('group/list', [GroupController::class, 'list']);

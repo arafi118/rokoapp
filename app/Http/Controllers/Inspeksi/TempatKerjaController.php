@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use App\Models\Group;
 use App\Models\Karyawan;
+use App\Models\Anggota;
 use App\Models\Meja;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -27,9 +28,9 @@ class TempatKerjaController extends Controller
             ->first();
 
         if ($statusAbsen) {
-
+            $anggota = Anggota::find(auth()->user()->id);
             $title = "Tempat Karyawan Bekerja";
-            return view('inspeksi.tempat_kerja.notifikasi', compact('title'));
+            return view('inspeksi.tempat_kerja.notifikasi', compact('title', 'anggota'));
         }
 
         $grouped = Group::with([
@@ -247,6 +248,38 @@ class TempatKerjaController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal update banyak karyawan: ' . $e->getMessage());
+        }
+    }
+
+    public function aktifKembali(Request $request)
+    {
+        $tanggal = $request->tanggal;
+
+        // Validasi tanggal
+        if (!$tanggal) {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Tanggal tidak ditemukan dalam permintaan.'
+            ], 400);
+        }
+
+        // Update semua absensi yang tanggalnya sama persis
+        $updated = \App\Models\Absensi::whereDate('tanggal', $tanggal)
+            ->update([
+                'status_absen' => 'open',
+                'updated_at' => now(),
+            ]);
+
+        if ($updated > 0) {
+            return response()->json([
+                'success' => true,
+                'msg' => "Absensi tanggal {$tanggal} berhasil diaktifkan kembali."
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => "Tidak ada data absensi pada tanggal {$tanggal}."
+            ]);
         }
     }
 }
