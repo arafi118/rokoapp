@@ -40,8 +40,8 @@ class PelaporanController extends Controller
         } 
         elseif ($file == 'jam_kerja') {
             $sub_laporan = [
-                ['value' => 'aktual', 'title' => 'Jam Kerja'],
-                ['value' => 'manhours', 'title' => 'Man Hours'],
+                ['value' => 'jam_kerja_aktual', 'title' => 'Jam Kerja'],
+                ['value' => 'jam_kerja_manhours', 'title' => 'Man Hours'],
             ];
         }
         elseif ($file == 'produktifitas') {
@@ -554,117 +554,116 @@ class PelaporanController extends Controller
 
         return $pdf->stream('Monitoring Karyawan.pdf');
     }
-public function produktifitas_index(array $data)
-{
-    $minggu_ke = explode('#', request()->get('minggu_ke'));
-    $tanggal_awal = trim($minggu_ke[0]);
-    $tanggal_akhir = trim($minggu_ke[1]);
+    
+    public function produktifitas_index(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-    $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-        ->with(['karyawan.getlevel'])
-        ->get();
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['karyawan.getlevel'])
+            ->get();
 
-    $total_data = $produksi->count(); // total seluruh baris data dalam rentang tanggal
+        $total_data = $produksi->count(); // total seluruh baris data dalam rentang tanggal
 
-    $data_per_tanggal = [];
+        $data_per_tanggal = [];
 
-    foreach ($produksi as $p) {
-        $tgl = $p->tanggal;
-        $level_id = $p->karyawan->getlevel->id ?? null;
-
-        if ($level_id && $total_data > 0) {
-            // Jumlah semua nilai (baik + buruk + buruk2)
-            $jumlah = (int)$p->jumlah_baik + (int)$p->jumlah_buruk + (int)$p->jumlah_buruk2;
-
-            // Hitung rata-rata per tanggal (dibagi total seluruh data)
-            $data_per_tanggal[$tgl][$level_id] = ($data_per_tanggal[$tgl][$level_id] ?? 0) + round($jumlah / $total_data, 2);
-        }
-    }
-
-    $title = 'Index Produktifitas';
-
-    $view = view('pelaporan.laporan.produktifitas_index', [
-        'tanggal_awal'  => $tanggal_awal,
-        'tanggal_akhir' => $tanggal_akhir,
-        'minggu_ke'     => $minggu_ke,
-        'data'          => $data_per_tanggal,
-        'title'         => $title,
-        'bulan'         => $data['bulan'] ?? null,
-        'tahun'         => $data['tahun'] ?? null,
-    ])->render();
-
-    $pdf = Pdf::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
-
-    return $pdf->stream('Produktifitas Index.pdf');
-}
-
-
-
-
- function produktifitas_aktual(array $data)
-{
-    $minggu_ke = explode('#', request()->get('minggu_ke'));
-    $tanggal_awal = trim($minggu_ke[0]);
-    $tanggal_akhir = trim($minggu_ke[1]);
-
-    $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-        ->with(['karyawan.getlevel'])
-        ->get();
-
-    $total_data = $produksi->count();
-
-    $data_per_tanggal = [];
-
-    if ($total_data > 0) {
         foreach ($produksi as $p) {
             $tgl = $p->tanggal;
             $level_id = $p->karyawan->getlevel->id ?? null;
 
-            if ($level_id) {
-                // gunakan float dan jangan round di sini
-                $jumlah = (float) $p->jumlah_baik;
+            if ($level_id && $total_data > 0) {
+                // Jumlah semua nilai (baik + buruk + buruk2)
+                $jumlah = (int)$p->jumlah_baik + (int)$p->jumlah_buruk + (int)$p->jumlah_buruk2;
 
-                // bagi dengan total_data, simpan hasil presisi
-                $nilai = $jumlah / $total_data;
-
-                // akumulasi per tanggal & level
-                $data_per_tanggal[$tgl][$level_id] = ($data_per_tanggal[$tgl][$level_id] ?? 0) + $nilai;
+                // Hitung rata-rata per tanggal (dibagi total seluruh data)
+                $data_per_tanggal[$tgl][$level_id] = ($data_per_tanggal[$tgl][$level_id] ?? 0) + round($jumlah / $total_data, 2);
             }
         }
+
+        $title = 'Index Produktifitas';
+
+        $view = view('pelaporan.laporan.produktifitas_index', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'data'          => $data_per_tanggal,
+            'title'         => $title,
+            'bulan'         => $data['bulan'] ?? null,
+            'tahun'         => $data['tahun'] ?? null,
+        ])->render();
+
+        $pdf = Pdf::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('Produktifitas Index.pdf');
     }
 
-    $title = 'Produktifitas (Orang/Jam/Batang)';
 
-    $view = view('pelaporan.laporan.produktifitas_aktual', [
-        'tanggal_awal'  => $tanggal_awal,
-        'tanggal_akhir' => $tanggal_akhir,
-        'minggu_ke'     => $minggu_ke,
-        'data'          => $data_per_tanggal,
-        'title'         => $title,
-        'bulan'         => $data['bulan'] ?? null,
-        'tahun'         => $data['tahun'] ?? null,
-    ])->render();
+    function produktifitas_aktual(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-    $pdf = Pdf::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['karyawan.getlevel'])
+            ->get();
 
-    return $pdf->stream('Produktifitas Aktual.pdf');
-}
+        $total_data = $produksi->count();
+
+        $data_per_tanggal = [];
+
+        if ($total_data > 0) {
+            foreach ($produksi as $p) {
+                $tgl = $p->tanggal;
+                $level_id = $p->karyawan->getlevel->id ?? null;
+
+                if ($level_id) {
+                    // gunakan float dan jangan round di sini
+                    $jumlah = (float) $p->jumlah_baik;
+
+                    // bagi dengan total_data, simpan hasil presisi
+                    $nilai = $jumlah / $total_data;
+
+                    // akumulasi per tanggal & level
+                    $data_per_tanggal[$tgl][$level_id] = ($data_per_tanggal[$tgl][$level_id] ?? 0) + $nilai;
+                }
+            }
+        }
+
+        $title = 'Produktifitas (Orang/Jam/Batang)';
+
+        $view = view('pelaporan.laporan.produktifitas_aktual', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'data'          => $data_per_tanggal,
+            'title'         => $title,
+            'bulan'         => $data['bulan'] ?? null,
+            'tahun'         => $data['tahun'] ?? null,
+        ])->render();
+
+        $pdf = Pdf::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('Produktifitas Aktual.pdf');
+    }
 
     private function volume(array $data)
     {
@@ -687,19 +686,56 @@ public function produktifitas_index(array $data)
 
     private function jam_kerja_aktual(array $data)
     {
-        $data['title_jamkerja'] = 'Laporan Jam Kerja';
-        $view = view('pelaporan.laporan.jam_kerja_aktual', $data)->render();
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = $minggu_ke[0];
+        $tanggal_akhir = $minggu_ke[1];
 
-        $pdf = Pdf::loadHTML($view)
-            ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 20,
-                'margin-bottom' => 20,
-                'margin-left'   => 15,
-                'margin-right'  => 15,
-            ]);
+        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['getkaryawan.getlevel'])
+            ->get();
 
-        return $pdf->stream('Jam Kerja.pdf');
+        // Hitung jumlah karyawan per tanggal dan per level
+        $karyawan = [];
+        foreach ($absensi as $a) {
+            $tanggal = $a->tanggal;
+            $level_id = $a->getkaryawan->getlevel->id ?? null;
+
+            if ($level_id) {
+                if (!isset($karyawan[$tanggal])) {
+                    $karyawan[$tanggal] = [];
+                }
+
+                if (isset($karyawan[$tanggal][$level_id])) {
+                    $karyawan[$tanggal][$level_id] += 1;
+                } else {
+                    $karyawan[$tanggal][$level_id] = 1;
+                }
+            }
+        }
+        $title = 'Laporan Jam Kerja';
+
+        $view = view('pelaporan.laporan.jam_kerja_aktual', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'absensi'       => $absensi,
+            'karyawan'      => $karyawan,
+            'title'         => $title,
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ])->render();
+
+         $pdf = PDF::loadHTML($view)
+        ->setPaper('a4', 'landscape')
+        ->setOptions([
+            'margin-top'    => 30,
+            'margin-bottom' => 15,
+            'margin-left'   => 25,
+            'margin-right'  => 20,
+            'enable-local-file-access' => true,
+        ]);
+
+        return $pdf->stream('Jam kerja.pdf');
     }
 
     private function jam_kerja_manhours(array $data)
