@@ -135,6 +135,7 @@
                         </a>
                     </li>
                 </ul>
+
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -142,15 +143,44 @@
                             <i data-lte-icon="minimize" class="fa fa-compress" style="display:none"></i>
                         </a>
                     </li>
+
+                    <!-- Dropdown User -->
                     <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             <img src="/assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow"
                                 alt="User Image" />
                             <span class="d-none d-md-inline">Alexander Pierce</span>
+                            <i class="bi bi-chevron-down"></i>
                         </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li class="dropdown-header text-center">
+                                <strong>Alexander Pierce</strong><br>
+                                <small class="text-muted">Administrator</small>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a href="" class="dropdown-item">
+                                    <i class="bi bi-person-circle me-2"></i> Profil Saya
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="btnLogout" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </a>
+                                <form id="formLogout" action="/inspeksi/logout" method="POST"
+                                    style="display:none;">
+                                    @csrf
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
+
         </nav>
 
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
@@ -252,25 +282,21 @@
             });
         @endif
 
-        $(document).ready(function() {
-            $('.select2').select2({
-                theme: 'bootstrap4'
-            });
-
-            $(document).on('click', '#btnLogout', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Yakin mau logout?',
-                    text: "Kamu akan keluar dari sistem.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, Logout!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) $('#formLogout').submit();
-                });
+        $(document).on('click', '#btnLogout', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Yakin mau logout?',
+                text: "Kamu akan keluar dari sistem.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#formLogout').submit();
+                }
             });
         });
     </script>
