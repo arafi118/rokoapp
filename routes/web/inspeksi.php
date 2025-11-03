@@ -69,7 +69,6 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::resource('meja', MejaController::class);
 
   //Logout route
-
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 

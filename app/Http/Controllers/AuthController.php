@@ -66,5 +66,4 @@ class AuthController extends Controller
 
         return redirect('/')->with('success', 'Terima Kasih, Anda Berhasil Logout');
     }
-    
 }
