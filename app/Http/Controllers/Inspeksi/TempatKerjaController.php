@@ -75,9 +75,11 @@ class TempatKerjaController extends Controller
             $dataKaryawan[$group->id]['meja'] = $dataMeja;
         }
 
+        $listKelompok = Group::get();
+
         $title = "Tempat Karyawan Bekerja";
 
-        return view('inspeksi.tempat_kerja.index', compact('dataKaryawan', 'title'));
+        return view('inspeksi.tempat_kerja.index', compact('dataKaryawan', 'listKelompok', 'title'));
     }
 
     public function listgroup(Request $request)

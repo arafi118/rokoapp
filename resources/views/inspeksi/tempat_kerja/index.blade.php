@@ -1,44 +1,25 @@
 @extends('inspeksi.layouts.base')
+
 @section('content')
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <style>
-        .dropdown-submenu {
-            position: relative;
-        }
-
-        .dropdown-submenu>.dropdown-menu {
-            top: 0;
-            left: 100%;
-            margin-top: -1px;
-            display: none;
-            position: absolute;
-        }
-
-        .dropdown.open>.dropdown-menu {
-            display: block;
-        }
-
-        .dropdown-menu {
-            min-width: 220px;
-            font-size: 13px;
-        }
-
-        .dropdown-menu li>a {
-            padding: 6px 12px;
-            display: block;
-        }
-
-        .dropdown-submenu>a::after {
-            content: "▸";
-            float: right;
-            font-size: 10px;
-            margin-top: 3px;
-        }
-
-        #kanbanDropdown {
-            top: 0;
-        }
-    </style>
+    <div class="row">
+        <div class="col-md-12 pb-3">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="filterKB">Pilih Kelompok</label>
+                        <select name="filterKB[]" id="filterKB" class="form-control select2" multiple="multiple">
+                            <option value="">- Pilih Kelompok Kanban -</option>
+                            <option value="Tsemua">Tampilkan Semua</option>
+                            @foreach ($listKelompok as $kelompok)
+                                <option value="{{ $kelompok->id }}">{{ $kelompok->nama }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-danger" id="msg_provinsi"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -64,7 +45,7 @@
                                                                     style="background-color: {{ $karyawan['warna'] }}; color: #fff;"
                                                                     data-meja-saat-ini="{{ $groupId }}-{{ $mejaId }}"
                                                                     data-id-karyawan="{{ $karyawan['id'] }}"
-                                                                    data-Level="{{ $karyawan['level'] }}"
+                                                                    data-level="{{ $karyawan['level'] }}"
                                                                     data-inisiallevel="{{ $karyawan['inisial'] }}"
                                                                     data-nik="{{ $karyawan['nik'] }}"
                                                                     data-kode="{{ $karyawan['kode_karyawan'] }}"
@@ -128,19 +109,19 @@
                             <h3 class="fw-bold mb-2 text-center">Kartu Karyawan Aktif</h3>
                             <table class="table table-borderless mb-0">
                                 <tr>
-                                    <td style="width: 130px;"><strong>Nama&nbsp;:</strong></td>
+                                    <td style="width: 130px;"><strong>Nama :</strong></td>
                                     <td id="modalNama">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>NIK&nbsp;&nbsp;&nbsp;&nbsp;:</strong></td>
+                                    <td><strong>NIK :</strong></td>
                                     <td id="modalNik">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Kode&nbsp;&nbsp;:</strong></td>
+                                    <td><strong>Kode :</strong></td>
                                     <td id="modalKode">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Level&nbsp;&nbsp;:</strong></td>
+                                    <td><strong>Level :</strong></td>
                                     <td id="modallevel">-</td>
                                 </tr>
                             </table>
@@ -156,11 +137,37 @@
 @endsection
 
 @section('script')
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $(document).off('contextmenu.bs.dropdown.data-api');
+            $(document).off('click.bs.dropdown.data-api');
+
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            $('#filterKB').on('change', function() {
+                const selectedValues = $(this).val() || [];
+                const tampilSemua = selectedValues.includes('Tsemua') || selectedValues.length === 0;
+
+                $('.col-md-6.mb-3').each(function() {
+                    const groupId = $(this).find('.kanban').first().data(
+                        'group');
+
+                    if (tampilSemua || selectedValues.includes(String(groupId))) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+
+        // --- Variabel Global ---
         let PERPINDAHAN_MEJA_KARYAWAN = [];
 
+        // --- Modal Detail ---
         $(document).on("click", ".ViewKaryawan", function() {
             const parentCard = $(this).closest(".card");
             $("#modalNama").text(parentCard.data("nama"));
@@ -171,6 +178,7 @@
             $("#ViewKaryawan").modal("show");
         });
 
+        // --- Drag & Drop (Dragula) ---
         const drake = dragula($(".kanban").toArray(), {
             mirrorContainer: document.body,
             revertOnSpill: true,
@@ -198,7 +206,6 @@
                     timer: 3000,
                     showConfirmButton: false
                 });
-
                 source.appendChild(el);
                 return;
             }
@@ -227,6 +234,7 @@
             kirimKeServer(id, mejaSaatIni, mejaTujuanLabel);
         });
 
+        // --- Klik kanan (contextmenu) pindah kanban ---
         $(document).on("contextmenu", ".dropdown-toggle", function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -257,18 +265,19 @@
                 let html = `
             <li class="text-center fw-bold text-primary py-2 border-bottom bg-light">Pindahkan Kanban</li>
             ${groups.map(g => `
-                                                    <li class="dropdown-submenu">
-                                                        <a href="#" class="test d-flex justify-content-between align-items-center" data-group-id="${g.id}">
-                                                            <span>${g.text}</span>
-                                                        </a>
-                                                    <ul class="dropdown-menu submenu" id="submenu-${g.id}"></ul>
-                                                            </li>
-                                                    `).join("")}
-        `;
+                                <li class="dropdown-submenu">
+                                    <a href="#" class="test d-flex justify-content-between align-items-center" data-group-id="${g.id}">
+                                        <span>${g.text}</span>
+                                    </a>
+                                    <ul class="dropdown-menu submenu" id="submenu-${g.id}"></ul>
+                                </li>
+                            `).join("")}
+            `;
                 container.html(html);
             });
         });
 
+        // --- Pilih meja tujuan ---
         $(document).on("click", ".dropdown-submenu a.test", function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -289,6 +298,7 @@
             });
         });
 
+        // --- Klik meja item untuk pindah ---
         $(document).on("click", ".meja-item", function(e) {
             e.preventDefault();
 
@@ -313,8 +323,6 @@
                     timer: 2000,
                     showConfirmButton: false
                 });
-
-                source.appendChild(el);
                 return;
             }
 
@@ -348,8 +356,10 @@
             kirimKeServer(id, mejaSaatIni, mejaTujuanLabel);
         });
 
+        // --- Tutup dropdown kalau klik di luar ---
         $(document).on("click", () => $(".kanban-dropdown").removeClass("open"));
 
+        // --- Simpan semua perubahan ---
         $(document).on("click", "#SimpanTempatKerja", function(e) {
             e.preventDefault();
 

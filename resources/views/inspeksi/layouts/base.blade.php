@@ -45,7 +45,7 @@
 
     <style>
         .modal-backdrop.show {
-            background-color: rgba(0, 0, 0, 0.5) !important;
+            background-color: rgba(169, 103, 103, 0.5) !important;
         }
 
         .kanban-dragging {
@@ -119,6 +119,65 @@
         .-rotate-45 {
             transform: rotate(-45deg);
         }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu>.dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+            position: absolute;
+        }
+
+        .dropdown.open>.dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu {
+            min-width: 220px;
+            font-size: 13px;
+        }
+
+        .dropdown-menu li>a {
+            padding: 6px 12px;
+            display: block;
+        }
+
+        .dropdown-submenu>a::after {
+            content: "▸";
+            float: right;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        #kanbanDropdown {
+            top: 0;
+        }
+
+        .select2-selection__choice__remove {
+            background: none !important;
+            border: none !important;
+            color: #888 !important;
+            font-weight: bold;
+        }
+
+        .select2-selection__choice__remove:hover {
+            color: #dc3545 !important;
+        }
+
+        .select2-selection__choice {
+            background: #f8f9fa !important;
+            border: 1px solid #dee2e6 !important;
+            color: #333 !important;
+            padding-right: 5px !important;
+        }
+
+        .select2-selection__choice:first-child {
+            margin-left: 12px !important;
+        }
     </style>
 
     @yield('style')
@@ -163,7 +222,7 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a href="" class="dropdown-item">
+                                <a href="/inspeksi/profile" class="dropdown-item">
                                     <i class="bi bi-person-circle me-2"></i> Profil Saya
                                 </a>
                             </li>
