@@ -14,7 +14,7 @@
 <style>
     body {
         font-family: Calibri, Arial, sans-serif;
-        font-size: 13px;
+        font-size: 12px;
     }
 
 
@@ -122,47 +122,62 @@
                 <td colspan="12" class="text-left"><strong>A. KATEGORI BORONG</strong></td>
             </tr>
 
-            @php $no = 1; @endphp
-            @foreach ($kategori as $bagian => $levels)
-                {{-- Baris per kategori --}}
-                @php $first = true; @endphp
-                @foreach ($levels as $lvl)
+            @php
+                $nomor = 1;
+            @endphp
+            @foreach ($levels as $level)
+                @foreach ($peringkat as $key => $value)
+                    @php
+                        $terdaftarAwal = 0;
+                        $tambahBaru = 0;
+                        $tambahNaikPeringkat = 0;
+                        $tambahMutasi = 0;
+                        $kurangNaikPeringkat = 0;
+                        $kurangMutasi = 0;
+                        $kurangKeluar = 0;
+
+                        if (isset($level['data'][$key])) {
+                            $data = $level['data'][$key];
+                            $terdaftarAwal = $data['terdaftar_awal'] ?? 0;
+                            $tambahBaru = $data['baru'] ?? 0;
+                            $tambahNaikPeringkat = $data['penambahan']['naik peringkat'] ?? 0;
+                            $tambahMutasi = $data['penambahan']['mutasi'] ?? 0;
+                            $kurangNaikPeringkat = $data['pengurangan']['naik peringkat'] ?? 0;
+                            $kurangMutasi = $data['pengurangan']['mutasi'] ?? 0;
+                            $kurangKeluar = $data['pengurangan']['keluar'] ?? 0;
+                        }
+
+                        $jumlahPenambahan = $tambahBaru + $tambahNaikPeringkat + $tambahMutasi;
+                        $jumlahPengurangan = $kurangNaikPeringkat + $kurangMutasi + $kurangKeluar;
+
+                        $terdaftarAkhir = $terdaftarAwal + $jumlahPenambahan - $jumlahPengurangan;
+                    @endphp
                     <tr>
-                        @if ($first)
-                            <td>{{ $no++ }}</td>
-                            <td class="text-left">{{ $bagian }}</td>
-                            @php $first = false; @endphp
-                        @else
-                            <td></td>
-                            <td></td>
+                        @if ($loop->first)
+                            <td rowspan="{{ count($peringkat) }}">{{ $nomor++ }}</td>
+                            <td rowspan="{{ count($peringkat) }}">{{ $level['nama'] }}</td>
                         @endif
-                        <td class="text-left">{{ $lvl['peringkat'] }}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td></td>
+                        <td>{{ $value }}</td>
+                        <td align="center">{{ $terdaftarAwal }}</td>
+                        <td align="center">{{ $tambahBaru }}</td>
+                        <td align="center">{{ $tambahNaikPeringkat }}</td>
+                        <td align="center">{{ $tambahMutasi }}</td>
+                        <td align="center">{{ $kurangNaikPeringkat }}</td>
+                        <td align="center">{{ $kurangMutasi }}</td>
+                        <td align="center">{{ $kurangKeluar }}</td>
+                        <td align="center">{{ $terdaftarAkhir }}</td>
+                        <td align="center"></td>
                     </tr>
                 @endforeach
 
-                {{-- Total per kategori --}}
                 <tr style="background-color:#e0e0e0;">
-                    <td colspan="3" class="text-right"><strong>Total {{ $bagian }}</strong></td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td></td>
+                    <td colspan="3">
+                        <b>Total {{ $level['nama'] }}</b>
+                    </td>
+                    <td colspan="9">&nbsp;</td>
                 </tr>
             @endforeach
+
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Borongan</strong></td>
                 <td>-</td>

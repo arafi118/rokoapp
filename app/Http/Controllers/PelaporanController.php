@@ -19,7 +19,7 @@ class PelaporanController extends Controller
         $laporan = JenisLaporan::where('file', '!=', '0')
             ->orderBy('urut', 'ASC')
             ->get();
-        
+
         return view('pelaporan.index', compact('title', 'laporan'));
     }
 
@@ -37,29 +37,24 @@ class PelaporanController extends Controller
                 ['value' => 'karyawan_komposisi_karyawan', 'title' => 'Komposisi Karyawan'],
 
             ];
-        } 
-        elseif ($file == 'jam_kerja') {
+        } elseif ($file == 'jam_kerja') {
             $sub_laporan = [
                 ['value' => 'jam_kerja_aktual', 'title' => 'Jam Kerja'],
                 ['value' => 'jam_kerja_manhours', 'title' => 'Man Hours'],
             ];
-        }
-        elseif ($file == 'produktifitas') {
+        } elseif ($file == 'produktifitas') {
             $sub_laporan = [
                 ['value' => 'produktifitas_aktual', 'title' => 'Produktifitas'],
                 ['value' => 'produktifitas_index', 'title' => 'Index Produktifitas'],
             ];
-        }
-        elseif ($file == 'kapasitas') {
+        } elseif ($file == 'kapasitas') {
             $sub_laporan = [
                 ['value' => 'stick_hours', 'title' => 'Stick / Hours'],
                 ['value' => 'balance_prosses', 'title' => 'Balance Prosses'],
                 ['value' => 'index_kapasitas', 'title' => 'Index Kapasitas'],
 
             ];
-        }
-
-        else {
+        } else {
             $sub_laporan = [
                 ['value' => '', 'title' => '---']
             ];
@@ -70,7 +65,7 @@ class PelaporanController extends Controller
             'sub_laporan' => $sub_laporan
         ]);
     }
-    
+
     public function preview(Request $request)
     {
         $laporan = $request->get('laporan');
@@ -140,15 +135,15 @@ class PelaporanController extends Controller
             'tahun'         => $data['tahun'],
         ])->render();
 
-         $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
         return $pdf->stream('Karyawan Terdaftar.pdf');
     }
@@ -160,7 +155,7 @@ class PelaporanController extends Controller
         $tanggal_akhir = $minggu_ke[1];
 
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-            ->where('status','H')
+            ->where('status', 'H')
             ->with(['getkaryawan.getlevel'])
             ->get();
 
@@ -195,14 +190,14 @@ class PelaporanController extends Controller
             'tahun'         => $data['tahun'],
         ])->render();
         $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
 
         return $pdf->stream('Karyawan Hadir.pdf');
@@ -215,7 +210,7 @@ class PelaporanController extends Controller
         $tanggal_akhir = $minggu_ke[1];
 
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-            ->where('status','T')
+            ->where('status', 'T')
             ->with(['getkaryawan.getlevel'])
             ->get();
 
@@ -252,14 +247,14 @@ class PelaporanController extends Controller
             'tahun'         => $data['tahun'],
         ])->render();
         $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
 
         return $pdf->stream('Karyawan Tidak Masuk.pdf');
@@ -317,7 +312,7 @@ class PelaporanController extends Controller
         return $pdf->stream('Karyawan Direkrut.pdf');
     }
 
-    public function karyawan_keluar(array $data) 
+    public function karyawan_keluar(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
         $tanggal_awal = $minggu_ke[0];
@@ -418,8 +413,8 @@ class PelaporanController extends Controller
             'bulan'         => $data['bulan'],
             'tahun'         => $data['tahun'],
         ])->render();
-        
-        
+
+
         $pdf = PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
             ->setOptions([
@@ -495,47 +490,105 @@ class PelaporanController extends Controller
         $bulan = $data['bulan'];
         $minggu_ke = $data['minggu_ke'] ?? null;
 
+        $tanggal_awal = "{$tahun}-{$bulan}-01";
+        $tanggal_akhir = date("Y-m-t", strtotime($tanggal_awal));
+        $periode_label = 'Bulanan';
         if ($minggu_ke) {
             $rentang = explode('#', $minggu_ke);
             $tanggal_awal = $rentang[0];
             $tanggal_akhir = $rentang[1];
             $periode_label = 'Mingguan';
-        } else {
-            $tanggal_awal = "{$tahun}-{$bulan}-01";
-            $tanggal_akhir = date("Y-m-t", strtotime($tanggal_awal));
-            $periode_label = 'Bulanan';
         }
 
-        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-            ->with(['getkaryawan.getlevel'])
-            ->get();
+        $levels = Level::where('level_karyawan', '1')->get()->pluck([], 'id')->toArray();
+        $peringkat = [
+            'P' => 'Pemula',
+            'T' => 'Terampil',
+            'M' => 'Mahir',
+            'R' => 'Resmi',
+        ];
 
-                
-        $kategori_list = ['Giling', 'Gunting', 'Pack', 'OPP', 'Banderol', 'MOP', 'Multi Skill'];
+        $daftarKaryawan = Karyawan::with([
+            'getmutasi' => function ($q) use ($tanggal_akhir) {
+                $q->where('tanggal', '<=', $tanggal_akhir)->orderBy('tanggal', 'desc');
+            }
+        ])->orderBy('id', 'asc')->get();
 
-        // Daftar peringkat tetap
-        $peringkat_list = ['Resmi', 'Mahir', 'Terampil', 'Pemula'];
+        $listMutasiKaryawan = [];
+        foreach ($daftarKaryawan as $karyawan) {
+            $dataKaryawan = [];
 
-        // Bangun struktur kategori => peringkat
-        $kategori = [];
-        foreach ($kategori_list as $bagian) {
-            $kategori[$bagian] = collect();
-            foreach ($peringkat_list as $lvl) {
-                $kategori[$bagian]->push([
-                    'peringkat' => $lvl,
-                    'bagian' => $bagian,
-                    'nama' => "Operator {$bagian} - {$lvl}",
-                ]);
+            $dataKaryawan['id'] = $karyawan->id;
+            $dataKaryawan['peringkat'] = substr($karyawan->kode_karyawan, 0, 1);
+            $dataKaryawan['masuk'] = $karyawan->tanggal_masuk;
+            $dataKaryawan['keluar'] = $karyawan->tanggal_keluar;
+            $dataKaryawan['level'] = $karyawan->level;
+            $dataKaryawan['status'] = $karyawan->status;
+            $dataKaryawan['mutasi'] = [];
+
+            if (count($karyawan->getmutasi) > 0) {
+                $mutasi = $karyawan->getmutasi[0];
+                $mutasiKaryawan = json_decode($mutasi->karyawan, true);
+                $riwayatKaryawan = json_decode($mutasi->riwayat, true);
+
+                if ($mutasi->tanggal < $tanggal_awal) {
+                    $dataKaryawan = [
+                        'id' => $mutasiKaryawan['id'],
+                        'peringkat' => substr($mutasiKaryawan['kode_karyawan'], 0, 1),
+                        'masuk' => $mutasiKaryawan['tanggal_masuk'],
+                        'keluar' => $mutasiKaryawan['tanggal_keluar'],
+                        'level' => $mutasiKaryawan['level'],
+                        'status' => $mutasiKaryawan['status'],
+                    ];
+                } else {
+                    $dataKaryawan = [
+                        'id' => $riwayatKaryawan['id'],
+                        'peringkat' => substr($riwayatKaryawan['kode_karyawan'], 0, 1),
+                        'masuk' => $riwayatKaryawan['tanggal_masuk'],
+                        'keluar' => $riwayatKaryawan['tanggal_keluar'],
+                        'level' => $riwayatKaryawan['level'],
+                        'status' => $riwayatKaryawan['status'],
+                        'mutasi' => [
+                            'jenis_mutasi' => $mutasi->jenis_mutasi,
+                            'peringkat' => substr($mutasiKaryawan['kode_karyawan'], 0, 1),
+                            'masuk' => $mutasi->tanggal,
+                            'keluar' => $mutasiKaryawan['tanggal_keluar'],
+                            'level' => $mutasiKaryawan['level'],
+                            'status' => $mutasiKaryawan['status'],
+                        ],
+                    ];
+                }
+            }
+
+            $listMutasiKaryawan[] = $dataKaryawan;
+        }
+
+        foreach ($listMutasiKaryawan as $listMutasi) {
+            if ($listMutasi['keluar'] < $tanggal_awal && $listMutasi['status'] === 'nonaktif') {
+                continue;
+            }
+
+            $isAwal = $listMutasi['masuk'] < $tanggal_awal;
+            $levelRef = &$levels[$listMutasi['level']]['data'][$listMutasi['peringkat']];
+            $key = $isAwal ? 'terdaftar_awal' : 'baru';
+            $levelRef[$key] = ($levelRef[$key] ?? 0) + 1;
+
+            if (!empty($listMutasi['mutasi'])) {
+                $mutasi = $listMutasi['mutasi'];
+                $mutasiRef = &$levels[$mutasi['level']]['data'][$mutasi['peringkat']];
+                $jenis = $mutasi['jenis_mutasi'];
+
+                $levelRef['pengurangan'][$jenis] = ($levelRef['pengurangan'][$jenis] ?? 0) + 1;
+                $mutasiRef['penambahan'][$jenis] = ($mutasiRef['penambahan'][$jenis] ?? 0) + 1;
             }
         }
-        
-        $title = "Data Monitoring Karyawan Periode {$periode_label}";
 
+        $title = "Data Monitoring Karyawan Periode {$periode_label}";
         $view = view('pelaporan.laporan.monitoring_karyawan', [
             'tanggal_awal'  => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
-            'absensi'       => $absensi,
-            'kategori'      => $kategori, 
+            'levels'        => $levels,
+            'peringkat'     => $peringkat,
             'title'         => $title,
             'bulan'         => $bulan,
             'tahun'         => $tahun,
@@ -552,9 +605,9 @@ class PelaporanController extends Controller
                 'enable-local-file-access' => true,
             ]);
 
-        return $pdf->stream('Monitoring Karyawan.pdf');
+        return $pdf->stream($title . '.pdf');
     }
-    
+
     public function produktifitas_index(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
@@ -672,14 +725,14 @@ class PelaporanController extends Controller
         $view = view('pelaporan.laporan.volume_produksi', $data)->render();
 
         $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
         return $pdf->stream();
     }
@@ -725,15 +778,15 @@ class PelaporanController extends Controller
             'tahun'         => $data['tahun'],
         ])->render();
 
-         $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
         return $pdf->stream('Jam kerja.pdf');
     }
@@ -784,12 +837,4 @@ class PelaporanController extends Controller
 
         return $pdf->stream($data['judul'] . '.pdf');
     }
-
-    
-
-    
-
-
-
-
 }

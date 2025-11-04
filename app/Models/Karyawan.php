@@ -40,4 +40,9 @@ class Karyawan extends Model
     {
         return $this->belongsTo(Meja::class, 'meja_id');
     }
+
+    public function getmutasi()
+    {
+        return $this->hasMany(Mutasi::class, 'karyawan_id');
+    }
 }
