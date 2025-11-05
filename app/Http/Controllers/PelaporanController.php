@@ -737,45 +737,149 @@ class PelaporanController extends Controller
         return $pdf->stream();
     }
 
-    private function jam_kerja_aktual(array $data)
+      private function jam_kerja_aktual(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
-        $tanggal_awal = $minggu_ke[0];
-        $tanggal_akhir = $minggu_ke[1];
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
+        // Ambil data absensi sesuai periode
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->whereIn('status', ['H', 'T'])
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Hitung jumlah karyawan per tanggal dan per level
-        $karyawan = [];
+        // Inisialisasi variabel
+        $jam_kerja = [];
+        $rata_rata_jam_kerja = [];
+
         foreach ($absensi as $a) {
             $tanggal = $a->tanggal;
             $level_id = $a->getkaryawan->getlevel->id ?? null;
 
-            if ($level_id) {
-                if (!isset($karyawan[$tanggal])) {
-                    $karyawan[$tanggal] = [];
+            // --- Hanya proses jika karyawan dan tanggal valid
+            if (!$level_id) continue;
+
+            // --- Jika jam_masuk dan jam_keluar terisi
+            if ($a->jam_masuk && $a->jam_keluar) {
+                $jam_masuk = strtotime($a->tanggal . ' ' . $a->jam_masuk);
+                $jam_keluar = strtotime($a->tanggal . ' ' . $a->jam_keluar);
+
+                // Jika shift malam (jam keluar < jam masuk)
+                if ($jam_keluar < $jam_masuk) {
+                    $jam_keluar = strtotime('+1 day', $jam_keluar);
                 }
 
-                if (isset($karyawan[$tanggal][$level_id])) {
-                    $karyawan[$tanggal][$level_id] += 1;
-                } else {
-                    $karyawan[$tanggal][$level_id] = 1;
-                }
+                // Hitung selisih dalam jam
+                $selisih_jam = round(($jam_keluar - $jam_masuk) / 3600, 2);
+            } else {
+                $selisih_jam = 0;
             }
+
+            // Simpan total per tanggal & level
+            $jam_kerja[$tanggal][$level_id] = ($jam_kerja[$tanggal][$level_id] ?? 0) + $selisih_jam;
+
+            // Simpan untuk rata-rata
+            $rata_rata_jam_kerja[$tanggal][] = $selisih_jam;
         }
+
+        // Hitung rata-rata jam kerja per tanggal (abaikan nilai 0)
+        foreach ($rata_rata_jam_kerja as $tgl => $values) {
+            $valid = array_filter($values, fn($v) => $v > 0);
+            $rata_rata_jam_kerja[$tgl] = count($valid) > 0
+                ? round(array_sum($valid) / count($valid), 2)
+                : 0;
+        }
+
         $title = 'Laporan Jam Kerja';
 
+        // Render ke tampilan Blade
         $view = view('pelaporan.laporan.jam_kerja_aktual', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'absensi'       => $absensi,
-            'karyawan'      => $karyawan,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'         => $tanggal_awal,
+            'tanggal_akhir'        => $tanggal_akhir,
+            'jam_kerja'            => $jam_kerja,
+            'rata_rata_jam_kerja'  => $rata_rata_jam_kerja,
+            'absensi'              => $absensi,
+            'title'                => $title,
+            'bulan'                => $data['bulan'],
+            'tahun'                => $data['tahun'],
+        ])->render();
+
+        // Buat PDF
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('Jam Kerja.pdf');
+    }
+
+    private function jam_kerja_manhours(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
+
+        // Ambil data absensi selama periode
+        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->whereIn('status', ['H', 'T'])
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        $jam_kerja = [];
+        $jumlah_karyawan = [];
+        $manhours = [];
+
+        foreach ($absensi as $a) {
+            $tanggal = $a->tanggal;
+            $level_id = $a->getkaryawan->getlevel->id ?? null;
+
+            if (!$level_id || !$a->jam_masuk || !$a->jam_keluar) continue;
+
+            $jam_masuk = strtotime($a->tanggal . ' ' . $a->jam_masuk);
+            $jam_keluar = strtotime($a->tanggal . ' ' . $a->jam_keluar);
+
+            // Jika shift malam (jam keluar < jam masuk)
+            if ($jam_keluar < $jam_masuk) {
+                $jam_keluar = strtotime('+1 day', $jam_keluar);
+            }
+
+            $selisih_jam = round(($jam_keluar - $jam_masuk) / 3600, 2);
+
+            // Simpan jam kerja total per tanggal per level
+            $jam_kerja[$tanggal][$level_id] = ($jam_kerja[$tanggal][$level_id] ?? 0) + $selisih_jam;
+
+            // Tambah jumlah orang per level
+            $jumlah_karyawan[$tanggal][$level_id] = ($jumlah_karyawan[$tanggal][$level_id] ?? 0) + 1;
+
+            // Hitung manhours (jam kerja × jumlah orang)
+            $manhours[$tanggal][$level_id] = ($manhours[$tanggal][$level_id] ?? 0) + $selisih_jam;
+        }
+
+        // Hitung total per tanggal untuk ditampilkan di bagian bawah
+        $total_per_tanggal = [];
+        foreach ($manhours as $tanggal => $levels) {
+            $total_per_tanggal[$tanggal] = array_sum($levels);
+        }
+
+        $title = 'Laporan Jam Kerja (Manhours)';
+
+        $view = view('pelaporan.laporan.jam_kerja_manhours', [
+            'tanggal_awal'        => $tanggal_awal,
+            'tanggal_akhir'       => $tanggal_akhir,
+            'jam_kerja'           => $jam_kerja,
+            'jumlah_karyawan'     => $jumlah_karyawan,
+            'manhours'            => $manhours,
+            'total_per_tanggal'   => $total_per_tanggal,
+            'absensi'             => $absensi,
+            'title'               => $title,
+            'bulan'               => $data['bulan'],
+            'tahun'               => $data['tahun'],
         ])->render();
 
         $pdf = PDF::loadHTML($view)
@@ -788,24 +892,7 @@ class PelaporanController extends Controller
                 'enable-local-file-access' => true,
             ]);
 
-        return $pdf->stream('Jam kerja.pdf');
-    }
-
-    private function jam_kerja_manhours(array $data)
-    {
-        $data['title_manhours'] = 'Laporan Man Hours';
-        $view = view('pelaporan.laporan.jam_kerja_manhours', $data)->render();
-
-        $pdf = Pdf::loadHTML($view)
-            ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 20,
-                'margin-bottom' => 20,
-                'margin-left'   => 15,
-                'margin-right'  => 15,
-            ]);
-
-        return $pdf->stream('Man Hours.pdf');
+        return $pdf->stream('Jam Kerja (Manhours).pdf');
     }
 
     private function kapasitas(array $data)

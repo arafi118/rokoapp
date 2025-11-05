@@ -37,7 +37,7 @@ $last_week = null;
     }
 
     thead th {
-        background-color: #d6eef8;
+        background-color: #c7f4ff;
         font-weight: bold;
     }
 

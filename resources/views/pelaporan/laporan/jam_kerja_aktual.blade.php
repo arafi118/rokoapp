@@ -2,11 +2,6 @@
     use App\Utils\Tanggal;
     use Carbon\CarbonPeriod;
 
-    //     BERHENTI 1 HARI SEBELEUM TANGGAL AKHIR
-    // $start = new DateTime($tanggal_awal);
-    // $end = new DateTime($tanggal_akhir);
-    // $period = new DatePeriod($start, new DateInterval('P1D'), $end);
-
     $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
     $weekly_total = array_fill(1, 8, 0);
     $last_week = null;
@@ -31,7 +26,7 @@
     }
 
     thead th {
-        background-color: #d6eef8;
+        background-color: #c7f4ff;
         font-weight: bold;
     }
 
@@ -69,14 +64,14 @@
 
 <table border="1" cellspacing="0" cellpadding="4" width="100%">
     <thead>
-        <tr>
+        <tr style="background-color:#d9e1f2; font-weight:bold; text-align:center;">
             <th rowspan="2" width="5%">WEEK</th>
             <th rowspan="2" width="12%">TANGGAL</th>
             <th rowspan="2" width="10%">HARI</th>
             <th rowspan="2" width="12%">Rencana Jam Kerja (jam/orang)</th>
             <th colspan="8">JAM KERJA AKTUAL (satuan jam/orang)</th>
         </tr>
-        <tr>
+        <tr style="background-color:#d9e1f2; text-align:center;">
             <th>Giling</th>
             <th>Gunting</th>
             <th>Packing</th>
@@ -95,50 +90,58 @@
                 $tgl_tampil = $date->format('d-M-y');
                 $hari = Tanggal::namaHari($tgl);
 
-                $harian = $karyawan[$tgl] ?? collect([]);
+                // Data harian dari controller
+                $harian = $jam_kerja[$tgl] ?? [];
 
+                // Buat baris level 1–8
                 $row = [];
                 for ($i = 1; $i <= 8; $i++) {
-                    $row[$i] = $harian[$i] ?? 0;
-                    $weekly_total[$i] += $row[$i];
+                    $nilai = $harian[$i] ?? 0;
+                    $row[$i] = number_format($nilai, 2, ',', '.');
+                    $weekly_total[$i] += $nilai;
                 }
+
+                // Rata-rata jam kerja per tanggal
+                $jam_rata = $rata_rata_jam_kerja[$tgl] ?? 0;
             @endphp
 
             <tr class="{{ $hari == 'Minggu' ? 'minggu' : '' }}">
                 <td>{{ $last_week !== $week ? $week : '' }}</td>
                 <td>{{ $tgl_tampil }}</td>
                 <td>{{ $hari }}</td>
-                <td></td>
-                @foreach ($row as $val)
-                    <td>{{ $val }}</td>
-                @endforeach
+                <td style="text-align:center;">
+                    {{ $hari == 'Minggu' ? '' : number_format($jam_rata, 2, ',', '.') }}
+                </td>
+
+                @for ($i = 1; $i <= 8; $i++)
+                    <td style="text-align:right;">{{ $row[$i] }}</td>
+                @endfor
             </tr>
 
-            {{-- total tiap akhir minggu --}}
+            {{-- Jika Minggu, tampilkan total mingguan --}}
             @if ($hari == 'Minggu')
-                <tr style="font-weight:bold; background-color:#f0f0f0;">
-                    <td colspan="4">Total</td>
-                    @foreach ($weekly_total as $val)
-                        <td>{{ $val }}</td>
-                    @endforeach
+                <tr style="font-weight:bold; background-color:#f2f2f2;">
+                    <td colspan="4">Total Mingguan</td>
+                    @for ($i = 1; $i <= 8; $i++)
+                        <td style="text-align:right;">{{ number_format($weekly_total[$i], 2, ',', '.') }}</td>
+                    @endfor
                 </tr>
                 @php
-                    $weekly_total = array_fill(1, 8, 0); // reset minggu berikutnya
+                    $weekly_total = array_fill(1, 8, 0);
                 @endphp
             @endif
 
             @php $last_week = $week; @endphp
         @endforeach
 
-        {{-- total untuk minggu terakhir (jika tidak berakhir di Minggu) --}}
+        {{-- Total akhir (jika tidak berhenti di hari Minggu) --}}
         @if (array_sum($weekly_total) > 0)
-            <tr style="font-weight:bold; background-color:#f0f0f0;">
-                <td colspan="4">Total</td>
-                @foreach ($weekly_total as $val)
-                    <td>{{ $val }}</td>
-                @endforeach
+            <tr style="font-weight:bold; background-color:#f2f2f2;">
+                <td colspan="4">Total Akhir</td>
+                @for ($i = 1; $i <= 8; $i++)
+                    <td style="text-align:right;">{{ number_format($weekly_total[$i], 2, ',', '.') }}</td>
+                @endfor
             </tr>
         @endif
-
     </tbody>
 </table>
