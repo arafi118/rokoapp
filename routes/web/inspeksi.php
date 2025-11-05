@@ -23,7 +23,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //profil routes
   Route::resource('profile', ProfilController::class);
-  Route::put('profile/update', [ProfilController::class, 'update']);
+  Route::put('profile/update/{id}', [ProfilController::class, 'update']);
   //Rencana routes
   Route::resource('rencana', RencanaController::class);
 

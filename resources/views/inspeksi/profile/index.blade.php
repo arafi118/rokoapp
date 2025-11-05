@@ -1,6 +1,6 @@
 @extends('inspeksi.layouts.base')
 @section('content')
-    <form action="{{ url('inspeksi/update/' . $anggota->id) }}" method="POST" enctype="multipart/form-data"
+    <form action="{{ url('inspeksi/profile/update/' . $anggota->id) }}" method="POST" enctype="multipart/form-data"
         id="FormUpdateProfil">
         @csrf
         @method('PUT')
@@ -166,7 +166,7 @@
                         // --- Update foto profil navbar ---
                         if (r.foto) {
                             $('.user-image').attr('src', '/storage/profil/' + r.foto + '?v=' +
-                            new Date().getTime());
+                                new Date().getTime());
                             $('#previewFoto').attr('src', '/storage/profil/' + r.foto + '?v=' +
                                 new Date().getTime());
                         }
