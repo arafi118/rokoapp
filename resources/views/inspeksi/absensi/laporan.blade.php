@@ -362,7 +362,7 @@
                         text: response.msg,
                         icon: 'success',
                     }).then((res) => {
-                        table.ajax.reload()
+
                     })
                 }
             })
@@ -391,7 +391,7 @@
                         text: response.msg,
                         icon: 'success',
                     }).then((res) => {
-                        table.ajax.reload()
+
                     })
                 }
             })
@@ -423,7 +423,7 @@
                         icon: 'success',
                     }).then((res) => {
                         $('#modalAbsenKaryawan').modal('hide')
-                        table.ajax.reload()
+
                     })
                 }
             })
