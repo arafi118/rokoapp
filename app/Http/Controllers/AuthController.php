@@ -23,8 +23,10 @@ class AuthController extends Controller
         ]);
 
         $anggota = Anggota::where('username', $request->username)->first();
+
         if ($anggota) {
             if (password_verify($request->password, $anggota->password)) {
+
                 $karyawan = Karyawan::where('anggota_id', $anggota->id)
                     ->where('status', 'aktif')
                     ->first();
@@ -48,7 +50,12 @@ class AuthController extends Controller
                 }
 
                 $redirect = '/' . strtolower($anggota->getjabatan->nama);
+
                 if (Auth::attempt($request->only('username', 'password'))) {
+
+                    // 🔹 Tambahan: simpan data anggota ke session
+                    session(['anggota' => $anggota]);
+
                     return redirect($redirect)->with('success', 'Selamat Datang ' . $anggota->nama);
                 }
             }
@@ -56,6 +63,7 @@ class AuthController extends Controller
 
         return back()->with('error', 'Login Gagal. Username atau Password Salah');
     }
+
 
     public function logout(Request $request)
     {
