@@ -187,7 +187,8 @@ class AbsensiController extends Controller
             $nomor = 1;
             $allowInsert = true;
             foreach ($absensi['absensi'] as $tanggal => $data) {
-                if (trim($data['status']) == 'K') {
+                $status = $this->getStatus($data['status']);
+                if ($status == 'K') {
                     $allowInsert = false;
                     Karyawan::where('id', $idKaryawan)->update([
                         'status' => 'nonaktif',
@@ -212,7 +213,7 @@ class AbsensiController extends Controller
                         'tanggal' => $tanggal,
                         'jam_masuk' => $jamMasuk,
                         'jam_keluar' => $jamKeluar,
-                        'status' => trim($data['status']),
+                        'status' => $status,
                         'status_absen' => 'close',
                         'target_harian' => $data['plan'],
                         'created_at' => now(),
@@ -235,6 +236,31 @@ class AbsensiController extends Controller
         Storage::delete($path);
         echo "<script>window.close();</script>";
         exit;
+    }
+
+    private function getStatus($status)
+    {
+        // Status H, I, S, A
+        switch ($status) {
+            case 'H':
+                return 'H';
+                break;
+            case 'I':
+                return 'I';
+                break;
+            case 'S':
+                return 'S';
+                break;
+            case 'A':
+                return 'A';
+                break;
+            case 'K':
+                return 'K';
+                break;
+            default:
+                return 'H';
+                break;
+        }
     }
 
     public function laporan()
