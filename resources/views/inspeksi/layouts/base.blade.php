@@ -1,5 +1,5 @@
    @php
-       $anggota = session('anggota');
+       $anggota = Auth::user();
    @endphp
 
    <!doctype html>
@@ -209,8 +209,10 @@
                        <li class="nav-item dropdown user-menu">
                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                <img src="{{ asset('storage/profil/' . ($anggota->foto ?? 'default.jpg')) }}"
-                                   class="user-image rounded-circle shadow" alt="User Image" />
-                               <span class="d-none d-md-inline">{{ $anggota->nama }}</span>
+                                   onerror="this.onerror=null;this.src='{{ asset('storage/profil/default.jpg') }}';"
+                                   class="user-image rounded-circle shadow border border-light" alt="User Image"
+                                   style="object-fit: cover; width: 40px; height: 40px;" />
+                               <span class="d-none d-md-inline">{{ $anggota->nama ?? 'Guest' }}</span>
                                <i class="bi bi-chevron-down"></i>
                            </a>
 
