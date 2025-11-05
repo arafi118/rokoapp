@@ -100,13 +100,14 @@ class AbsensiController extends Controller
             for ($i = 5; $i < $jumlahData; $i++) {
                 $data = $sheet[$i];
                 if ($i == 5 && count($dataTanggal) == 0) {
+                    $dateAwal = date('Y-m-d', ($data[4] - 25569) * 86400);
                     $dataTanggal = [
-                        date('Y-m-d', ($data[4] - 25569) * 86400),
-                        date('Y-m-d', ($data[7] - 25569) * 86400),
-                        date('Y-m-d', ($data[10] - 25569) * 86400),
-                        date('Y-m-d', ($data[13] - 25569) * 86400),
-                        date('Y-m-d', ($data[16] - 25569) * 86400),
-                        date('Y-m-d', ($data[19] - 25569) * 86400),
+                        date('Y-m-d', strtotime($dateAwal . ' + 0 days')),
+                        date('Y-m-d', strtotime($dateAwal . ' + 1 days')),
+                        date('Y-m-d', strtotime($dateAwal . ' + 2 days')),
+                        date('Y-m-d', strtotime($dateAwal . ' + 3 days')),
+                        date('Y-m-d', strtotime($dateAwal . ' + 4 days')),
+                        date('Y-m-d', strtotime($dateAwal . ' + 5 days')),
                     ];
                 } else {
                     if (is_numeric($data[0])) {
