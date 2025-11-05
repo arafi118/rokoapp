@@ -19,7 +19,7 @@ Route::post('/auth', [AuthController::class, 'auth'])->middleware('guest');
 
 Route::get('/link', function () {
     // Storage link
-    symlink(base_path('storage'), public_path('storage'));
+    symlink(base_path('storage/app/public'), public_path('storage'));
 });
 
 foreach (glob(base_path('routes/web/*.php')) as $file) {
