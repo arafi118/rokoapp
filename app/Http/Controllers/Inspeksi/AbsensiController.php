@@ -79,7 +79,7 @@ class AbsensiController extends Controller
         $level = [
             'giling' => 1,
             'gunting' => 2,
-            'pack' => 3,
+            'packing' => 3,
             'bandrol' => 4,
             'opp' => 5,
             'mop' => 6,
