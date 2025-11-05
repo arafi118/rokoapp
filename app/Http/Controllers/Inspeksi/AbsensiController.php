@@ -99,7 +99,7 @@ class AbsensiController extends Controller
             }
             for ($i = 5; $i < $jumlahData; $i++) {
                 $data = $sheet[$i];
-                if ($i == 5) {
+                if ($i == 5 && count($dataTanggal) == 0) {
                     $dataTanggal = [
                         date('Y-m-d', ($data[4] - 25569) * 86400),
                         date('Y-m-d', ($data[7] - 25569) * 86400),

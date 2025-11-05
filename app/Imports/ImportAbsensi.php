@@ -11,6 +11,10 @@ use App\Imports\Absen\Kelompok6;
 use App\Imports\Absen\Kelompok7;
 use App\Imports\Absen\Kelompok8;
 use App\Imports\Absen\Kelompok9;
+use App\Imports\Absen\Kelompok10;
+use App\Imports\Absen\Kelompok11;
+use App\Imports\Absen\Kelompok12;
+use App\Imports\Absen\Kelompok13;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
@@ -29,6 +33,10 @@ class ImportAbsensi implements WithMultipleSheets, SkipsUnknownSheets
             6 => new Kelompok7(),
             7 => new Kelompok8(),
             8 => new Kelompok9(),
+            9 => new Kelompok10(),
+            10 => new Kelompok11(),
+            11 => new Kelompok12(),
+            12 => new Kelompok13(),
         ];
     }
 
