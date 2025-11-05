@@ -12,6 +12,7 @@ use App\Models\Karyawan;
 use App\Models\Produksi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -231,6 +232,7 @@ class AbsensiController extends Controller
             Absensi::insert($chunk);
         }
 
+        Storage::delete($path);
         echo "<script>window.close();</script>";
         exit;
     }
