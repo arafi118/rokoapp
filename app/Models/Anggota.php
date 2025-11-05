@@ -12,28 +12,7 @@ class Anggota extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = "anggota";
-
-    protected $fillable = [
-        'nama',
-        'nik',
-        'no_kk',
-        'jenis_kelamin',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'alamat',
-        'desa',
-        'kecamatan',
-        'kabupaten',
-        'ijazah',
-        'jabatan_id',
-        'username',
-        'password',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $guarded = ['id'];
 
     public function karyawan()
     {

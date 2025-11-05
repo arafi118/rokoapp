@@ -20,7 +20,9 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary" id="scanQr">Scan QR</button>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                            data-bs-target="#importAbsensi">Import Excel</button>
+                        <button type="button" class="btn btn-primary ms-3" id="scanQr">Scan QR</button>
                     </div>
                 </form>
             </div>
@@ -30,6 +32,34 @@
 
                 <div class="d-flex justify-content-end mt-3">
                     <button type="button" class="btn btn-primary" id="stopQr">Stop QR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="importAbsensi" tabindex="-1" aria-labelledby="importAbsensiLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importAbsensiLabel">
+                        Import Absensi
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/inspeksi/absensi-karyawan/import" method="post" id="formImport"
+                        enctype="multipart/form-data" target="_blank">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="file" class="form-label">File Absensi</label>
+                            <input type="file" class="form-control" accept=".xlsx, .xls" id="file" name="file">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="import">Import</button>
                 </div>
             </div>
         </div>
@@ -110,5 +140,18 @@
                 }
             })
         }
+    </script>
+
+    <script>
+        $(document).on('click', '#import', function() {
+            var file = $('#file')[0].files[0];
+            if (!file) {
+                Swal.fire("Error!", "File belum dipilih", "error");
+                return;
+            }
+
+            var form = $('#formImport');
+            form.submit();
+        })
     </script>
 @endsection

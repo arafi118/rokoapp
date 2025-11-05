@@ -44,10 +44,6 @@
     <link rel="stylesheet" href="/assets/css/adminlte.min.css?v=3.2.0">
 
     <style>
-        .modal-backdrop.show {
-            background-color: rgba(169, 103, 103, 0.5) !important;
-        }
-
         .kanban-dragging {
             opacity: .4;
         }
@@ -319,6 +315,11 @@
     <script src="https://cdn.jsdelivr.net/npm/simplebar@6.2.6/dist/simplebar.min.js"></script>
 
     <script>
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            allowClear: true,
+        });
+
         const toastMixin = Swal.mixin({
             toast: true,
             position: 'top-right',
