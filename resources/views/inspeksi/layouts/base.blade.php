@@ -203,16 +203,16 @@
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            <img src="/assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow"
-                                alt="User Image" />
-                            <span class="d-none d-md-inline">Alexander Pierce</span>
+                            <img src="{{ asset('storage/profil/' . $anggota->foto) }}"
+                                class="user-image rounded-circle shadow" alt="User Image" />
+                            <span class="d-none d-md-inline">{{ $anggota->nama }}</span>
                             <i class="bi bi-chevron-down"></i>
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                             <li class="dropdown-header text-center">
-                                <strong>Alexander Pierce</strong><br>
-                                <small class="text-muted">Administrator</small>
+                                <strong>{{ $anggota->nama }}</strong><br>
+                                <small class="text-muted">{{ $anggota->getjabatan->nama }}</small>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">

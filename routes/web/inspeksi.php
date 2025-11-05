@@ -23,7 +23,7 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 
   //profil routes
   Route::resource('profile', ProfilController::class);
-
+  Route::put('profile/update', [ProfilController::class, 'update']);
   //Rencana routes
   Route::resource('rencana', RencanaController::class);
 
@@ -81,3 +81,15 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
 Route::get('/cron/update-banyak-karyawan', [TempatKerjaController::class, 'updateBanyakKaryawan'])
   ->withoutMiddleware(['auth', 'inspeksi'])
   ->name('cron.updateBanyakKaryawan');
+
+Route::get('/link', function () {
+  $target = __DIR__ . '/../storage/app/public';
+  $shortcut = __DIR__ . '/../public/storage';
+
+  try {
+    symlink($target, $shortcut);
+    return response()->json("Symlink created successfully.");
+  } catch (\Exception $e) {
+    return response()->json("Failed to create symlink: " . $e->getMessage());
+  }
+});
