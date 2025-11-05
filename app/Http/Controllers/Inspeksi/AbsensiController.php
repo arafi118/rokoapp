@@ -102,12 +102,12 @@ class AbsensiController extends Controller
                 if ($i == 5 && count($dataTanggal) == 0) {
                     $dateAwal = date('Y-m-d', ($data[4] - 25569) * 86400);
                     $dataTanggal = [
-                        date('Y-m-d', strtotime($dateAwal . ' + 0 days')),
-                        date('Y-m-d', strtotime($dateAwal . ' + 1 days')),
-                        date('Y-m-d', strtotime($dateAwal . ' + 2 days')),
-                        date('Y-m-d', strtotime($dateAwal . ' + 3 days')),
-                        date('Y-m-d', strtotime($dateAwal . ' + 4 days')),
-                        date('Y-m-d', strtotime($dateAwal . ' + 5 days')),
+                        date('Y-m-d', strtotime('+0 days', strtotime($dateAwal))),
+                        date('Y-m-d', strtotime('+1 days', strtotime($dateAwal))),
+                        date('Y-m-d', strtotime('+2 days', strtotime($dateAwal))),
+                        date('Y-m-d', strtotime('+3 days', strtotime($dateAwal))),
+                        date('Y-m-d', strtotime('+4 days', strtotime($dateAwal))),
+                        date('Y-m-d', strtotime('+5 days', strtotime($dateAwal))),
                     ];
                 } else {
                     if (is_numeric($data[0])) {
