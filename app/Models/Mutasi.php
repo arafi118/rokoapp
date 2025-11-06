@@ -10,4 +10,9 @@ class Mutasi extends Model
     use HasFactory;
 
     protected $table = 'mutasi';
+
+    public function getkaryawan()
+    {
+        return $this->belongsTo(Karyawan::class, 'karyawan_id');
+    }
 }

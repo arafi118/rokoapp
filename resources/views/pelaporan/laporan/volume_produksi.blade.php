@@ -1,3 +1,13 @@
+@php
+    use App\Utils\Tanggal;
+    use Carbon\CarbonPeriod;
+    $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
+    $weekly_total = [];
+    foreach ($levels as $lvl) {
+        $weekly_total[$lvl->nama] = 0;
+    }
+    $last_week = null;
+@endphp
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -18,7 +28,7 @@
     }
 
     thead th {
-        background-color: #b7dee8;
+        background-color: #c7f4ff;
         font-weight: bold;
         text-align: center;
     }
@@ -34,11 +44,6 @@
         text-align: center;
     }
 
-    .minggu {
-        color: red;
-        font-weight: bold;
-    }
-
     h2 {
         text-align: center;
         font-size: 20px;
@@ -52,7 +57,7 @@
 <table class="header-info" style="margin-bottom:10px;">
     <tr>
         <td width="15%">BULAN</td>
-        <td>: {{ App\Utils\Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
+        <td>: {{ Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
     </tr>
     <tr>
         <td>LOKASI</td>
@@ -60,341 +65,99 @@
     </tr>
 </table>
 
-<table>
+<table border="1" cellspacing="0" cellpadding="4" width="100%">
     <thead>
         <tr>
             <th rowspan="3" width="5%">WEEK</th>
             <th rowspan="3" width="10%">TANGGAL</th>
             <th rowspan="3" width="8%">HARI</th>
             <th rowspan="3" width="10%">Rencana Produksi Terbanderol</th>
-            <th colspan="6">BRAND : ARS-16</th>
-            <th rowspan="3" width="10%">Pengeluaran Finished Goods<br>(satuan batang)</th>
+            <th colspan="{{ count($levels) - 1 }}">BRAND : ARS-16</th>
+            <th rowspan="3" width="10%">Pengeluaran Finished Goods<br>(batang)</th>
             <th rowspan="3" width="6%">Afkir<br>batang</th>
-            <th colspan="3">STOCK AKHIR<br>(satuan batang)</th>
+            <th colspan="3">STOCK AKHIR<br>(batang)</th>
         </tr>
         <tr>
-            <th colspan="6">PRODUKSI AKTUAL<br>(satuan batang)</th>
+            <th colspan="{{ count($levels) - 1 }}">PRODUKSI AKTUAL<br>(batang)</th>
             <th rowspan="2" width="8%">ZB<br>(Polosan)</th>
             <th rowspan="2" width="8%">Pack Tercukai<br>(Wanspot)</th>
             <th rowspan="2" width="8%">Pak Terbanderol</th>
         </tr>
         <tr>
-            <th width="7%">Giling</th>
-            <th width="7%">Gunting</th>
-            <th width="7%">Packing</th>
-            <th width="7%">Banderol</th>
-            <th width="7%">OPP</th>
-            <th width="7%">MOP</th>
+            @foreach ($levels as $lvl)
+                @if (strtolower($lvl->nama) != 'multi level')
+                    <th width="7%">{{ str_replace('Operator ', '', $lvl->nama) }}</th>
+                @endif
+            @endforeach
         </tr>
     </thead>
-
     <tbody>
+        @foreach ($period as $date)
+            @php
+                $week = $date->format('W');
+                $tgl = $date->format('Y-m-d');
+                $tgl_tampil = $date->format('d-M-y');
+                $hari = Tanggal::namaHari($tgl);
+                $harian = $rekap[$tgl] ?? [];
+                $row = [];
+                foreach ($levels as $lvl) {
+                    if (strtolower($lvl->nama) != 'multi level') {
+                        $row[$lvl->nama] = $harian[$lvl->nama] ?? 0;
+                        $weekly_total[$lvl->nama] += $row[$lvl->nama];
+                    }
+                }
+            @endphp
+            <tr class="{{ $hari == 'Minggu' ? 'minggu' : '' }}">
+                <td>{{ $last_week !== $week ? $week : '' }}</td>
+                <td>{{ $tgl_tampil }}</td>
+                <td>{{ $hari }}</td>
+                <td></td>
+                @foreach ($levels as $lvl)
+                    @if (strtolower($lvl->nama) != 'multi level')
+                        <td style="text-align:right;">{{ number_format($row[$lvl->nama]) }}</td>
+                    @endif
+                @endforeach
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
 
-        <tr class="minggu">
-            <td></td>
-            <td>05-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="total-row">
-            <td></td>
-            <td style="text-align: right; padding-right: 20px;">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            {{-- Total tiap akhir minggu --}}
+            @if ($hari == 'Minggu')
+                <tr style="font-weight:bold; background-color:#f0f0f0;">
+                    <td colspan="4">Total</td>
+                    @foreach ($levels as $lvl)
+                        @if (strtolower($lvl->nama) != 'multi level')
+                            <td style="text-align:right;">{{ number_format($weekly_total[$lvl->nama]) }}</td>
+                        @endif
+                    @endforeach
+                    <td colspan="5"></td>
+                </tr>
+                @php
+                    foreach ($levels as $lvl) {
+                        if (strtolower($lvl->nama) != 'multi level') {
+                            $weekly_total[$lvl->nama] = 0;
+                        }
+                    }
+                @endphp
+            @endif
 
-        </tr>
-        <tr>
-            <td>36</td>
-            <td>06-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>07-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            @php $last_week = $week; @endphp
+        @endforeach
 
-        </tr>
-        <tr>
-            <td></td>
-            <td>08-Oct-25</td>
-            <td>Rabu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>09-Oct-25</td>
-            <td>Kamis</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>10-Oct-25</td>
-            <td>Jumat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td></td>
-            <td>11-Oct-25</td>
-            <td>Sabtu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>12-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="total-row">
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>37</td>
-            <td>13-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>14-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        <tr>
-            <td></td>
-            <td>15-Oct-25</td>
-            <td>Rabu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>16-Oct-25</td>
-            <td>Kamis</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>17-Oct-25</td>
-            <td>Jumat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>18-Oct-25</td>
-            <td>Sabtu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>19-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="total-row">
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        {{-- Total minggu terakhir --}}
+        @if (collect($weekly_total)->sum() > 0)
+            <tr style="font-weight:bold; background-color:#f0f0f0;">
+                <td colspan="4">Total Akhir</td>
+                @foreach ($levels as $lvl)
+                    @if (strtolower($lvl->nama) != 'multi level')
+                        <td style="text-align:right;">{{ number_format($weekly_total[$lvl->nama]) }}</td>
+                    @endif
+                @endforeach
+                <td colspan="5"></td>
+            </tr>
+        @endif
     </tbody>
 </table>

@@ -109,7 +109,7 @@
                 <td>{{ $last_week !== $week ? $week : '' }}</td>
                 <td>{{ $tgl_tampil }}</td>
                 <td>{{ $hari }}</td>
-                <td style="text-align:center;">
+                <td style="text-align:right;">
                     {{ $hari == 'Minggu' ? '' : number_format($jam_rata, 2, ',', '.') }}
                 </td>
 

@@ -8,6 +8,7 @@ use App\Models\Absensi;
 use App\Models\Karyawan;
 use App\Models\Produksi;
 use App\Models\Level;
+use App\Models\Mutasi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -366,54 +367,43 @@ class PelaporanController extends Controller
     public function karyawan_dimutasi(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
-        $tanggal_awal = $minggu_ke[0];
-        $tanggal_akhir = $minggu_ke[1];
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-        // Ambil data absensi dalam rentang minggu
-        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+        // Ambil data mutasi dalam periode minggu yang dipilih
+        $mutasi = Mutasi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Deteksi karyawan yang punya group/meja berbeda di minggu itu
-        $mutasi = [];
+        // Kelompokkan data mutasi per tanggal dan per level
         $kelompok_per_tanggal = [];
 
-        $grouping = $absensi->groupBy('karyawan_id');
-        foreach ($grouping as $karyawan_id => $records) {
-            $uniqueGroup = $records->pluck('group_id')->unique();
-            $uniqueMeja = $records->pluck('meja_id')->unique();
+        foreach ($mutasi as $row) {
+            $tanggal = $row->tanggal;
+            $level_id = $row->getkaryawan->getlevel->id ?? null;
 
-            if ($uniqueGroup->count() > 1 || $uniqueMeja->count() > 1) {
-                // Ambil tanggal terakhir mutasi
-                $tanggal_mutasi = $records->sortBy('tanggal')->last()->tanggal;
-                $karyawan = $records->first()->getkaryawan;
-                $level_id = $karyawan->getlevel->id ?? null;
-
-                if ($level_id) {
-                    if (!isset($kelompok_per_tanggal[$tanggal_mutasi])) {
-                        $kelompok_per_tanggal[$tanggal_mutasi] = [];
-                    }
-                    $kelompok_per_tanggal[$tanggal_mutasi][$level_id] =
-                        ($kelompok_per_tanggal[$tanggal_mutasi][$level_id] ?? 0) + 1;
+            if ($level_id) {
+                if (!isset($kelompok_per_tanggal[$tanggal])) {
+                    $kelompok_per_tanggal[$tanggal] = [];
                 }
 
-                $mutasi[] = $karyawan;
+                $kelompok_per_tanggal[$tanggal][$level_id] =
+                    ($kelompok_per_tanggal[$tanggal][$level_id] ?? 0) + 1;
             }
         }
 
         $title = 'Karyawan Dimutasi';
 
         $view = view('pelaporan.laporan.karyawan_dimutasi', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'karyawan'      => $kelompok_per_tanggal,
-            'karyawan_mutasi' => $mutasi,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'     => $tanggal_awal,
+            'tanggal_akhir'    => $tanggal_akhir,
+            'minggu_ke'        => $minggu_ke,
+            'karyawan'         => $kelompok_per_tanggal,
+            'karyawan_mutasi'  => $mutasi,
+            'title'            => $title,
+            'bulan'            => $data['bulan'],
+            'tahun'            => $data['tahun'],
         ])->render();
-
 
         $pdf = PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
@@ -427,6 +417,7 @@ class PelaporanController extends Controller
 
         return $pdf->stream('Karyawan Dimutasi.pdf');
     }
+
 
     private function karyawan_komposisi_karyawan(array $data)
     {
@@ -660,7 +651,6 @@ class PelaporanController extends Controller
         return $pdf->stream('Produktifitas Index.pdf');
     }
 
-
     function produktifitas_aktual(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
@@ -718,13 +708,57 @@ class PelaporanController extends Controller
         return $pdf->stream('Produktifitas Aktual.pdf');
     }
 
-    private function volume(array $data)
+    private function volume_produksi (array $data)
     {
-        $data['title'] = 'Volume Produksi';
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-        $view = view('pelaporan.laporan.volume_produksi', $data)->render();
+        // Ambil level operator (bukan mandor / kepala)
+        $levels = Level::where('level_karyawan', 1)
+            ->orderBy('id', 'asc')
+            ->get();
 
-        $pdf = PDF::loadHTML($view)
+        // Ambil data produksi yang valid selama periode
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['karyawan.getlevel'])
+            ->get();
+
+        $rekap = [];
+
+        foreach ($produksi as $p) {
+            $tanggal = $p->tanggal;
+            $level_nama = $p->karyawan->getlevel->nama ?? null;
+
+            if ($level_nama) {
+                if (!isset($rekap[$tanggal])) {
+                    $rekap[$tanggal] = [];
+                }
+
+                if (!isset($rekap[$tanggal][$level_nama])) {
+                    $rekap[$tanggal][$level_nama] = 0;
+                }
+
+                // jumlah batang baik per bagian (level)
+                $rekap[$tanggal][$level_nama] += (int) $p->jumlah_baik;
+            }
+        }
+
+        $title = 'Volume Produksi';
+
+        $view = view('pelaporan.laporan.volume_produksi', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'produksi'      => $produksi,
+            'rekap'         => $rekap,
+            'levels'        => $levels,
+            'title'         => $title,
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ])->render();
+
+        $pdf = Pdf::loadHTML($view)
             ->setPaper('a4', 'landscape')
             ->setOptions([
                 'margin-top'    => 30,
@@ -737,7 +771,7 @@ class PelaporanController extends Controller
         return $pdf->stream();
     }
 
-      private function jam_kerja_aktual(array $data)
+    private function jam_kerja_aktual(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
         $tanggal_awal = trim($minggu_ke[0]);

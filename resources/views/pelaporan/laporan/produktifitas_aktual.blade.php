@@ -70,7 +70,6 @@
             <th rowspan="2" width="12%">TANGGAL</th>
             <th rowspan="2" width="10%">HARI</th>
             <th colspan="6">JUMLAH PRODUKSI (BATANG)</th>
-            <th rowspan="2">TOTAL</th>
         </tr>
         <tr>
             <th>Giling</th>
@@ -112,10 +111,6 @@
                         {{ fmod($val, 1) == 0 ? (int) $val : rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') }}
                     </td>
                 @endforeach
-
-                <td align="right">
-                    <strong>{{ fmod($total_harian, 1) == 0 ? (int) $total_harian : rtrim(rtrim(number_format($total_harian, 2, '.', ''), '0'), '.') }}</strong>
-                </td>
             </tr>
 
             {{-- total tiap akhir minggu --}}
@@ -127,9 +122,7 @@
                             {{ fmod($val, 1) == 0 ? (int) $val : rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') }}
                         </td>
                     @endforeach
-                    <td align="right">
-                        <strong>{{ fmod(array_sum($weekly_total), 1) == 0 ? (int) array_sum($weekly_total) : rtrim(rtrim(number_format(array_sum($weekly_total), 2, '.', ''), '0'), '.') }}</strong>
-                    </td>
+
                 </tr>
                 @php $weekly_total = []; @endphp
             @endif
@@ -140,7 +133,7 @@
         {{-- total terakhir jika tidak berakhir di minggu --}}
         @if (array_sum($weekly_total ?? []) > 0)
             <tr style="font-weight:bold; background-color:#f0f0f0;">
-                <td colspan="3">Total Akhir</td>
+                <td colspan="3">Total </td>
                 @foreach ($weekly_total as $val)
                     <td align="right">
                         {{ fmod($val, 1) == 0 ? (int) $val : rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') }}

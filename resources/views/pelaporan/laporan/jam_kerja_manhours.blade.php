@@ -108,7 +108,7 @@
                 <td>{{ $tgl_tampil }}</td>
                 <td>{{ $hari }}</td>
                 <td style="text-align:right;">
-                    {{ $hari == 'Minggu' ? '' : number_format($total_harian, 2, ',', '.') }}
+                    {{ $hari == 'Minggu' ? '' : number_format($total_harian, 2, ',', '.') }} 
                 </td>
 
                 @for ($i = 1; $i <= 8; $i++)

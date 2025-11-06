@@ -69,7 +69,6 @@
                 <th rowspan="2" width="12%">TANGGAL</th>
                 <th rowspan="2" width="10%">HARI</th>
                 <th colspan="6">JUMLAH PRODUKSI (BATANG)</th>
-                <th rowspan="2">TOTAL</th>
             </tr>
             <tr>
                 <th>Giling</th>
@@ -107,7 +106,6 @@
                     @foreach ($row as $val)
                         <td align="right">{{ number_format($val, 0, ',', '.') }}</td>
                     @endforeach
-                    <td align="right"><strong>{{ number_format($total_harian, 0, ',', '.') }}</strong></td>
                 </tr>
 
                 {{-- total tiap akhir minggu --}}
@@ -117,25 +115,22 @@
                         @foreach ($weekly_total as $val)
                             <td align="right">{{ number_format($val, 0, ',', '.') }}</td>
                         @endforeach
-                        <td align="right"><strong>{{ number_format(array_sum($weekly_total), 0, ',', '.') }}</strong>
-                        </td>
                     </tr>
                     @php
                         $weekly_total = [];
                     @endphp
                 @endif
-
                 @php $last_week = $week; @endphp
             @endforeach
 
             {{-- total terakhir jika tidak berakhir di minggu --}}
             @if (array_sum($weekly_total ?? []) > 0)
                 <tr style="font-weight:bold; background-color:#f0f0f0;">
-                    <td colspan="3">Total Akhir</td>
+                    <td colspan="3">Total </td>
                     @foreach ($weekly_total as $val)
                         <td align="right">{{ number_format($val, 0, ',', '.') }}</td>
                     @endforeach
-                    <td align="right"><strong>{{ number_format(array_sum($weekly_total), 0, ',', '.') }}</strong></td>
+                    </td>
                 </tr>
             @endif
         </tbody>
