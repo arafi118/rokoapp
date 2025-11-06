@@ -86,6 +86,13 @@ class AbsensiController extends Controller
             'mop' => 6,
         ];
 
+        $groupId = [
+            'packing' => 18,
+            'bandrol' => 19,
+            'opp' => 20,
+            'mop' => 21,
+        ];
+
         $dataTanggal = [];
         $dataKodeKaryawan = [];
         $dataAbsensi = [];
@@ -110,42 +117,42 @@ class AbsensiController extends Controller
                         date('Y-m-d', strtotime('+5 days', strtotime($dateAwal))),
                     ];
                 } else {
-                    if (is_numeric($data[0])) {
+                    if (is_numeric($data[0]) && $data[1] != '') {
                         $dataKodeKaryawan[] = $data[1];
                         $dataAbsensi[] = [
                             'kode' => $data[1],
                             'nama' => $data[2],
-                            'kelompok' => $index + 1,
+                            'kelompok' => (isset($groupId[$jenisAbsen]) ? $groupId[$jenisAbsen] : ($index + 1)),
                             'absensi' => [
                                 $dataTanggal[0] => [
                                     'status' => $data[4],
-                                    'plan' => $data[5],
-                                    'jk' => $data[6],
+                                    'plan' => $data[5] ?? 0,
+                                    'jk' => $data[6] ?? 0,
                                 ],
                                 $dataTanggal[1] => [
                                     'status' => $data[7],
-                                    'plan' => $data[8],
-                                    'jk' => $data[9],
+                                    'plan' => $data[8] ?? 0,
+                                    'jk' => $data[9] ?? 0,
                                 ],
                                 $dataTanggal[2] => [
                                     'status' => $data[10],
-                                    'plan' => $data[11],
-                                    'jk' => $data[12],
+                                    'plan' => $data[11] ?? 0,
+                                    'jk' => $data[12] ?? 0,
                                 ],
                                 $dataTanggal[3] => [
                                     'status' => $data[13],
-                                    'plan' => $data[14],
-                                    'jk' => $data[15],
+                                    'plan' => $data[14] ?? 0,
+                                    'jk' => $data[15] ?? 0,
                                 ],
                                 $dataTanggal[4] => [
                                     'status' => $data[16],
-                                    'plan' => $data[17],
-                                    'jk' => $data[18],
+                                    'plan' => $data[17] ?? 0,
+                                    'jk' => $data[18] ?? 0,
                                 ],
                                 $dataTanggal[5] => [
                                     'status' => $data[19],
-                                    'plan' => $data[20],
-                                    'jk' => $data[21],
+                                    'plan' => $data[20] ?? 0,
+                                    'jk' => $data[21] ?? 0,
                                 ],
                             ]
                         ];
@@ -154,17 +161,17 @@ class AbsensiController extends Controller
             }
         }
 
+        $hapusIdKaryawan = [];
         $dataIdKaryawan = Karyawan::whereIn('kode_karyawan', $dataKodeKaryawan)->get()->pluck('id', 'kode_karyawan')->toArray();
-
         $insertAbsensi = [];
         foreach ($dataAbsensi as $index => $absensi) {
             $idKaryawan = $dataIdKaryawan[$absensi['kode']] ?? null;
             if (!$idKaryawan) {
                 $anggota = Anggota::create([
-                    'nama' => $absensi['nama']
+                    'nama' => $dataAbsensi[$index]['nama']
                 ]);
 
-                $kodeKaryawan = $absensi['kode'];
+                $kodeKaryawan = $dataAbsensi[$index]['kode'];
                 $tahun = substr($kodeKaryawan, 3, 2);
                 $bulan = substr($kodeKaryawan, 5, 2);
 
@@ -222,12 +229,12 @@ class AbsensiController extends Controller
                     ];
                 }
 
+                $hapusIdKaryawan[] = $idKaryawan;
                 $nomor++;
             }
         }
 
-        $tanggalAbsen = array_keys($dataTanggal);
-        Absensi::whereIn('tanggal', $tanggalAbsen)->delete();
+        Absensi::whereIn('tanggal', $dataTanggal)->whereIn('karyawan_id', $hapusIdKaryawan)->delete();
 
         $chunkSize = 100;
         foreach (array_chunk($insertAbsensi, $chunkSize) as $chunk) {

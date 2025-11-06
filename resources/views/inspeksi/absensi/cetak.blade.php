@@ -138,7 +138,10 @@
                         $diff = date_diff($jam_keluar, $jam_masuk);
 
                         $status = $absen['status'];
-                        $jam_kerja = $diff->h;
+                        $jam_kerja = $diff->h - 1;
+                        if (date('D', strtotime($date->format('Y-m-d'))) == 'Sat') {
+                            $jam_kerja = $diff->h;
+                        }
                     } else {
                         $status = 'A';
                         $jam_kerja = 0;
