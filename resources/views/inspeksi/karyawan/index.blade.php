@@ -112,8 +112,8 @@
                         name: 'tanggal_masuk'
                     },
                     {
-                        data: 'getlevel.nama',
-                        name: 'getlevel.nama'
+                        data: 'level_nama',
+                        name: 'level_nama'
                     },
                     {
                         data: null,

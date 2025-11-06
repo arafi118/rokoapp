@@ -24,10 +24,12 @@ class KaryawanController extends Controller
         if ($request->ajax()) {
             $data = Karyawan::with(
                 'getanggota',
-                'getlevel',
                 'getgroup',
                 'getmeja'
-            )->select('karyawan.*')->where('karyawan.status', 'Aktif');
+            )->select('karyawan.*', 'level.nama as level_nama')
+                ->join('level', 'karyawan.level', '=', 'level.id')
+                ->where('level.level_karyawan', 1)
+                ->where('karyawan.status', 'Aktif');
             return DataTables::eloquent($data)
                 ->addIndexColumn()
                 ->addColumn('status_karyawan', function ($row) {
