@@ -1,124 +1,104 @@
+@php
+    $anggota = Auth::user();
+@endphp
 <!doctype html>
 <html lang="en">
-<!--begin::Head-->
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>{{ env('APP_NAME') }} | {{ $title }}</title>
-    <!--begin::Accessibility Meta Tags-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-    <!--end::Accessibility Meta Tags-->
-    <!--begin::Primary Meta Tags-->
     <meta name="title" content="{{ env('APP_NAME') }} | {{ $title }}" />
-    <meta name="author" content="ColorlibHQ" />
-    <!--end::Primary Meta Tags-->
-    <!--begin::Accessibility Features-->
-    <!-- Skip links will be dynamically added by accessibility.js -->
-    <meta name="supported-color-schemes" content="light dark" />
     <link rel="preload" href="/assets/css/adminlte.css" as="style" />
-    <!--end::Accessibility Features-->
-    <!--begin::Fonts-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-        integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
-        onload="this.media='all'" />
-    <!--end::Fonts-->
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
-        crossorigin="anonymous" />
+        crossorigin="anonymous" media="print" onload="this.media='all'" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/assets/css/adminlte.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css">
-    <link rel="preload" href="/assets/css/adminlte.css" as="style" />
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    <!--begin::Third Party Plugin(Bootstrap Icons)-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-        crossorigin="anonymous" />
-    <!--end::Third Party Plugin(Bootstrap Icons)-->
-    <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="/assets/css/adminlte.css" />
-    <!--end::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.bootstrap5.css">
 </head>
 
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-    <!--begin::App Wrapper-->
     <div class="app-wrapper">
-        <!--begin::Header-->
         <nav class="app-header navbar navbar-expand bg-body">
-            <!--begin::Container-->
             <div class="container-fluid">
-                <!--begin::Start Navbar Links-->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-                            <i class="bi bi-list"></i>
-                        </a>
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#"><i class="bi bi-list"></i></a>
                     </li>
                 </ul>
-                <!--end::Start Navbar Links-->
-                <!--begin::End Navbar Links-->
                 <ul class="navbar-nav ms-auto">
-                    <!--begin::Fullscreen Toggle-->
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-lte-toggle="fullscreen">
                             <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display:none"></i>
                         </a>
                     </li>
-                    <!--end::Fullscreen Toggle-->
-                    <!--begin::User Menu Dropdown-->
                     <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link">
-                            <img src="/assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow"
-                                alt="User Image" />
-                            <span class="d-none d-md-inline">Alexander Pierce</span>
+                        <a href="#"
+                            class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none"
+                            data-bs-toggle="dropdown" style="width:auto;transition:all 0.2s ease;">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('storage/profil/' . ($anggota->foto ?? 'default.jpg')) }}"
+                                    onerror="this.onerror=null;this.src='{{ asset('storage/profil/default.jpg') }}';"
+                                    class="rounded-circle me-2 user-image" alt="User Image"
+                                    style="object-fit:cover;width:40px;height:40px;border:2px solid rgba(108,108,108,0.7);transition:transform 0.3s ease;"
+                                    onmouseover="this.style.transform='scale(1.05)'"
+                                    onmouseout="this.style.transform='scale(1)'">
+                                <span
+                                    class="fw-semibold text-dark d-none d-md-inline">{{ $anggota->nama ?? 'Guest User' }}</span>
+                            </div>
+                            <i class="bi bi-chevron-down ms-2 text-muted"></i>
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 overflow-hidden">
+                            <li class="dropdown-header text-center pb-2">
+                                <strong class="fw-semibold">{{ $anggota->nama }}</strong><br>
+                                <small class="text-muted">{{ $anggota->getjabatan->nama }}</small>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider my-2">
+                            </li>
+                            <li>
+                                <a href="/mandor/profile" class="dropdown-item rounded-3 py-2">
+                                    <i class="bi bi-person-circle me-2 ms-2"></i> Profil Saya
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="btnLogout" class="dropdown-item text-danger rounded-3 py-2">
+                                    <i class="bi bi-box-arrow-right me-2 ms-2"></i> Logout
+                                </a>
+                                <form id="formLogout" action="/mandor/logout" method="POST" style="display:none;">
+                                    @csrf</form>
+                            </li>
+                        </ul>
                     </li>
-                    <!--end::User Menu Dropdown-->
                 </ul>
-                <!--end::End Navbar Links-->
             </div>
-            <!--end::Container-->
         </nav>
-        <!--end::Header-->
-        <!--begin::Sidebar-->
+
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-            <!--begin::Sidebar Brand-->
             <div class="sidebar-brand">
-                <!--begin::Brand Link-->
                 <a href="/assets/index.html" class="brand-link">
-                    <!--begin::Brand Image-->
                     <img src="/assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
-                    <!--end::Brand Image-->
-                    <!--begin::Brand Text-->
                     <span class="brand-text fw-light">AdminLTE 4</span>
-                    <!--end::Brand Text-->
                 </a>
-                <!--end::Brand Link-->
             </div>
-            <!--end::Sidebar Brand-->
-            <!--begin::Sidebar Wrapper-->
             <div class="sidebar-wrapper">
-                <nav class="mt-2">
-                    <!--begin::Sidebar Menu-->
-                    @include('mandor.layouts.sidebar')
-                    <!--end::Sidebar Menu-->
-                </nav>
+                <nav class="mt-2">@include('anggota.layouts.sidebar')</nav>
             </div>
-            <!--end::Sidebar Wrapper-->
         </aside>
-        <!--end::Sidebar-->
-        <!--begin::App Main-->
+
         <main class="app-main">
-            <!--begin::App Content Header-->
             <div class="app-content-header">
-                <!--begin::Container-->
                 <div class="container-fluid">
-                    <!--begin::Row-->
                     <div class="row">
                         <div class="col-sm-6">
                             <h3 class="mb-0">{{ $title }}</h3>
@@ -144,97 +124,73 @@
                                                 href="/{{ $basePath }}{{ $p }}">{{ ucwords($pathName) }}</a>
                                         @endif
                                     </li>
-
-                                    @php
-                                        $basePath .= $p . '/';
-                                    @endphp
+                                    @php $basePath .= $p . '/'; @endphp
                                 @endforeach
                             </ol>
                         </div>
                     </div>
-                    <!--end::Row-->
                 </div>
-                <!--end::Container-->
             </div>
             <div class="app-content">
-                <!--begin::Container-->
-                <div class="container-fluid">
-                    @yield('content')
-                </div>
-                <!--end::Container-->
+                <div class="container-fluid">@yield('content')</div>
             </div>
-            <!--end::App Content-->
         </main>
-        <!--end::App Main-->
-        <!--begin::Footer-->
-        <footer class="app-footer">
-            <!--begin::To the end-->
-            <div class="float-end d-none d-sm-inline">Anything you want</div>
-            <!--end::To the end-->
-            <!--begin::Copyright-->
-            <strong>
-                Copyright &copy; 2014-2025&nbsp;
-                <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
-            </strong>
-            All rights reserved.
-            <!--end::Copyright-->
-        </footer>
-        <!--end::Footer-->
-    </div>
-    <!--end::App Wrapper-->
-    <!--begin::Script-->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
-        crossorigin="anonymous"></script>
-    <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous">
-    </script>
-    <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-    <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="/assets/js/adminlte.js"></script>
-    <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
 
-    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+        <footer class="app-footer">
+            <div class="float-end d-none d-sm-inline">Anything you want</div>
+            <strong>Copyright &copy; 2014-2025
+                <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+            </strong> All rights reserved.
+        </footer>
+    </div>
+
+    <!-- SCRIPT ZONE -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js">
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/dataTables.rowReorder.js"></script>
-    <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/rowReorder.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1"></script>
+    <script src="/assets/js/adminlte.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        const toastMixin = Swal.mixin({
+            toast: true,
+            position: 'top-right',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+        @if (session('success'))
+            toastMixin.fire({
+                icon: 'success',
+                title: '{{ session('success') }}'
+            });
+        @endif
+        @if (session('error'))
+            toastMixin.fire({
+                icon: 'error',
+                title: '{{ session('error') }}'
+            });
+        @endif
+
         $(document).ready(function() {
             $('.select2').select2({
-                theme: 'bootstrap4',
+                theme: 'bootstrap4'
             });
-        });
-
-        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-        const Default = {
-            scrollbarTheme: 'os-theme-light',
-            scrollbarAutoHide: 'leave',
-            scrollbarClickScroll: true,
-        };
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-            if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+            $('.datatable').DataTable();
+            const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+            if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars)
                 OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
                     scrollbars: {
-                        theme: Default.scrollbarTheme,
-                        autoHide: Default.scrollbarAutoHide,
-                        clickScroll: Default.scrollbarClickScroll,
-                    },
+                        autoHide: 'leave'
+                    }
                 });
-            }
         });
-    </script>
-    <!--end::OverlayScrollbars Configure-->
 
-    <script>
         $(document).on('click', '#btnLogout', function(e) {
             e.preventDefault();
             Swal.fire({
@@ -247,15 +203,11 @@
                 confirmButtonText: 'Ya, Logout!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#formLogout').submit();
-                }
+                if (result.isConfirmed) $('#formLogout').submit();
             });
         });
     </script>
-
     @yield('script')
 </body>
-<!--end::Body-->
 
 </html>
