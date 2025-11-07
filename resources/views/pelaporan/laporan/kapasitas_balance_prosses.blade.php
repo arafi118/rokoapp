@@ -1,3 +1,27 @@
+@php
+    use App\Utils\Tanggal;
+    use Carbon\CarbonPeriod;
+
+    // Buat rentang tanggal harian
+    $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
+
+    // Inisialisasi total mingguan
+    $proses = ['Giling', 'Gunting', 'Packing', 'Banderol', 'DPP', 'MOP'];
+    $weekly_total = array_fill_keys($proses, 0);
+    $last_week = null;
+
+    // Pemetaan level_id ke nama proses (disesuaikan dengan struktur di DB)
+    $level_map = [
+        1 => 'Giling',
+        2 => 'Gunting',
+        3 => 'Packing',
+        4 => 'Banderol',
+        5 => 'DPP',
+        6 => 'MOP',
+    ];
+@endphp
+
+<title>{{ $title }}</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -14,13 +38,16 @@
         border: 1px solid #000;
         padding: 3px 5px;
         text-align: center;
-        vertical-align: middle;
     }
 
     thead th {
-        background-color: #b7dee8;
+        background-color: #c7f4ff;
         font-weight: bold;
-        text-align: center;
+    }
+
+    .title {
+        text-align: left;
+        font-weight: bold;
     }
 
     .header-info td {
@@ -28,272 +55,96 @@
         text-align: left;
         padding: 2px 0;
     }
-
-    .total-row td {
-        font-weight: bold;
-        text-align: center;
-    }
-
-    .minggu {
-        color: red;
-        font-weight: bold;
-    }
-
-    h2 {
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 15px;
-    }
 </style>
-<title>{{ $title_balance_proses }}</title>
-<h2 style="text-align: center; margin: 20px 0;">
-    BALANCE PROSES <br>
-    <span style="font-weight: bold;"></span>
+
+<h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
+    BALANCE PROSES
 </h2>
 
-<table class="header-info" style="margin: 20px auto;">
+<table class="header-info" style="margin-bottom:10px;">
     <tr>
-        <td width="13%">BULAN</td>
-        <td>: {{ App\Utils\Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
+        <td width="15%">BULAN</td>
+        <td>: {{ Tanggal::namaBulan(date('Y-' . $bulan . '-01')) }} {{ $tahun }}</td>
     </tr>
     <tr>
         <td>LOKASI</td>
         <td>: SKT MAGELANG - PT. ATI</td>
     </tr>
+    <tr>
+        <td>BRAND</td>
+        <td>: ARS-16</td>
+    </tr>
 </table>
 
-
-<table>
+<table border="1" cellspacing="0" cellpadding="4" width="100%">
     <thead>
         <tr>
-            <th rowspan="3" width="5%">WEEK</th>
-            <th rowspan="3" width="10%">TANGGAL</th>
-            <th rowspan="3" width="8%">HARI</th>
-            <th colspan="6">BRAND : ARS-16</th>
+            <th rowspan="2" width="5%">WEEK</th>
+            <th rowspan="2" width="12%">TANGGAL</th>
+            <th rowspan="2" width="10%">HARI</th>
+            <th colspan="6">BALANCE PROSES</th>
         </tr>
         <tr>
-            <th colspan="6"> BALANCE PROSES</th>
-        </tr>
-        <tr>
-            <th width="7%">Giling</th>
-            <th width="7%">Gunting</th>
-            <th width="7%">Packing</th>
-            <th width="7%">Banderol</th>
-            <th width="7%">OPP</th>
-            <th width="7%">MOP</th>
-
+            @foreach ($proses as $nama)
+                <th>{{ $nama }}</th>
+            @endforeach
         </tr>
     </thead>
-
     <tbody>
+        @foreach ($period as $date)
+            @php
+                $week = $date->format('W');
+                $tgl = $date->format('Y-m-d');
+                $tgl_tampil = $date->format('d-M-y');
+                $hari = Tanggal::namaHari($tgl);
 
-        <tr class="minggu">
-            <td></td>
-            <td>05-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="total-row">
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>36</td>
-            <td>06-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>07-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>08-Oct-25</td>
-            <td>Rabu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>09-Oct-25</td>
-            <td>Kamis</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+                // Ambil data persentase harian dari controller
+                $harian = $persentase[$tgl] ?? [];
 
-        </tr>
-        <tr>
-            <td></td>
-            <td>10-Oct-25</td>
-            <td>Jumat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+                // Siapkan baris data untuk tiap proses
+                $row = [];
+                foreach ($proses as $nama) {
+                    // Samakan format key seperti di data (misalnya 'Operator Giling')
+                    $key = 'Operator ' . $nama;
+                    $row[$nama] = $harian[$key] ?? 0;
+                    $weekly_total[$nama] += $row[$nama];
+                }
 
-        </tr>
-        <tr>
-            <td></td>
-            <td>11-Oct-25</td>
-            <td>Sabtu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            @endphp
 
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>12-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <tr class="{{ $hari == 'Minggu' ? 'minggu' : '' }}">
+                <td>{{ $last_week !== $week ? $week : '' }}</td>
+                <td>{{ $tgl_tampil }}</td>
+                <td>{{ $hari }}</td>
+                @foreach ($row as $val)
+                    <td>{{ number_format($val, 2) }}</td>
+                @endforeach
+            </tr>
 
-        </tr>
-        <tr class="total-row">
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            {{-- total tiap akhir minggu --}}
+            @if ($hari == 'Minggu')
+                <tr style="font-weight:bold; background-color:#f0f0f0;">
+                    <td colspan="3">Total</td>
+                    @foreach ($weekly_total as $val)
+                        <td>{{ number_format($val, 2) }}</td>
+                    @endforeach
+                </tr>
+                @php
+                    $weekly_total = array_fill_keys($proses, 0);
+                @endphp
+            @endif
 
+            @php $last_week = $week; @endphp
+        @endforeach
 
-        </tr>
-
-        <tr>
-            <td>37</td>
-            <td>13-Oct-25</td>
-            <td>Senin</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td></td>
-            <td>14-Oct-25</td>
-            <td>Selasa</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        <tr>
-            <td></td>
-            <td>15-Oct-25</td>
-            <td>Rabu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td></td>
-            <td>16-Oct-25</td>
-            <td>Kamis</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td></td>
-            <td>17-Oct-25</td>
-            <td>Jumat</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td></td>
-            <td>18-Oct-25</td>
-            <td>Sabtu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-
-        </tr>
-        </tr>
-        <tr class="minggu">
-            <td></td>
-            <td>19-Oct-25</td>
-            <td>Minggu</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr class="total-row">
-            <td colspan="3">Total</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-
-        </tr>
+        {{-- total minggu terakhir jika tidak berakhir di Minggu --}}
+        @if (array_sum($weekly_total) > 0)
+            <tr style="font-weight:bold; background-color:#f0f0f0;">
+                <td colspan="3">Total</td>
+                @foreach ($weekly_total as $val)
+                    <td>{{ number_format($val, 2) }}</td>
+                @endforeach
+            </tr>
+        @endif
     </tbody>
 </table>

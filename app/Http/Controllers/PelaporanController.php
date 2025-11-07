@@ -77,7 +77,7 @@ class PelaporanController extends Controller
         $data['bulan'] = $data['bulan'] ?? date('m');
         $data['hari']  = $data['hari'] ?? null;
 
-        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas']) && $sub) {
+        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas','kapasitas']) && $sub) {
             $method = "{$sub}";
             if (method_exists($this, $method)) {
                 return $this->$method($data);
@@ -929,33 +929,206 @@ class PelaporanController extends Controller
         return $pdf->stream('Jam Kerja (Manhours).pdf');
     }
 
-    private function kapasitas(array $data)
+    private function stick_hours(array $data, $return_raw = false)
     {
-        $sub = $data['sub_laporan'] ?? 'stick_hours';
-        $viewPath = "pelaporan.laporan.kapasitas_{$sub}";
+            $minggu_ke = explode('#', request()->get('minggu_ke'));
+            $tanggal_awal = trim($minggu_ke[0]);
+            $tanggal_akhir = trim($minggu_ke[1]);
 
-        if (!view()->exists($viewPath)) {
-            abort(404, "View untuk sub laporan {$sub} tidak ditemukan");
+            $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+                ->with(['karyawan.getlevel', 'karyawan.getabsensi'])
+                ->get();
+
+            $produksi_stick = [];
+
+            foreach ($produksi as $p) {
+                $tanggal = $p->tanggal;
+                $karyawan = $p->karyawan;
+                $level = $karyawan->getlevel->nama ?? null;
+
+                if ($level) {
+                    $absen = $karyawan->getabsensi
+                        ->where('tanggal', $tanggal)
+                        ->first();
+
+                    $jam_kerja = 8;
+                    if ($absen && $absen->jam_masuk && $absen->jam_keluar) {
+                        $jam_masuk = \Carbon\Carbon::parse($absen->jam_masuk);
+                        $jam_keluar = \Carbon\Carbon::parse($absen->jam_keluar);
+                        $jam_kerja = $jam_keluar->diffInHours($jam_masuk);
+                    }
+
+                    if (!isset($produksi_stick[$tanggal])) {
+                        $produksi_stick[$tanggal] = [];
+                    }
+
+                    $jumlah_baik = $p->jumlah_baik ?? 0;
+
+                    if (isset($produksi_stick[$tanggal][$level])) {
+                        $produksi_stick[$tanggal][$level]['total'] += $jumlah_baik;
+                        $produksi_stick[$tanggal][$level]['jam_kerja'] += $jam_kerja;
+                    } else {
+                        $produksi_stick[$tanggal][$level] = [
+                            'total' => $jumlah_baik,
+                            'jam_kerja' => $jam_kerja,
+                        ];
+                    }
+                }
+            }
+
+            // Hitung produksi per jam (stick/hours)
+            foreach ($produksi_stick as $tanggal => &$levels) {
+                foreach ($levels as $level => &$data_level) {
+                    $jam_kerja = $data_level['jam_kerja'] ?: 1;
+                    $data_level['per_jam'] = $data_level['total'] / $jam_kerja;
+                }
+            }
+
+            // Jika hanya ingin data mentah
+            if ($return_raw) {
+                // Kembalikan hanya nilai per jam per level
+                $hasil = [];
+                foreach ($produksi_stick as $tanggal => $levels) {
+                    foreach ($levels as $level => $data_level) {
+                        $hasil[$tanggal][$level] = $data_level['per_jam'];
+                    }
+                }
+                return $hasil;
+            }
+
+            $title = 'Stick / Hours';
+
+            $view = view('pelaporan.laporan.kapasitas_stick_hours', [
+                'tanggal_awal'  => $tanggal_awal,
+                'tanggal_akhir' => $tanggal_akhir,
+                'minggu_ke'     => $minggu_ke,
+                'produksi_stick'=> $produksi_stick,
+                'title'         => $title,
+                'bulan'         => $data['bulan'],
+                'tahun'         => $data['tahun'],
+            ])->render();
+
+            $pdf = PDF::loadHTML($view)
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'margin-top'    => 30,
+                    'margin-bottom' => 15,
+                    'margin-left'   => 25,
+                    'margin-right'  => 20,
+                    'enable-local-file-access' => true,
+                ]);
+
+            return $pdf->stream('Produksi_per_Jam.pdf');
+    }
+
+
+
+
+    public function balance_prosses(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
+
+        // Ambil hasil stick/hours dalam bentuk array
+        $stick_hours_data = $this->stick_hours($data, true);
+
+        $hasil = [];
+        $persentase = [];
+
+        foreach ($stick_hours_data as $tanggal => $levels) {
+            // Cari nilai tertinggi dari semua level di tanggal tsb
+            $max = max($levels);
+
+            foreach ($levels as $level => $value) {
+                // Bandingkan dengan nilai tertinggi
+                $hasil[$tanggal][$level] = round($value, 3);
+                $persentase[$tanggal][$level] = $max > 0
+                    ? round($value / $max, 2)
+                    : 0;
+            }
         }
 
-        $data['title_stick_hours'] = 'Stick / Hours';
-        $data['title_balance_proses'] = 'Balance Proses';
-        $data['title_index_kapasitas'] = 'Index Kapasitas';
+        $title = 'Balance Proses';
 
-        $data['data_kapasitas'] = [];
-        $data['judul'] = ucfirst(str_replace('_', ' ', $sub));
+        $view = view('pelaporan.laporan.kapasitas_balance_prosses', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'hasil'         => $hasil,
+            'persentase'    => $persentase,
+            'title'         => $title,
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ])->render();
 
-        $view = view($viewPath, $data)->render();
-
-        $pdf = Pdf::loadHTML($view)
+        $pdf = PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
             ->setOptions([
-                'margin-top' => 20,
-                'margin-bottom' => 20,
-                'margin-left' => 15,
-                'margin-right' => 15,
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
             ]);
 
-        return $pdf->stream($data['judul'] . '.pdf');
+        return $pdf->stream('Balance_Proses.pdf');
     }
+
+
+
+
+    public function index_kapasitas(array $data)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
+
+        // Ambil hasil stick/hours per hari
+        $stick_hours_data = $this->stick_hours($data, true);
+
+        $hasil = [];
+        $index = [];
+
+        foreach ($stick_hours_data as $tanggal => $levels) {
+            $total_harian = array_sum($levels);
+
+            foreach ($levels as $level => $value) {
+                $hasil[$tanggal][$level] = round($value, 3);
+                $index[$tanggal][$level] = $total_harian > 0
+                    ? round($value / $total_harian, 2)
+                    : 0;
+            }
+
+            // Total = 1, hanya untuk pengecekan
+            $index[$tanggal]['Total'] = 1;
+        }
+  
+        $title = 'Index Kapasitas';
+
+        $view = view('pelaporan.laporan.kapasitas_index_kapasitas', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'hasil'         => $hasil,
+            'index'         => $index,
+            'title'         => $title,
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ])->render();
+
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('Index_Kapasitas.pdf');
+    }
+
+
 }
