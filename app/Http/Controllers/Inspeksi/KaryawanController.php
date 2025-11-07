@@ -28,8 +28,7 @@ class KaryawanController extends Controller
                 'getmeja'
             )->select('karyawan.*', 'level.nama as level_nama')
                 ->join('level', 'karyawan.level', '=', 'level.id')
-                ->where('level.level_karyawan', 1)
-                ->where('karyawan.status', 'Aktif');
+                ->where('level.level_karyawan', 1);
             return DataTables::eloquent($data)
                 ->addIndexColumn()
                 ->addColumn('status_karyawan', function ($row) {
