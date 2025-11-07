@@ -207,31 +207,39 @@
 
                        <!-- Dropdown User -->
                        <li class="nav-item dropdown user-menu">
-                           <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                               <img src="{{ asset('storage/profil/' . ($anggota->foto ?? 'default.jpg')) }}"
-                                   onerror="this.onerror=null;this.src='{{ asset('storage/profil/default.jpg') }}';"
-                                   class="user-image rounded-circle shadow border border-light" alt="User Image"
-                                   style="object-fit: cover; width: 40px; height: 40px;" />
-                               <span class="d-none d-md-inline">{{ $anggota->nama ?? 'Guest' }}</span>
-                               <i class="bi bi-chevron-down"></i>
-                           </a>
+                           <a href="#"
+                               class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none"
+                               data-bs-toggle="dropdown" style="width: auto; transition: all 0.2s ease;">
 
-                           <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                               <li class="dropdown-header text-center">
-                                   <strong>{{ $anggota->nama }}</strong><br>
+                               <div class="d-flex align-items-center">
+                                   <img src="{{ asset('storage/profil/' . ($anggota->foto ?? 'default.jpg')) }}"
+                                       onerror="this.onerror=null;this.src='{{ asset('storage/profil/default.jpg') }}';"
+                                       class="rounded-circle me-2 user-image" alt="User Image"
+                                       style="object-fit: cover; width: 40px; height: 40px; border: 2px solid rgba(108, 108, 108, 0.7); transition: transform 0.3s ease;"
+                                       onmouseover="this.style.transform='scale(1.05)'"
+                                       onmouseout="this.style.transform='scale(1)'">
+                                   <span
+                                       class="fw-semibold text-dark d-none d-md-inline">{{ $anggota->nama ?? 'Guest User' }}</span>
+                               </div>
+
+                               <i class="bi bi-chevron-down ms-2 text-muted"></i>
+                           </a>
+                           <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 overflow-hidden">
+                               <li class="dropdown-header text-center pb-2">
+                                   <strong class="fw-semibold">{{ $anggota->nama }}</strong><br>
                                    <small class="text-muted">{{ $anggota->getjabatan->nama }}</small>
                                </li>
                                <li>
-                                   <hr class="dropdown-divider">
+                                   <hr class="dropdown-divider my-2">
                                </li>
                                <li>
-                                   <a href="/inspeksi/profile" class="dropdown-item">
-                                       <i class="bi bi-person-circle me-2"></i> Profil Saya
+                                   <a href="/inspeksi/profile" class="dropdown-item rounded-3 py-2">
+                                       <i class="bi bi-person-circle me-2 ms-2"></i> Profil Saya
                                    </a>
                                </li>
                                <li>
-                                   <a href="#" id="btnLogout" class="dropdown-item text-danger">
-                                       <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                   <a href="#" id="btnLogout" class="dropdown-item text-danger rounded-3 py-2">
+                                       <i class="bi bi-box-arrow-right me-2 ms-2"></i> Logout
                                    </a>
                                    <form id="formLogout" action="/inspeksi/logout" method="POST"
                                        style="display:none;">
