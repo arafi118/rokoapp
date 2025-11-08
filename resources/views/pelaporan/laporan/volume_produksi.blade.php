@@ -1,12 +1,21 @@
 @php
     use App\Utils\Tanggal;
     use Carbon\CarbonPeriod;
+
     $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
     $weekly_total = [];
+
+    // Inisialisasi stok awal
+    $stok_batangan_sebelumnya = 0;
+    $stok_zb_sebelumnya = 0;
+    $stok_pack_tercukai_sebelumnya = 0;
+    $stok_pack_terbanderol_sebelumnya = 0;
+
+    $last_week = null;
+
     foreach ($levels as $lvl) {
         $weekly_total[$lvl->nama] = 0;
     }
-    $last_week = null;
 @endphp
 <style>
     body {
@@ -64,24 +73,24 @@
         <td>: SKT MAGELANG - PT. ATI</td>
     </tr>
 </table>
-
 <table border="1" cellspacing="0" cellpadding="4" width="100%">
     <thead>
         <tr>
             <th rowspan="3" width="5%">WEEK</th>
             <th rowspan="3" width="10%">TANGGAL</th>
             <th rowspan="3" width="8%">HARI</th>
-            <th rowspan="3" width="10%">Rencana Produksi Terbanderol</th>
+            <th rowspan="3" width="10%">Rencana Produksi Terbanderol<br>(batang)</th>
             <th colspan="{{ count($levels) - 1 }}">BRAND : ARS-16</th>
             <th rowspan="3" width="10%">Pengeluaran Finished Goods<br>(batang)</th>
-            <th rowspan="3" width="6%">Afkir<br>batang</th>
-            <th colspan="3">STOCK AKHIR<br>(batang)</th>
+            <th rowspan="3" width="8%">Afkir<br>(batang)</th>
+            <th colspan="4">STOCK AKHIR<br>(batang)</th>
         </tr>
         <tr>
             <th colspan="{{ count($levels) - 1 }}">PRODUKSI AKTUAL<br>(batang)</th>
+            <th rowspan="2" width="8%">Batangan</th>
             <th rowspan="2" width="8%">ZB<br>(Polosan)</th>
             <th rowspan="2" width="8%">Pack Tercukai<br>(Wanspot)</th>
-            <th rowspan="2" width="8%">Pak Terbanderol</th>
+            <th rowspan="2" width="8%">Pack Terbanderol</th>
         </tr>
         <tr>
             @foreach ($levels as $lvl)
@@ -91,6 +100,7 @@
             @endforeach
         </tr>
     </thead>
+
     <tbody>
         @foreach ($period as $date)
             @php
@@ -98,7 +108,34 @@
                 $tgl = $date->format('Y-m-d');
                 $tgl_tampil = $date->format('d-M-y');
                 $hari = Tanggal::namaHari($tgl);
+
                 $harian = $rekap[$tgl] ?? [];
+                $rencana_harian = $rencana[$tgl] ?? [];
+
+                $total_rencana = collect($rencana_harian)
+                    ->filter(fn($val, $lvl) => strtolower($lvl) != 'multi level')
+                    ->sum();
+
+                $giling = $harian['Giling'] ?? 0;
+                $gunting = $harian['Gunting'] ?? 0;
+                $packing = $harian['Packing'] ?? 0;
+                $banderol = $harian['Banderol'] ?? 0;
+                $opp = $harian['OPP'] ?? 0;
+                $mop = $harian['MOP'] ?? 0;
+
+                $pengeluaran = 0;
+                $afkir = 0;
+
+                $stok_batangan = $stok_batangan_sebelumnya + $total_rencana - $pengeluaran - $afkir;
+                $stok_zb = $stok_zb_sebelumnya + $gunting - $afkir;
+                $stok_pack_tercukai = $stok_pack_tercukai_sebelumnya + $mop - $opp;
+                $stok_pack_terbanderol = $stok_pack_terbanderol_sebelumnya + $opp - $banderol;
+
+                $stok_batangan_sebelumnya = $stok_batangan;
+                $stok_zb_sebelumnya = $stok_zb;
+                $stok_pack_tercukai_sebelumnya = $stok_pack_tercukai;
+                $stok_pack_terbanderol_sebelumnya = $stok_pack_terbanderol;
+
                 $row = [];
                 foreach ($levels as $lvl) {
                     if (strtolower($lvl->nama) != 'multi level') {
@@ -107,24 +144,30 @@
                     }
                 }
             @endphp
+
             <tr class="{{ $hari == 'Minggu' ? 'minggu' : '' }}">
                 <td>{{ $last_week !== $week ? $week : '' }}</td>
                 <td>{{ $tgl_tampil }}</td>
                 <td>{{ $hari }}</td>
-                <td></td>
+
+                <td style="text-align:right;">{{ number_format($total_rencana) }}</td>
+
                 @foreach ($levels as $lvl)
                     @if (strtolower($lvl->nama) != 'multi level')
                         <td style="text-align:right;">{{ number_format($row[$lvl->nama]) }}</td>
                     @endif
                 @endforeach
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+
+                <td style="text-align:right;">{{ number_format($pengeluaran) }}</td>
+                <td style="text-align:right;">{{ number_format($afkir) }}</td>
+
+                <td style="text-align:right;">{{ number_format($stok_batangan) }}</td>
+                <td style="text-align:right;">{{ number_format($stok_zb) }}</td>
+                <td style="text-align:right;">{{ number_format($stok_pack_tercukai) }}</td>
+                <td style="text-align:right;">{{ number_format($stok_pack_terbanderol) }}</td>
             </tr>
 
-            {{-- Total tiap akhir minggu --}}
+            {{-- === TOTAL MINGGUAN === --}}
             @if ($hari == 'Minggu')
                 <tr style="font-weight:bold; background-color:#f0f0f0;">
                     <td colspan="4">Total</td>
@@ -133,7 +176,8 @@
                             <td style="text-align:right;">{{ number_format($weekly_total[$lvl->nama]) }}</td>
                         @endif
                     @endforeach
-                    <td colspan="5"></td>
+                    {{-- Sisa kolom: Pengeluaran, Afkir, 4 stok = 6 --}}
+                    <td colspan="6"></td>
                 </tr>
                 @php
                     foreach ($levels as $lvl) {
@@ -146,18 +190,5 @@
 
             @php $last_week = $week; @endphp
         @endforeach
-
-        {{-- Total minggu terakhir --}}
-        @if (collect($weekly_total)->sum() > 0)
-            <tr style="font-weight:bold; background-color:#f0f0f0;">
-                <td colspan="4">Total Akhir</td>
-                @foreach ($levels as $lvl)
-                    @if (strtolower($lvl->nama) != 'multi level')
-                        <td style="text-align:right;">{{ number_format($weekly_total[$lvl->nama]) }}</td>
-                    @endif
-                @endforeach
-                <td colspan="5"></td>
-            </tr>
-        @endif
     </tbody>
 </table>

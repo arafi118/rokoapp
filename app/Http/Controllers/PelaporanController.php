@@ -36,6 +36,8 @@ class PelaporanController extends Controller
                 ['value' => 'karyawan_dimutasi', 'title' => 'Karyawan Dimutasi'],
                 ['value' => 'karyawan_kehadiran', 'title' => 'Kehadiran'],
                 ['value' => 'karyawan_komposisi_karyawan', 'title' => 'Komposisi Karyawan'],
+                ['value' => 'volume_produksi', 'title' => 'Volume Produksi'],
+
 
             ];
         } elseif ($file == 'jam_kerja') {
@@ -708,7 +710,7 @@ class PelaporanController extends Controller
         return $pdf->stream('Produktifitas Aktual.pdf');
     }
 
-    private function volume_produksi (array $data)
+    private function volume_produksi(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
         $tanggal_awal = trim($minggu_ke[0]);
@@ -719,7 +721,7 @@ class PelaporanController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        // Ambil data produksi yang valid selama periode
+        // --- PRODUKSI AKTUAL ---
         $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->with(['karyawan.getlevel'])
             ->get();
@@ -731,16 +733,33 @@ class PelaporanController extends Controller
             $level_nama = $p->karyawan->getlevel->nama ?? null;
 
             if ($level_nama) {
-                if (!isset($rekap[$tanggal])) {
-                    $rekap[$tanggal] = [];
-                }
-
                 if (!isset($rekap[$tanggal][$level_nama])) {
                     $rekap[$tanggal][$level_nama] = 0;
                 }
 
-                // jumlah batang baik per bagian (level)
+                // Jumlah batang baik per bagian (level)
                 $rekap[$tanggal][$level_nama] += (int) $p->jumlah_baik;
+            }
+        }
+
+        // --- RENCANA PRODUKSI (TARGET HARIAN) ---
+        $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        $rencana = [];
+
+        foreach ($absensi as $a) {
+            $tanggal = $a->tanggal;
+            $level_nama = $a->getkaryawan->getlevel->nama ?? null;
+
+            if ($level_nama && $a->target_harian) {
+                if (!isset($rencana[$tanggal][$level_nama])) {
+                    $rencana[$tanggal][$level_nama] = 0;
+                }
+
+                // Jumlahkan target_harian per level per tanggal
+                $rencana[$tanggal][$level_nama] += (int) $a->target_harian;
             }
         }
 
@@ -752,6 +771,7 @@ class PelaporanController extends Controller
             'minggu_ke'     => $minggu_ke,
             'produksi'      => $produksi,
             'rekap'         => $rekap,
+            'rencana'       => $rencana, // ← ditambahkan ke view
             'levels'        => $levels,
             'title'         => $title,
             'bulan'         => $data['bulan'],
@@ -768,8 +788,9 @@ class PelaporanController extends Controller
                 'enable-local-file-access' => true,
             ]);
 
-        return $pdf->stream();
+        return $pdf->stream('Volume_Produksi.pdf');
     }
+
 
     private function jam_kerja_aktual(array $data)
     {
@@ -1074,9 +1095,6 @@ class PelaporanController extends Controller
 
         return $pdf->stream('Balance_Proses.pdf');
     }
-
-
-
 
     public function index_kapasitas(array $data)
     {
