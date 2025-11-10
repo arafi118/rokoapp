@@ -42,7 +42,7 @@
     }
 </style>
 <h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
-    PRODUKSI (ORANG/JAM/BATANG)
+    PRODUKTIVITAS (ORANG/JAM/BATANG)
 </h2>
 
 <table class="header-info" style="margin-bottom:10px;">
@@ -69,7 +69,7 @@
             <th rowspan="2" width="5%">WEEK</th>
             <th rowspan="2" width="12%">TANGGAL</th>
             <th rowspan="2" width="10%">HARI</th>
-            <th colspan="6">JUMLAH PRODUKSI (BATANG)</th>
+            <th colspan="6">PRODUKTIVITAS (orang/jam/batang)</th>
         </tr>
         <tr>
             <th>Giling</th>

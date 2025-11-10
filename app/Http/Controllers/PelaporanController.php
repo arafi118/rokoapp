@@ -8,6 +8,7 @@ use App\Models\Absensi;
 use App\Models\Karyawan;
 use App\Models\Produksi;
 use App\Models\Level;
+use App\Models\Group;
 use App\Models\Mutasi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -47,8 +48,8 @@ class PelaporanController extends Controller
             ];
         } elseif ($file == 'produktifitas') {
             $sub_laporan = [
-                ['value' => 'produktifitas_aktual', 'title' => 'Produksi'],
-                ['value' => 'produktifitas_index', 'title' => 'Index Produksi'],
+                ['value' => 'produktifitas_aktual', 'title' => 'Produktivitas'],
+                ['value' => 'produktifitas_index', 'title' => 'Index Produktivitas'],
                 ['value' => 'produktifitas_harian', 'title' => 'Produksi Harian'],
 
             ];
@@ -59,7 +60,20 @@ class PelaporanController extends Controller
                 ['value' => 'index_kapasitas', 'title' => 'Index Kapasitas'],
 
             ];
-        } else {
+        } 
+        elseif ($file == 'produksi') {
+            // 🔹 ambil semua kelompok dari tabel group
+            $groups = Group::select('id', 'nama')->orderBy('nama')->get();
+
+            // ubah jadi array sesuai format sub_laporan
+            $sub_laporan = $groups->map(function ($g) {
+                return [
+                    'value' => 'laporan_produksi_' . $g->id, // nanti method dinamis
+                    'title' => $g->nama
+                ];
+            })->toArray();
+        }
+        else {
             $sub_laporan = [
                 ['value' => '', 'title' => '---']
             ];
@@ -81,11 +95,15 @@ class PelaporanController extends Controller
         $data['bulan'] = $data['bulan'] ?? date('m');
         $data['hari']  = $data['hari'] ?? null;
 
-        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas','kapasitas']) && $sub) {
+        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas','kapasitas','produksi']) && $sub) {
             $method = "{$sub}";
             if (method_exists($this, $method)) {
                 return $this->$method($data);
             }
+        }
+        if (str_starts_with($sub, 'laporan_produksi_')) {
+            $group_id = str_replace('laporan_produksi_', '', $sub);
+            return $this->laporan_produksi($data, $group_id);
         }
 
         if (method_exists($this, $laporan)) {
@@ -630,7 +648,7 @@ class PelaporanController extends Controller
             }
         }
 
-        $title = 'Index Produksi';
+        $title = 'Index Produktivitas';
 
         $view = view('pelaporan.laporan.produktifitas_index', [
             'tanggal_awal'  => $tanggal_awal,
@@ -687,7 +705,7 @@ class PelaporanController extends Controller
             }
         }
 
-        $title = 'Produksi (Orang/Jam/Batang)';
+        $title = 'Produktivitas (Orang/Jam/Batang)';
 
         $view = view('pelaporan.laporan.produktifitas_aktual', [
             'tanggal_awal'  => $tanggal_awal,
@@ -711,6 +729,99 @@ class PelaporanController extends Controller
 
         return $pdf->stream('Produktifitas Aktual.pdf');
     }
+
+private function laporan_produksi(array $data, $group_id)
+{
+    $minggu_ke = explode('#', request()->get('minggu_ke'));
+    $tanggal_awal = trim($minggu_ke[0]);
+    $tanggal_akhir = trim($minggu_ke[1]);
+
+    // Ambil data absensi & produksi sesuai group_id + periode
+    $absensi = Absensi::with(['getkaryawan.getanggota', 'getgroup'])
+        ->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+        ->where('group_id', $group_id)
+        ->get();
+
+    $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+        ->whereIn('karyawan_id', $absensi->pluck('karyawan_id')->unique())
+        ->get();
+
+    // Susun data per group -> karyawan -> tanggal
+    $kelompok_data = [];
+
+    foreach ($absensi as $a) {
+        // skip jika relasi tidak lengkap
+        if (!$a->getgroup || !$a->getkaryawan) {
+            continue;
+        }
+
+        $group_nama   = $a->getgroup->nama ?? '-';
+        $karyawan     = $a->getkaryawan;
+        $anggota      = $karyawan->getanggota ?? null;
+        $karyawan_id  = $a->karyawan_id;
+        $tgl_absen    = $a->tanggal;
+        $karyawan_nama = $anggota->nama ?? '-';
+        $nip          = $karyawan->kode_karyawan ?? '-';
+        $plan         = $a->target_harian ?? 0;
+
+        // hitung actual
+        $actual = $produksi
+            ->where('karyawan_id', $karyawan_id)
+            ->where('tanggal', $tgl_absen)
+            ->sum('jumlah_baik');
+
+        if ($plan > 0 || $actual > 0) {
+            $kelompok_data[$group_id]['nama'] = $group_nama;
+            $kelompok_data[$group_id]['data'][$karyawan_id]['nama'] = $karyawan_nama;
+            $kelompok_data[$group_id]['data'][$karyawan_id]['nip'] = $nip;
+            $kelompok_data[$group_id]['data'][$karyawan_id]['tanggal'][$tgl_absen] = [
+                'plan'   => $plan,
+                'actual' => $actual,
+            ];
+        }
+    }
+
+    // pastikan hanya ada satu group karena sudah difilter
+    $kelompok_data = array_filter($kelompok_data, fn($g) => isset($g['data']) && count($g['data']) > 0);
+
+    // kalau tidak ada data, tampilkan view kosong
+    if (empty($kelompok_data)) {
+        return view('pelaporan.laporan.produksi_harian', [
+            'title'         => 'Laporan Produksi Harian',
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'kelompok_data' => [],
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ]);
+    }
+
+    $title = 'Laporan Produksi Harian';
+
+    $view = view('pelaporan.laporan.produksi_harian', [
+        'title'         => $title,
+        'tanggal_awal'  => $tanggal_awal,
+        'tanggal_akhir' => $tanggal_akhir,
+        'kelompok_data' => $kelompok_data,
+        'bulan'         => $data['bulan'],
+        'tahun'         => $data['tahun'],
+    ])->render();
+
+    $pdf = PDF::loadHTML($view)
+        ->setPaper('a4', 'landscape')
+        ->setOptions([
+            'margin-top'    => 30,
+            'margin-bottom' => 15,
+            'margin-left'   => 25,
+            'margin-right'  => 20,
+            'enable-local-file-access' => true,
+        ]);
+
+    return $pdf->stream('laporan_produksi_' . $group_id . '.pdf');
+}
+
+
+
 
     private function volume_produksi(array $data)
     {
