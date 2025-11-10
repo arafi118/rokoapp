@@ -47,8 +47,10 @@ class PelaporanController extends Controller
             ];
         } elseif ($file == 'produktifitas') {
             $sub_laporan = [
-                ['value' => 'produktifitas_aktual', 'title' => 'Produktifitas'],
-                ['value' => 'produktifitas_index', 'title' => 'Index Produktifitas'],
+                ['value' => 'produktifitas_aktual', 'title' => 'Produksi'],
+                ['value' => 'produktifitas_index', 'title' => 'Index Produksi'],
+                ['value' => 'produktifitas_harian', 'title' => 'Produksi Harian'],
+
             ];
         } elseif ($file == 'kapasitas') {
             $sub_laporan = [
@@ -628,7 +630,7 @@ class PelaporanController extends Controller
             }
         }
 
-        $title = 'Index Produktifitas';
+        $title = 'Index Produksi';
 
         $view = view('pelaporan.laporan.produktifitas_index', [
             'tanggal_awal'  => $tanggal_awal,
@@ -685,7 +687,7 @@ class PelaporanController extends Controller
             }
         }
 
-        $title = 'Produktifitas (Orang/Jam/Batang)';
+        $title = 'Produksi (Orang/Jam/Batang)';
 
         $view = view('pelaporan.laporan.produktifitas_aktual', [
             'tanggal_awal'  => $tanggal_awal,

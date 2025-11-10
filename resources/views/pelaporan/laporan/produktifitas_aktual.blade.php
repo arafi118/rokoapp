@@ -42,7 +42,7 @@
     }
 </style>
 <h2 style="text-align:center; font-size:20px; font-weight:bold; margin-bottom:15px;">
-    PRODUKTIFITAS (ORANG/JAM/BATANG)
+    PRODUKSI (ORANG/JAM/BATANG)
 </h2>
 
 <table class="header-info" style="margin-bottom:10px;">
