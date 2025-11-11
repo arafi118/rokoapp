@@ -130,7 +130,7 @@
                 <tr>
                     <td>{{ $no++ }}</td>
                     <td style="text-align:left;">{{ $karyawan['nama'] }}</td>
-                    <td>P. {{ $karyawan['nip'] }}</td>
+                    <td>{{ $karyawan['nip'] }}</td>
                     @foreach ($hariList as $h)
                         @php
                             $hari = Tanggal::namaHari($h['tanggal']);
