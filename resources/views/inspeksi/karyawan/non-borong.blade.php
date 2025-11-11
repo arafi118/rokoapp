@@ -10,7 +10,7 @@
                             <i class="bi bi-plus-circle"></i> Tambah Karyawan
                         </button>
                     </div>
-                    <div class="table-responsive">
+                    <div class="table-responsive pt-3">
                         <table id="karyawan" class="table table-hover table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
@@ -88,8 +88,8 @@
                         name: 'tanggal_masuk'
                     },
                     {
-                        data: 'level_nama',
-                        name: 'level_nama'
+                        data: 'getlevel.nama',
+                        name: 'getlevel.nama'
                     },
                     {
                         data: null,
@@ -120,6 +120,31 @@
                     [1, 'asc']
                 ]
             });
+
+            const filterWrapper = $('#karyawan_filter');
+            filterWrapper.empty();
+
+            filterWrapper.append(`
+                <div class="input-group">
+                <label class="input-group-text" for="search-karyawan">Cari</label>
+                <input type="text" id="search-karyawan" class="form-control" placeholder="Cari...">
+                <select class="form-select" id="status-karyawan">
+                    <option value="all">Semua</option>
+                    <option value="aktif" selected>Aktif</option>
+                    <option value="nonaktif">Nonaktif</option>
+                </select>
+                </div>
+            `);
+
+            $('#search-karyawan').on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            $('#status-karyawan').on('change', function() {
+                const val = this.value;
+                table.ajax.url(`/inspeksi/karyawan/data?level_karyawan=0&status=${val}`).load();
+            });
+
 
             $(document).on('change', '#checkAll', function() {
                 if ($(this).is(':checked')) {
