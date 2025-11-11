@@ -35,7 +35,6 @@ class PelaporanController extends Controller
                 ['value' => 'karyawan_direkrut', 'title' => 'Karyawan Direkrut'],
                 ['value' => 'karyawan_keluar', 'title' => 'Karyawan Keluar'],
                 ['value' => 'karyawan_dimutasi', 'title' => 'Karyawan Dimutasi'],
-                ['value' => 'karyawan_kehadiran', 'title' => 'Kehadiran'],
                 ['value' => 'karyawan_komposisi_karyawan', 'title' => 'Komposisi Karyawan'],
                 ['value' => 'volume_produksi', 'title' => 'Volume Produksi'],
 
@@ -730,47 +729,46 @@ class PelaporanController extends Controller
         return $pdf->stream('Produktifitas Aktual.pdf');
     }
 
-private function laporan_produksi(array $data, $group_id)
-{
-    $minggu_ke = explode('#', request()->get('minggu_ke'));
-    $tanggal_awal = trim($minggu_ke[0]);
-    $tanggal_akhir = trim($minggu_ke[1]);
+    private function laporan_produksi(array $data, $group_id)
+    {
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-    // Ambil data absensi & produksi sesuai group_id + periode
-    $absensi = Absensi::with(['getkaryawan.getanggota', 'getgroup'])
-        ->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-        ->where('group_id', $group_id)
-        ->get();
+        // Ambil data absensi & produksi sesuai group_id + periode
+        $absensi = Absensi::with(['getkaryawan.getanggota', 'getgroup'])
+            ->whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->where('group_id', $group_id)
+            ->get();
 
-    $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-        ->whereIn('karyawan_id', $absensi->pluck('karyawan_id')->unique())
-        ->get();
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->whereIn('karyawan_id', $absensi->pluck('karyawan_id')->unique())
+            ->get();
 
-    // Susun data per group -> karyawan -> tanggal
-    $kelompok_data = [];
+        // Susun data per group -> karyawan -> tanggal
+        $kelompok_data = [];
 
-    foreach ($absensi as $a) {
-        // skip jika relasi tidak lengkap
-        if (!$a->getgroup || !$a->getkaryawan) {
-            continue;
-        }
+        foreach ($absensi as $a) {
+            // skip jika relasi tidak lengkap
+            if (!$a->getgroup || !$a->getkaryawan) {
+                continue;
+            }
 
-        $group_nama   = $a->getgroup->nama ?? '-';
-        $karyawan     = $a->getkaryawan;
-        $anggota      = $karyawan->getanggota ?? null;
-        $karyawan_id  = $a->karyawan_id;
-        $tgl_absen    = $a->tanggal;
-        $karyawan_nama = $anggota->nama ?? '-';
-        $nip          = $karyawan->kode_karyawan ?? '-';
-        $plan         = $a->target_harian ?? 0;
+            $group_nama    = $a->getgroup->nama ?? '-';
+            $karyawan      = $a->getkaryawan;
+            $anggota       = $karyawan->getanggota ?? null;
+            $karyawan_id   = $a->karyawan_id;
+            $tgl_absen     = $a->tanggal;
+            $karyawan_nama = $anggota->nama ?? '-';
+            $nip           = $karyawan->kode_karyawan ?? '-';
+            $plan          = $a->target_harian ?? 0;
 
-        // hitung actual
-        $actual = $produksi
-            ->where('karyawan_id', $karyawan_id)
-            ->where('tanggal', $tgl_absen)
-            ->sum('jumlah_baik');
+            // hitung actual
+            $actual = $produksi
+                ->where('karyawan_id', $karyawan_id)
+                ->where('tanggal', $tgl_absen)
+                ->sum('jumlah_baik');
 
-        if ($plan > 0 || $actual > 0) {
             $kelompok_data[$group_id]['nama'] = $group_nama;
             $kelompok_data[$group_id]['data'][$karyawan_id]['nama'] = $karyawan_nama;
             $kelompok_data[$group_id]['data'][$karyawan_id]['nip'] = $nip;
@@ -779,49 +777,44 @@ private function laporan_produksi(array $data, $group_id)
                 'actual' => $actual,
             ];
         }
-    }
 
-    // pastikan hanya ada satu group karena sudah difilter
-    $kelompok_data = array_filter($kelompok_data, fn($g) => isset($g['data']) && count($g['data']) > 0);
+        // Jika tidak ada data sama sekali, buat struktur kosong agar tabel tetap muncul
+        if (empty($kelompok_data)) {
+            $kelompok_data[$group_id] = [
+                'nama' => '-',
+                'data' => [
+                    [
+                        'nama' => '-',
+                        'nip' => '-',
+                        'tanggal' => [],
+                    ],
+                ],
+            ];
+        }
 
-    // kalau tidak ada data, tampilkan view kosong
-    if (empty($kelompok_data)) {
-        return view('pelaporan.laporan.produksi_harian', [
-            'title'         => 'Laporan Produksi Harian',
+        $title = 'Laporan Produksi Harian';
+
+        $view = view('pelaporan.laporan.produksi_harian', [
+            'title'         => $title,
             'tanggal_awal'  => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
-            'kelompok_data' => [],
+            'kelompok_data' => $kelompok_data,
             'bulan'         => $data['bulan'],
             'tahun'         => $data['tahun'],
-        ]);
+        ])->render();
+
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
+
+        return $pdf->stream('laporan_produksi_' . $group_id . '.pdf');
     }
-
-    $title = 'Laporan Produksi Harian';
-
-    $view = view('pelaporan.laporan.produksi_harian', [
-        'title'         => $title,
-        'tanggal_awal'  => $tanggal_awal,
-        'tanggal_akhir' => $tanggal_akhir,
-        'kelompok_data' => $kelompok_data,
-        'bulan'         => $data['bulan'],
-        'tahun'         => $data['tahun'],
-    ])->render();
-
-    $pdf = PDF::loadHTML($view)
-        ->setPaper('a4', 'landscape')
-        ->setOptions([
-            'margin-top'    => 30,
-            'margin-bottom' => 15,
-            'margin-left'   => 25,
-            'margin-right'  => 20,
-            'enable-local-file-access' => true,
-        ]);
-
-    return $pdf->stream('laporan_produksi_' . $group_id . '.pdf');
-}
-
-
-
 
     private function volume_produksi(array $data)
     {
@@ -1154,8 +1147,6 @@ private function laporan_produksi(array $data, $group_id)
 
             return $pdf->stream('Produksi_per_Jam.pdf');
     }
-
-
 
 
     public function balance_prosses(array $data)
