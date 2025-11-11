@@ -53,11 +53,26 @@
         </a>
     </li>
     <li class="nav-item">
-        <a href="/inspeksi/karyawan" class="nav-link">
-            <i class="nav-icon bi bi-person-lines-fill"></i>
-            <p>Karyawan</p>
+        <a href="#" class="nav-link">
+            <i class="nav-icon bi bi-person-badge"></i>
+            <p>Karyawan<i class="nav-arrow bi bi-chevron-right"></i></p>
         </a>
+        <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="/inspeksi/karyawan" class="nav-link">
+                    <i class="nav-icon bi bi-person-lines-fill"></i>
+                    <p>Karyawan Borong</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/inspeksi/karyawan/karyawan-non-borong" class="nav-link">
+                    <i class="nav-icon bi bi-person-lines-fill"></i>
+                    <p>Non Borong</p>
+                </a>
+            </li>
+        </ul>
     </li>
+
     <li class="nav-item">
         <a href="/inspeksi/tempat-kerja" class="nav-link">
             <i class="nav-icon bi bi-building"></i>

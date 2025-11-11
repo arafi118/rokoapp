@@ -118,9 +118,9 @@ class AbsensiController extends Controller
                     ];
                 } else {
                     if (is_numeric($data[0]) && $data[1] != '') {
-                        $dataKodeKaryawan[] = $data[1];
+                        $dataKodeKaryawan[] = (is_numeric(substr($data[1], 0, 1))) ? 'P. ' . $data[1] : $data[1];
                         $dataAbsensi[] = [
-                            'kode' => $data[1],
+                            'kode' => (is_numeric(substr($data[1], 0, 1))) ? 'P. ' . $data[1] : $data[1],
                             'nama' => $data[2],
                             'kelompok' => (isset($groupId[$jenisAbsen]) ? $groupId[$jenisAbsen] : ($index + 1)),
                             'absensi' => [

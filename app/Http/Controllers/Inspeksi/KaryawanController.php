@@ -19,16 +19,28 @@ class KaryawanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->ajax()) {
+        return view('inspeksi.karyawan.index', ['title' => 'Karyawan Borong']);
+    }
+
+    public function nonBorong()
+    {
+        return view('inspeksi.karyawan.non-borong', ['title' => 'Karyawan Non Borong']);
+    }
+
+    public function getData()
+    {
+        if (request()->ajax()) {
+            $level_karyawan = request()->get('level_karyawan') ?? 1;
             $data = Karyawan::with(
                 'getanggota',
                 'getgroup',
                 'getmeja'
             )->select('karyawan.*', 'level.nama as level_nama')
                 ->join('level', 'karyawan.level', '=', 'level.id')
-                ->where('level.level_karyawan', 1);
+                ->where('level.level_karyawan', $level_karyawan);
+
             return DataTables::eloquent($data)
                 ->addIndexColumn()
                 ->addColumn('status_karyawan', function ($row) {
@@ -39,8 +51,6 @@ class KaryawanController extends Controller
                 })
                 ->toJson();
         }
-
-        return view('inspeksi.karyawan.index', ['title' => 'Karyawan Aktif']);
     }
 
     public function getgroup(Request $request)

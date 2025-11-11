@@ -1,15 +1,11 @@
 @extends('inspeksi.layouts.base')
 
 @section('content')
-    @include('inspeksi.karyawan.form')
     <div class="row mb-2">
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <button id="btnCetakSP" class="btn btn-info btn-sm">
-                            <i class="bi bi-plus-circle"></i> Cetak SP
-                        </button>
                         <button id="btnTambah" class="btn btn-success btn-sm">
                             <i class="bi bi-plus-circle"></i> Tambah Karyawan
                         </button>
@@ -18,16 +14,9 @@
                         <table id="karyawan" class="table table-hover table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>
-                                        <div class="icheck-primary d-inline">
-                                            <input type="checkbox" id="checkAll">
-                                            <label for="checkAll">
-                                            </label>
-                                        </div>
-                                    </th>
                                     <th>Nama Karyawan</th>
                                     <th>Kode Karyawan</th>
-                                    <th>Group Karyawan</th>
+                                    <th>Alamat</th>
                                     <th>Tanggal Masuk</th>
                                     <th>Level</th>
                                     <th>Aksi</th>
@@ -65,21 +54,8 @@
             const table = $('#karyawan').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '/inspeksi/karyawan/data?level_karyawan=1',
+                ajax: '/inspeksi/karyawan/data?level_karyawan=0',
                 columns: [{
-                        data: 'id',
-                        name: 'id',
-                        orderable: false,
-                        searchable: false,
-                        render: (data, type, row) => {
-                            return `
-                                <div class="icheck-primary d-inline">
-                                    <input type="checkbox" name="id[]" id="id-${data}" class="id" value="${data}">
-                                    <label for="id-${data}">
-                                    </label>
-                                </div>`
-                        }
-                    }, {
                         data: 'getanggota.nama',
                         name: 'getanggota.nama',
                         render: function(data, type, row) {
@@ -103,8 +79,8 @@
                         name: 'kode_karyawan'
                     },
                     {
-                        data: 'getgroup.nama',
-                        name: 'getgroup.nama',
+                        data: 'getanggota.alamat',
+                        name: 'getanggota.alamat',
                         defaultContent: '-'
                     },
                     {
