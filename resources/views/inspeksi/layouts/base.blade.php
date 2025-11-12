@@ -276,29 +276,51 @@
                            </div>
                            <div class="col-sm-6">
                                @php
-                                   $path = explode('/', request()->path());
-                                   $basePath = '';
+                                   $currentPath = request()->path();
                                @endphp
-                               <ol class="breadcrumb float-sm-end">
-                                   @foreach ($path as $p)
-                                       @php
-                                           $pathName = str_replace('-', ' ', $p);
-                                           if ($loop->iteration == 1) {
-                                               $pathName = 'Home';
-                                           }
-                                       @endphp
-                                       <li class="breadcrumb-item {{ $p == end($path) ? 'active' : '' }}">
-                                           @if ($p == end($path))
-                                               {{ ucwords($pathName) }}
-                                           @else
-                                               <a
-                                                   href="/{{ $basePath }}{{ $p }}">{{ ucwords($pathName) }}</a>
-                                           @endif
-                                       </li>
-                                       @php $basePath .= $p . '/'; @endphp
-                                   @endforeach
-                               </ol>
+
+                               @if ($currentPath == '/' || strtolower($currentPath) == 'inspeksi')
+                                   <div class="col-sm-12 d-flex justify-content-end align-items-center pe-0">
+                                       <div class="bg-white rounded-pill p-1 d-inline-flex shadow-sm">
+                                           <div class="btn-group" role="group" aria-label="Periode Data">
+                                               <input type="radio" class="btn-check" name="periode" id="mingguan"
+                                                   autocomplete="off" checked>
+                                               <label class="btn btn-warning rounded-pill px-4"
+                                                   for="mingguan">Mingguan</label>
+                                               <input type="radio" class="btn-check" name="periode" id="bulanan"
+                                                   autocomplete="off">
+                                               <label class="btn btn-outline-warning rounded-pill px-4"
+                                                   for="bulanan">Bulanan</label>
+                                           </div>
+                                       </div>
+                                   </div>
+                               @else
+                                   @php
+                                       $path = explode('/', $currentPath);
+                                       $basePath = '';
+                                   @endphp
+                                   <ol class="breadcrumb float-sm-end">
+                                       @foreach ($path as $p)
+                                           @php
+                                               $pathName = str_replace('-', ' ', $p);
+                                               if ($loop->iteration == 1) {
+                                                   $pathName = 'Home';
+                                               }
+                                           @endphp
+                                           <li class="breadcrumb-item {{ $p == end($path) ? 'active' : '' }}">
+                                               @if ($p == end($path))
+                                                   {{ ucwords($pathName) }}
+                                               @else
+                                                   <a
+                                                       href="/{{ $basePath }}{{ $p }}">{{ ucwords($pathName) }}</a>
+                                               @endif
+                                           </li>
+                                           @php $basePath .= $p . '/'; @endphp
+                                       @endforeach
+                                   </ol>
+                               @endif
                            </div>
+
                        </div>
                    </div>
                </div>
@@ -331,6 +353,7 @@
        <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js" crossorigin="anonymous"></script>
        <script src="https://cdn.jsdelivr.net/npm/simplebar@6.2.6/dist/simplebar.min.js"></script>
 
+       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
        <script>
            $('.select2').select2({
                theme: 'bootstrap4',

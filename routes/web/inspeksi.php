@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   //Dashboard route
   Route::get('/', [InspeksiController::class, 'index']);
+  Route::get('/chart', [InspeksiController::class, 'chart']);
+  Route::get('/modalGLGT', [InspeksiController::class, 'modalGLGT']);
 
   //Level routes
   Route::resource('level', LevelController::class);
