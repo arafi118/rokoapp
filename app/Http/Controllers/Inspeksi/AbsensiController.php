@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inspeksi;
 
 use App\Http\Controllers\Controller;
 use App\Imports\ImportAbsensi;
+use App\Imports\ImportAbsensiNonBorong;
 use App\Models\Absensi;
 use App\Models\Anggota;
 use App\Models\Group;
@@ -235,6 +236,150 @@ class AbsensiController extends Controller
         }
 
         Absensi::whereIn('tanggal', $dataTanggal)->whereIn('karyawan_id', $hapusIdKaryawan)->delete();
+
+        $chunkSize = 100;
+        foreach (array_chunk($insertAbsensi, $chunkSize) as $chunk) {
+            Absensi::insert($chunk);
+        }
+
+        Storage::delete($path);
+        echo "<script>window.close();</script>";
+        exit;
+    }
+
+    public function importNonBorong(Request $request)
+    {
+        $file = $request->file('fileNonBorong');
+        $path = $file->store('import');
+
+        $tanggal_awal = '';
+        $tanggal_akhir = '';
+
+        $absensi = [];
+        $dataKodeKaryawan = [];
+        $data = Excel::toArray(new ImportAbsensiNonBorong(), $path)[2];
+        foreach ($data as $index => $value) {
+            if ($index == 1) {
+                $tanggal_awal = date('Y-m-d', ($value[2] - 25569) * 86400);
+                $tanggal_akhir = date('Y-m-d', ($value[3] - 25569) * 86400);
+            }
+
+            if (!is_numeric($value[0])) {
+                continue;
+            }
+
+            if ($index >= 7) {
+                $kodeKaryawan = $value[1];
+                $namaKaryawan = $value[3];
+
+                $kehadiran = [];
+                $jumlahHari = date('t', strtotime($tanggal_awal));
+                for ($i = 1; $i <= $jumlahHari; $i++) {
+                    $tanggal = date('Y-m-d', strtotime('+' . ($i - 1) . ' days', strtotime($tanggal_awal)));
+                    $jamMasuk = $value[$i * 5];
+                    $jamKeluar = $value[$i * 5 + 1];
+                    $lembur1 = $value[$i * 5 + 2];
+                    $lembur2 = $value[$i * 5 + 3];
+
+                    $status = (strtotime($jamKeluar) > 1) ? 'H' : 'A';
+                    if ($jamMasuk == 'I') {
+                        $status = 'I';
+                    }
+
+                    if ($jamMasuk == 'S') {
+                        $status = 'S';
+                    }
+
+                    if ($jamMasuk == 'OFF') {
+                        $status = 'A';
+                    }
+
+                    if ($jamMasuk == 'A') {
+                        $status = 'A';
+                    }
+
+                    $kehadiran[] = [
+                        'tanggal' => $tanggal,
+                        'jam_masuk' => $jamMasuk,
+                        'jam_keluar' => $jamKeluar,
+                        'lembur1' => $lembur1,
+                        'lembur2' => $lembur2,
+                        'status' => $status,
+                    ];
+                }
+
+                $kodeKaryawan = !is_numeric(substr($kodeKaryawan, 0, 1)) ? $kodeKaryawan : 'K. ' . $kodeKaryawan;
+                $absensi[] = [
+                    'kode_karyawan' => $kodeKaryawan,
+                    'nama' => $namaKaryawan,
+                    'kehadiran' => $kehadiran,
+                ];
+                $dataKodeKaryawan[] = $kodeKaryawan;
+            }
+        }
+
+        $insertAbsensi = [];
+        $dataIdKaryawan = Karyawan::whereIn('kode_karyawan', $dataKodeKaryawan)->get()->pluck('id', 'kode_karyawan')->toArray();
+        foreach ($absensi as $data) {
+            $kodeKaryawan = $data['kode_karyawan'];
+            $namaKaryawan = $data['nama'];
+
+            $idKaryawan = $dataIdKaryawan[$kodeKaryawan] ?? null;
+            if (!$idKaryawan) {
+                $anggota = Anggota::create([
+                    'nama' => $namaKaryawan
+                ]);
+
+                $tahun = substr($kodeKaryawan, 4, 2);
+                $bulan = substr($kodeKaryawan, 6, 2);
+
+                $tanggalMasuk = $tahun . '-' . $bulan . '-01';
+                $tanggalMasuk = date('Y-m-d', strtotime($tanggalMasuk));
+
+                $karyawan = Karyawan::create([
+                    'group_id' => '0',
+                    'meja_id' => '0',
+                    'anggota_id' => $anggota->id,
+                    'kode_karyawan' => $kodeKaryawan,
+                    'tanggal_masuk' => $tanggalMasuk,
+                    'tanggal_keluar' => null,
+                    'status' => 'aktif',
+                    'level' => '22',
+                ]);
+
+                $idKaryawan = $karyawan->id;
+            }
+
+            foreach ($data['kehadiran'] as $kehadiran) {
+                if ($kehadiran['jam_keluar'] == '' && $kehadiran['jam_masuk'] == '') {
+                    continue;
+                }
+
+                $jamMasuk = '00:00:00';
+                $jamKeluar = '00:00:00';
+                if ($kehadiran['status'] == 'H') {
+                    $jamMasuk = $kehadiran['jam_masuk'];
+                    $jamKeluar = $kehadiran['jam_keluar'];
+                }
+
+                $insertAbsensi[] = [
+                    'karyawan_id' => $idKaryawan,
+                    'group_id' => '0',
+                    'meja_id' => '0',
+                    'jadwal' => '0',
+                    'tanggal' => $kehadiran['tanggal'],
+                    'jam_masuk' => $jamMasuk,
+                    'jam_keluar' => $jamKeluar,
+                    'status' => $kehadiran['status'],
+                    'status_absen' => 'close',
+                    'target_harian' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        Absensi::where('tanggal', 'LIKE', date('Y-m', strtotime($tanggal_awal)) . '%')->whereIn('karyawan_id', array_values($dataIdKaryawan))->delete();
 
         $chunkSize = 100;
         foreach (array_chunk($insertAbsensi, $chunkSize) as $chunk) {

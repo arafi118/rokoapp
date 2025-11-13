@@ -20,8 +20,10 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-info" data-bs-toggle="modal"
-                            data-bs-target="#importAbsensi">Import Excel</button>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#importAbsensi">Import Absensi Borong</button>
+                        <button type="button" class="btn btn-success ms-3" data-bs-toggle="modal"
+                            data-bs-target="#importAbsensiNonBorong">Import Absensi Non Borong</button>
                         <button type="button" class="btn btn-primary ms-3" id="scanQr">Scan QR</button>
                     </div>
                 </form>
@@ -60,6 +62,36 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="import">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="importAbsensiNonBorong" tabindex="-1" aria-labelledby="importAbsensiLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importAbsensiLabel">
+                        Import Absensi Non Borong
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/inspeksi/absensi-karyawan/import-non-borong" method="post" id="formImportNonBorong"
+                        enctype="multipart/form-data" target="_blank">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="fileNonBorong" class="form-label">File Absensi</label>
+                            <input type="file" class="form-control" accept=".xlsx, .xls" id="fileNonBorong"
+                                name="fileNonBorong">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="importNonBorong">Import</button>
                 </div>
             </div>
         </div>
@@ -151,6 +183,17 @@
             }
 
             var form = $('#formImport');
+            form.submit();
+        })
+
+        $(document).on('click', '#importNonBorong', function() {
+            var file = $('#fileNonBorong')[0].files[0];
+            if (!file) {
+                Swal.fire("Error!", "File belum dipilih", "error");
+                return;
+            }
+
+            var form = $('#formImportNonBorong');
             form.submit();
         })
     </script>
