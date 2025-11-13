@@ -19,6 +19,10 @@ Route::prefix('inspeksi')->middleware(['auth', 'inspeksi'])->group(function () {
   Route::get('/', [InspeksiController::class, 'index']);
   Route::get('/chart', [InspeksiController::class, 'chart']);
   Route::get('/modalGLGT', [InspeksiController::class, 'modalGLGT']);
+  Route::get('/modalPACK', [InspeksiController::class, 'modalPACK']);
+  Route::get('/modalBANDEROL', [InspeksiController::class, 'modalBANDEROL']);
+  Route::get('/modalOPP', [InspeksiController::class, 'modalOPP']);
+  Route::get('/modalMOP', [InspeksiController::class, 'modalMOP']);
 
   //Level routes
   Route::resource('level', LevelController::class);

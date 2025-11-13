@@ -43,7 +43,7 @@
                                             <h2 class="h2 text-primary d-inline">{{ $aktual_pack }}</h2> <span>btg</span>
                                         </div>
                                         <div>
-                                            <button type="button"
+                                            <button type="button" id="ModalPACK"
                                                 class="btn btn-primary btn-icon rounded-circle -rotate-45"
                                                 data-bs-toggle="modal" data-bs-target="#modalPACK">
                                                 <i class="bi bi-arrow-right"></i>
@@ -78,7 +78,7 @@
                                             <span>btg</span>
                                         </div>
                                         <div>
-                                            <button type="button"
+                                            <button type="button" id="ModalBDL"
                                                 class="btn btn-primary btn-icon rounded-circle -rotate-45"
                                                 data-bs-toggle="modal" data-bs-target="#modalBanderol">
                                                 <i class="bi bi-arrow-right"></i>
@@ -100,7 +100,7 @@
                                             <h2 class="h2 text-primary d-inline">{{ $aktual_opp }}</h2> <span>btg</span>
                                         </div>
                                         <div>
-                                            <button type="button"
+                                            <button type="button" id="ModalOPP"
                                                 class="btn btn-primary btn-icon rounded-circle -rotate-45"
                                                 data-bs-toggle="modal" data-bs-target="#modalOPP">
                                                 <i class="bi bi-arrow-right"></i>
@@ -123,7 +123,7 @@
                                             <h2 class="h2 text-primary d-inline">{{ $aktual_mop }}</h2> <span>btg</span>
                                         </div>
                                         <div>
-                                            <button type="button"
+                                            <button type="button" id="ModalMOP"
                                                 class="btn btn-primary btn-icon rounded-circle -rotate-45"
                                                 data-bs-toggle="modal" data-bs-target="#modalMOP">
                                                 <i class="bi bi-arrow-right"></i>
@@ -155,13 +155,13 @@
                             <div class="col-md-12">
                                 <div class="timeline">
                                     <div class="time-label">
-                                        <span class="bg-red" id="tgl_data"></span>
+                                        <span class="bg-red" id="tgl_dataGLGT"></span>
                                     </div>
                                     <div>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> GT/GL</span>
                                             <h3 class="timeline-header no-border"><a href="#">ARS-16</a>
-                                                <span id="total_keseluruhan"></span> btg
+                                                <span id="total_keseluruhanGLGT"></span> btg
                                             </h3>
                                         </div>
                                     </div>
@@ -182,10 +182,10 @@
                                             <span class="time"><i class="fas fa-clock"></i> GT/GL</span>
                                             <h3 class="timeline-header"><a href="#">Pekerja </a> Hadir :</h3>
                                             <div class="timeline-body">
-                                                🟢 Giling : <span id="hadir_gl"></span>
+                                                🟢 Giling : <span id="gl_hadir"> orang</span>
                                             </div>
                                             <div class="timeline-body">
-                                                🟢 Gunting : <span id="hadir_gt"></span>
+                                                🟢 Gunting : <span id="gt_hadir"> orang</span>
                                             </div>
                                         </div>
                                     </div>
@@ -194,10 +194,10 @@
                                             <span class="time"><i class="fas fa-clock"></i> GT/GL</span>
                                             <h3 class="timeline-header"><a href="#">Pekerja </a> tidak Hadir :</h3>
                                             <div class="timeline-body">
-                                                🟢 Giling : <span id="tidak_hadir_gl"></span>
+                                                🟢 Giling : <span id="gl_tidak_hadir"> orang</span>
                                             </div>
                                             <div class="timeline-body">
-                                                🟢 Gunting : <span id="tidak_hadir_gt"></span>
+                                                🟢 Gunting : <span id="gt_tidak_hadir"> orang</span>
                                             </div>
                                         </div>
                                     </div>
@@ -206,10 +206,10 @@
                                             <span class="time"><i class="fas fa-clock"></i> GT/GL</span>
                                             <h3 class="timeline-header"><a href="#">Total </a> Pekerja :</h3>
                                             <div class="timeline-body">
-                                                🟢 Giling : <span id="total_gl"></span>
+                                                🟢 Giling : <span id="gl_total"> orang</span>
                                             </div>
                                             <div class="timeline-body">
-                                                🟢 Gunting : <span id="total_gt"></span>
+                                                🟢 Gunting : <span id="gt_total"> orang</span>
                                             </div>
                                         </div>
                                     </div>
@@ -230,11 +230,54 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title" id="modalPACKLabel">Detail PACK</h5>
+                    <h5 class="modal-title" id="modalPACKLabel">
+                        Detail PACK ( <span id="tgl_dataPK"></span> )
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <p>Isi detail data PACK di sini...</p>
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_hadirPK"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja tidak hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_tidak_hadirPK"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Total Pekerja</p>
+                                    <h4 class="fw-bold mb-0 text-dark"> <span id="total_pekerjaPK"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 border-end border-2 border-secondary">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> ARS-16</h4>
+                            <p class="text-muted mb-1 mt-3">
+                                <span id="total_btgPK"></span> btg
+                            </p>
+                            <h6 class="fw-bold">( <span id="total_packPK"></span> pack )</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> Rata-rata Productivity</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="rata_btgPK"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="rata_packPK"></span> pack )</h6>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -248,13 +291,55 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="modalBanderolLabel">Detail BANDEROL</h5>
+                    <h5 class="modal-title" id="modalBanderolLabel">
+                        Detail BANDEROL ( <span id="tgl_dataBDL"></span> )
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <p>Isi detail data Banderol di sini...</p>
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_hadirBDL"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja tidak hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_tidak_hadirBDL"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Total Pekerja</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="total_pekerjaBDL"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 border-end border-2 border-secondary">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> ARS-16</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="total_btgBDL"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="total_packBDL"></span> pack )</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> Rata-rata Productivity</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="rata_btgBDL"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="rata_packBDL"></span> pack )</h6>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
@@ -262,17 +347,57 @@
         </div>
     </div>
 
+
     {{-- Modal OPP --}}
     <div class="modal fade" id="modalOPP" tabindex="-1" aria-labelledby="modalOPPLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="modalOPPLabel">Detail OPP</h5>
+                    <h5 class="modal-title" id="modalOPPLabel">Detail OPP <span id="tgl_dataOPP"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <p>Isi detail data OPP di sini...</p>
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_hadirOPP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja tidak hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_tidak_hadirOPP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Total Pekerja</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="total_pekerjaOPP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 border-end border-2 border-secondary">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> ARS-16</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="total_btgOPP"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="total_packOPP"></span> pack )</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> Rata-rata Productivity</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="rata_btgOPP"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="rata_packOPP"></span> pack )</h6>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -286,12 +411,51 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-secondary text-white">
-                    <h5 class="modal-title" id="modalMOPLabel">Detail MOP</h5>
+                    <h5 class="modal-title" id="modalMOPLabel">Detail MOP <span id="tgl_dataMOP"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <p>Isi detail data MOP di sini...</p>
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_hadirMOP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Pekerja tidak hadir</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="pekerja_tidak_hadirMOP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <p class="text-muted mb-1">Total Pekerja</p>
+                                    <h4 class="fw-bold mb-0 text-dark"><span id="total_pekerjaMOP"></span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 border-end border-2 border-secondary">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> ARS-16</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="total_btgMOP"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="total_packMOP"></span> pack )</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="fw-bold text-primary"><i class="bi bi-brush-fill"></i> Rata-rata Productivity</h4>
+                            <p class="text-muted mb-1 mt-3"><span id="rata_btgMOP"></span> btg</p>
+                            <h6 class="fw-bold">( <span id="rata_packMOP"></span> pack )</h6>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -302,6 +466,7 @@
 @endsection
 @section('script')
     <script>
+        // Chart.js Initialization
         const ctx = document.getElementById('chart');
         let chartInstance = null;
         const progressContainer = $(`
@@ -472,6 +637,7 @@
         $('input[name="periode"]:checked').trigger('change');
     </script>
     <script>
+        // Modal GL/GT
         $(document).on('click', '#ModalGTGL', function(e) {
             e.preventDefault();
 
@@ -479,25 +645,161 @@
                 url: "/inspeksi/modalGLGT",
                 method: "GET",
                 beforeSend: function() {
-                    $('#modalGLGT').modal('show');
-                    $('#tgl_data, #jam_kerja, #gl_jumlah_baik, #gt_jumlah_baik, #total_keseluruhan, #hadir_gl, #hadir_gt, #tidak_hadir_gl, #tidak_hadir_gt, #total_gl, #total_gt')
-                        .text('...');
+                    const modal = $('#modalGLGT');
+                    modal.modal('show');
+                    modal.find('span').each(function() {
+                        $(this).text('...');
+                    });
                 },
                 success: function(res) {
                     const r = res.rekap;
-                    $('#tgl_data').text(res.tanggal);
-                    $('#gl_jumlah_baik').text(res.rataGL);
-                    $('#gt_jumlah_baik').text(res.rataGL);
-                    $('#total_keseluruhan').text(res.totalKeseluruhan);
-                    $('#hadir_gl').text(r.GL.hadir);
-                    $('#tidak_hadir_gl').text(r.GL.tidak_hadir);
-                    $('#total_gl').text(r.GL.total);
-                    $('#hadir_gt').text(r.GT.hadir);
-                    $('#tidak_hadir_gt').text(r.GT.tidak_hadir);
-                    $('#total_gt').text(r.GT.total);
+                    const modal = $('#modalGLGT');
+
+                    modal.find('#tgl_dataGLGT').text(res.tanggal_GTGL);
+                    modal.find('#total_keseluruhanGLGT').text(res.totalKeseluruhan_GTGL);
+                    modal.find('#gl_jumlah_baik').text(res.rata_GL);
+                    modal.find('#gt_jumlah_baik').text(res.rata_GT);
+                    modal.find('#gl_hadir').text(r.GL.hadir_GL);
+                    modal.find('#gt_hadir').text(r.GT.hadir_GT);
+                    modal.find('#gl_tidak_hadir').text(r.GL.tidak_hadirGL);
+                    modal.find('#gt_tidak_hadir').text(r.GT.tidak_hadirGT);
+                    modal.find('#gl_total').text(r.GL.total_GL);
+                    modal.find('#gt_total').text(r.GT.total_GT);
                 },
                 error: function() {
-                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data.', 'error');
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data GL/GT.', 'error');
+                }
+            });
+        });
+
+        // Modal PACK
+        $(document).on('click', '#ModalPACK', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/inspeksi/modalPACK",
+                method: "GET",
+                beforeSend: function() {
+                    const modal = $('#modalPACK');
+                    modal.modal('show');
+                    modal.find('span').each(function() {
+                        $(this).text('...');
+                    });
+                },
+                success: function(res) {
+                    const p = res.PACK;
+                    const modal = $('#modalPACK');
+
+                    modal.find('#tgl_dataPK').text(res.tanggal_PK);
+                    modal.find('#total_btgPK').text(p.ARS.total_btg_PK);
+                    modal.find('#total_packPK').text(p.ARS.total_pack_PK);
+                    modal.find('#rata_btgPK').text(p.rata_prod.btg_PK);
+                    modal.find('#rata_packPK').text(p.rata_prod.pack_PK);
+                    modal.find('#pekerja_hadirPK').text(p.hadir_PK);
+                    modal.find('#pekerja_tidak_hadirPK').text(p.tidak_hadir_PK);
+                    modal.find('#total_pekerjaPK').text(p.total_PK);
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data PACK.', 'error');
+                }
+            });
+        });
+
+        // Modal BANDEROL
+        $(document).on('click', '#ModalBDL', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/inspeksi/modalBANDEROL",
+                method: "GET",
+                beforeSend: function() {
+                    const modal = $('#modalBanderol');
+                    modal.modal('show');
+                    modal.find('span').each(function() {
+                        $(this).text('...');
+                    });
+                },
+                success: function(res) {
+                    const BD = res.BANDEROL;
+                    const modal = $('#modalBanderol');
+
+                    modal.find('#tgl_dataBDL').text(res.tanggal_BDL);
+                    modal.find('#total_btgBDL').text(BD.ARS.total_btg_BDL);
+                    modal.find('#total_packBDL').text(BD.ARS.total_pack_BDL);
+                    modal.find('#rata_btgBDL').text(BD.rata_prod.btg_BDL);
+                    modal.find('#rata_packBDL').text(BD.rata_prod.pack_BDL);
+                    modal.find('#pekerja_hadirBDL').text(BD.hadir_BDL);
+                    modal.find('#pekerja_tidak_hadirBDL').text(BD.tidak_hadir_BDL);
+                    modal.find('#total_pekerjaBDL').text(BD.total_BDL);
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data PACK.', 'error');
+                }
+            });
+        });
+
+        // Modal OPP
+        $(document).on('click', '#ModalOPP', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/inspeksi/modalOPP",
+                method: "GET",
+                beforeSend: function() {
+                    const modal = $('#modalOPP');
+                    modal.modal('show');
+                    modal.find('span').each(function() {
+                        $(this).text('...');
+                    });
+                },
+                success: function(res) {
+                    const o = res.OPP;
+                    const modal = $('#modalOPP');
+
+                    modal.find('#tgl_dataOPP').text(res.tanggal_OPP);
+                    modal.find('#total_btgOPP').text(o.ARS.total_btg_OPP);
+                    modal.find('#total_packOPP').text(o.ARS.total_pack_OPP);
+                    modal.find('#rata_btgOPP').text(o.rata_prod.btg_OPP);
+                    modal.find('#rata_packOPP').text(o.rata_prod.pack_OPP);
+                    modal.find('#pekerja_hadirOPP').text(o.hadir_OPP);
+                    modal.find('#pekerja_tidak_hadirOPP').text(o.tidak_hadir_OPP);
+                    modal.find('#total_pekerjaOPP').text(o.total_OPP);
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data PACK.', 'error');
+                }
+            });
+        });
+
+        // Modal MOP
+        $(document).on('click', '#ModalMOP', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/inspeksi/modalMOP",
+                method: "GET",
+                beforeSend: function() {
+                    const modal = $('#modalMOP');
+                    modal.modal('show');
+                    modal.find('span').each(function() {
+                        $(this).text('...');
+                    });
+                },
+                success: function(res) {
+                    const mp = res.MOP;
+                    const modal = $('#modalMOP');
+
+                    modal.find('#tgl_dataMOP').text(res.tanggal_MOP);
+                    modal.find('#total_btgMOP').text(mp.ARS.total_btg_MOP);
+                    modal.find('#total_packMOP').text(mp.ARS.total_pack_MOP);
+                    modal.find('#rata_btgMOP').text(mp.rata_prod.btg_MOP);
+                    modal.find('#rata_packMOP').text(mp.rata_prod.pack_MOP);
+                    modal.find('#pekerja_hadirMOP').text(mp.hadir_MOP);
+                    modal.find('#pekerja_tidak_hadirMOP').text(mp.tidak_hadir_MOP);
+                    modal.find('#total_pekerjaMOP').text(mp.total_MOP);
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat memuat data PACK.', 'error');
                 }
             });
         });
