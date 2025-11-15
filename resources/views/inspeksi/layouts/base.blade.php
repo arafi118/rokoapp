@@ -266,7 +266,6 @@
                    <nav class="mt-2">@include('inspeksi.layouts.sidebar')</nav>
                </div>
            </aside>
-
            <main class="app-main">
                <div class="app-content-header">
                    <div class="container-fluid">
@@ -278,7 +277,6 @@
                                @php
                                    $currentPath = request()->path();
                                @endphp
-
                                @if ($currentPath == '/' || strtolower($currentPath) == 'inspeksi')
                                    <div class="col-sm-12 d-flex justify-content-end align-items-center pe-0">
                                        <div class="bg-white rounded-pill p-1 d-inline-flex shadow-sm">
