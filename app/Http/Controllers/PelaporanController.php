@@ -119,14 +119,15 @@ class PelaporanController extends Controller
     public function karyawan_terdaftar(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
-        $tanggal_awal = $minggu_ke[0];
-        $tanggal_akhir = $minggu_ke[1];
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
+        // --- Ambil data absensi minggu terpilih
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Hitung jumlah karyawan per tanggal dan per level
+        // --- Hitung per tanggal & level
         $karyawan = [];
         foreach ($absensi as $a) {
             $tanggal = $a->tanggal;
@@ -137,24 +138,47 @@ class PelaporanController extends Controller
                     $karyawan[$tanggal] = [];
                 }
 
-                if (isset($karyawan[$tanggal][$level_id])) {
-                    $karyawan[$tanggal][$level_id] += 1;
-                } else {
-                    $karyawan[$tanggal][$level_id] = 1;
-                }
+                $karyawan[$tanggal][$level_id] = ($karyawan[$tanggal][$level_id] ?? 0) + 1;
             }
         }
+
+
+        // ========= "TERDAFTAR BULAN LALU" =========
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $absen_bulan_lalu = Absensi::whereDate('tanggal', $tanggal_bulan_lalu)
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        // Hitung per level (1-8)
+        $terdaftar_lalu = [];
+        for ($i = 1; $i <= 8; $i++) {
+            $terdaftar_lalu[$i] = 0;
+        }
+
+        foreach ($absen_bulan_lalu as $a) {
+            $level_id = $a->getkaryawan->getlevel->id ?? null;
+
+            if ($level_id && isset($terdaftar_lalu[$level_id])) {
+                $terdaftar_lalu[$level_id] += 1;
+            }
+        }
+
         $title = 'Data Karyawan';
 
         $view = view('pelaporan.laporan.karyawan_terdaftar', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'absensi'       => $absensi,
-            'karyawan'      => $karyawan,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'        => $tanggal_awal,
+            'tanggal_akhir'       => $tanggal_akhir,
+            'minggu_ke'           => $minggu_ke,
+            'absensi'             => $absensi,
+            'karyawan'            => $karyawan,
+            'title'               => $title,
+            'bulan'               => $data['bulan'],
+            'tahun'               => $data['tahun'],
+
+            // kirim variabel baru
+            'terdaftar_lalu'      => $terdaftar_lalu,
+            'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
         ])->render();
 
         $pdf = PDF::loadHTML($view)
@@ -170,18 +194,20 @@ class PelaporanController extends Controller
         return $pdf->stream('Karyawan Terdaftar.pdf');
     }
 
+
     private function karyawan_hadir(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
         $tanggal_awal = $minggu_ke[0];
         $tanggal_akhir = $minggu_ke[1];
 
+        // Ambil absensi hadir dalam periode
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->where('status', 'H')
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Hitung jumlah karyawan per tanggal dan per level
+        // Hitung jumlah hadir per tanggal per level
         $karyawan = [];
         foreach ($absensi as $a) {
             $tanggal = $a->tanggal;
@@ -192,38 +218,47 @@ class PelaporanController extends Controller
                     $karyawan[$tanggal] = [];
                 }
 
-                if (isset($karyawan[$tanggal][$level_id])) {
-                    $karyawan[$tanggal][$level_id] += 1;
-                } else {
-                    $karyawan[$tanggal][$level_id] = 1;
-                }
+                $karyawan[$tanggal][$level_id] = ($karyawan[$tanggal][$level_id] ?? 0) + 1;
             }
         }
+
+        // Hitung Data Hadir Bulan Lalu
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $absensi_lalu = Absensi::where('tanggal', $tanggal_bulan_lalu)
+            ->where('status', 'H')
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        $terdaftar_lalu = array_fill(1, 8, 0); // Default 0
+
+        foreach ($absensi_lalu as $a) {
+            $level_id = $a->getkaryawan->getlevel->id ?? null;
+            if ($level_id && isset($terdaftar_lalu[$level_id])) {
+                $terdaftar_lalu[$level_id] += 1;
+            }
+        }
+
         $title = 'Karyawan Hadir';
 
         $view = view('pelaporan.laporan.karyawan_hadir', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'absensi'       => $absensi,
-            'karyawan'      => $karyawan,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'      => $tanggal_awal,
+            'tanggal_akhir'     => $tanggal_akhir,
+            'minggu_ke'         => $minggu_ke,
+            'absensi'           => $absensi,
+            'karyawan'          => $karyawan,
+            'title'             => $title,
+            'bulan'             => $data['bulan'],
+            'tahun'             => $data['tahun'],
+            'terdaftar_lalu'    => $terdaftar_lalu,
+            'tanggal_bulan_lalu'=> $tanggal_bulan_lalu,
         ])->render();
-        $pdf = PDF::loadHTML($view)
+
+        return PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 30,
-                'margin-bottom' => 15,
-                'margin-left'   => 25,
-                'margin-right'  => 20,
-                'enable-local-file-access' => true,
-            ]);
-
-
-        return $pdf->stream('Karyawan Hadir.pdf');
+            ->stream('Karyawan Hadir.pdf');
     }
+
 
     private function karyawan_tidak_masuk(array $data)
     {
@@ -231,56 +266,62 @@ class PelaporanController extends Controller
         $tanggal_awal = $minggu_ke[0];
         $tanggal_akhir = $minggu_ke[1];
 
+        // Ambil absensi tidak masuk dalam periode
         $absensi = Absensi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->where('status', 'T')
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Hitung jumlah karyawan per tanggal dan per level
+        // Hitung jumlah per tanggal & per level
         $karyawan = [];
         foreach ($absensi as $a) {
             $tanggal = $a->tanggal;
             $level_id = $a->getkaryawan->getlevel->id ?? null;
 
             if ($level_id) {
-                if (!isset($karyawan[$tanggal])) {
-                    $karyawan[$tanggal] = [];
-                }
-
-                if (isset($karyawan[$tanggal][$level_id])) {
-                    $karyawan[$tanggal][$level_id] += 1;
-                } else {
-                    $karyawan[$tanggal][$level_id] = 1;
-                }
+                $karyawan[$tanggal][$level_id] = ($karyawan[$tanggal][$level_id] ?? 0) + 1;
             }
         }
-        // dd($absensi->groupBy('tanggal')->keys());
+
+        // ==============================
+        // Hitung Tidak Masuk Bulan Lalu
+        // ==============================
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $absensi_lalu = Absensi::where('tanggal', $tanggal_bulan_lalu)
+            ->where('status', 'T')
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        $tidak_masuk_lalu = array_fill(1, 8, 0);
+
+        foreach ($absensi_lalu as $a) {
+            $level_id = $a->getkaryawan->getlevel->id ?? null;
+            if ($level_id && isset($tidak_masuk_lalu[$level_id])) {
+                $tidak_masuk_lalu[$level_id] += 1;
+            }
+        }
 
         $title = 'Karyawan Tidak Masuk';
 
         $view = view('pelaporan.laporan.karyawan_tidak_masuk', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'absensi'       => $absensi,
-            'karyawan'      => $karyawan,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'       => $tanggal_awal,
+            'tanggal_akhir'      => $tanggal_akhir,
+            'minggu_ke'          => $minggu_ke,
+            'absensi'            => $absensi,
+            'karyawan'           => $karyawan,
+            'title'              => $title,
+            'bulan'              => $data['bulan'],
+            'tahun'              => $data['tahun'],
+            'tidak_masuk_lalu'   => $tidak_masuk_lalu,
+            'tanggal_bulan_lalu' => $tanggal_bulan_lalu,
         ])->render();
-        $pdf = PDF::loadHTML($view)
+
+        return PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 30,
-                'margin-bottom' => 15,
-                'margin-left'   => 25,
-                'margin-right'  => 20,
-                'enable-local-file-access' => true,
-            ]);
-
-
-        return $pdf->stream('Karyawan Tidak Masuk.pdf');
+            ->stream('Karyawan Tidak Masuk.pdf');
     }
+
 
     public function karyawan_direkrut(array $data)
     {
@@ -288,102 +329,113 @@ class PelaporanController extends Controller
         $tanggal_awal = $minggu_ke[0];
         $tanggal_akhir = $minggu_ke[1];
 
-        // Ambil data karyawan yang direkrut berdasarkan tanggal_masuk
+        // DATA DIREKRUT PERIODE INI
+
         $karyawan_baru = Karyawan::whereBetween('tanggal_masuk', [$tanggal_awal, $tanggal_akhir])
             ->with('getlevel')
             ->get();
 
-        // Hitung jumlah karyawan per tanggal & per level
         $rekruit = [];
         foreach ($karyawan_baru as $k) {
             $tanggal = $k->tanggal_masuk;
             $level_id = $k->getlevel->id ?? null;
 
             if ($level_id) {
-                if (!isset($rekruit[$tanggal])) {
-                    $rekruit[$tanggal] = [];
-                }
-
                 $rekruit[$tanggal][$level_id] = ($rekruit[$tanggal][$level_id] ?? 0) + 1;
+            }
+        }
+
+        // DATA DIREKRUT BULAN LALU
+        
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $rekruit_lalu_raw = Karyawan::where('tanggal_masuk', $tanggal_bulan_lalu)
+            ->with('getlevel')
+            ->get();
+
+        $rekruit_bulan_lalu = array_fill(1, 8, 0);
+
+        foreach ($rekruit_lalu_raw as $k) {
+            $level_id = $k->getlevel->id ?? null;
+
+            if ($level_id && isset($rekruit_bulan_lalu[$level_id])) {
+                $rekruit_bulan_lalu[$level_id]++;
             }
         }
 
         $title = 'Karyawan Direkrut';
 
+        // kirim ke view
         $view = view('pelaporan.laporan.karyawan_direkrut', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'karyawan'      => $rekruit,
-            'karyawan_baru' => $karyawan_baru,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
+            'tanggal_awal'        => $tanggal_awal,
+            'tanggal_akhir'       => $tanggal_akhir,
+            'minggu_ke'           => $minggu_ke,
+            'karyawan'            => $rekruit,
+            'title'               => $title,
+            'bulan'               => $data['bulan'],
+            'tahun'               => $data['tahun'],
+            'rekruit_bulan_lalu'  => $rekruit_bulan_lalu,
+            'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
         ])->render();
 
-        $pdf = PDF::loadHTML($view)
+        return PDF::loadHTML($view)
             ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 30,
-                'margin-bottom' => 15,
-                'margin-left'   => 25,
-                'margin-right'  => 20,
-                'enable-local-file-access' => true,
-            ]);
-
-        return $pdf->stream('Karyawan Direkrut.pdf');
+            ->stream('Karyawan Direkrut.pdf');
     }
+
 
     public function karyawan_keluar(array $data)
     {
         $minggu_ke = explode('#', request()->get('minggu_ke'));
-        $tanggal_awal = $minggu_ke[0];
-        $tanggal_akhir = $minggu_ke[1];
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-        // Ambil data karyawan yang KELUAR berdasarkan tanggal_keluar
+        //  DATA KELUAR BULAN LALU
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $keluar_lalu_raw = Karyawan::where('tanggal_keluar', $tanggal_bulan_lalu)
+            ->with('getlevel')
+            ->get();
+
+        $keluar_bulan_lalu = array_fill(1, 8, 0);
+
+        foreach ($keluar_lalu_raw as $k) {
+            $level_id = $k->getlevel->id ?? null;
+            if ($level_id && isset($keluar_bulan_lalu[$level_id])) {
+                $keluar_bulan_lalu[$level_id]++;
+            }
+        }
+
+        // DATA KELUAR MINGGU INI
         $karyawan_keluar = Karyawan::whereBetween('tanggal_keluar', [$tanggal_awal, $tanggal_akhir])
             ->with('getlevel')
             ->get();
 
-        // Hitung jumlah karyawan keluar per tanggal & per level
         $keluar = [];
         foreach ($karyawan_keluar as $k) {
             $tanggal = $k->tanggal_keluar;
             $level_id = $k->getlevel->id ?? null;
 
             if ($level_id) {
-                if (!isset($keluar[$tanggal])) {
-                    $keluar[$tanggal] = [];
-                }
-
                 $keluar[$tanggal][$level_id] = ($keluar[$tanggal][$level_id] ?? 0) + 1;
             }
         }
-        $title = 'Karyawan Keluar';
 
-        $view = view('pelaporan.laporan.karyawan_keluar', [
-            'tanggal_awal'  => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'minggu_ke'     => $minggu_ke,
-            'karyawan'      => $keluar,
-            'karyawan_keluar' => $karyawan_keluar,
-            'title'         => $title,
-            'bulan'         => $data['bulan'],
-            'tahun'         => $data['tahun'],
-        ])->render();
-
-        $pdf = PDF::loadHTML($view)
-            ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 30,
-                'margin-bottom' => 15,
-                'margin-left'   => 25,
-                'margin-right'  => 20,
-                'enable-local-file-access' => true,
-            ]);
-
-        return $pdf->stream('Karyawan Keluar.pdf');
+        return PDF::loadHTML(view('pelaporan.laporan.karyawan_keluar', [
+            'tanggal_awal'        => $tanggal_awal,
+            'tanggal_akhir'       => $tanggal_akhir,
+            'minggu_ke'           => $minggu_ke,
+            'karyawan'            => $keluar,
+            'title'               => 'Karyawan Keluar',
+            'bulan'               => $data['bulan'],
+            'tahun'               => $data['tahun'],
+            'keluar_bulan_lalu'   => $keluar_bulan_lalu,
+            'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
+        ]))
+        ->setPaper('a4', 'landscape')
+        ->stream('Karyawan Keluar.pdf');
     }
+
 
     public function karyawan_dimutasi(array $data)
     {
@@ -391,12 +443,27 @@ class PelaporanController extends Controller
         $tanggal_awal = trim($minggu_ke[0]);
         $tanggal_akhir = trim($minggu_ke[1]);
 
-        // Ambil data mutasi dalam periode minggu yang dipilih
+        //  DATA MUTASI BULAN LALU
+        $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
+
+        $mutasi_lalu_raw = Mutasi::where('tanggal', $tanggal_bulan_lalu)
+            ->with(['getkaryawan.getlevel'])
+            ->get();
+
+        $mutasi_bulan_lalu = array_fill(1, 8, 0);
+
+        foreach ($mutasi_lalu_raw as $row) {
+            $level_id = $row->getkaryawan->getlevel->id ?? null;
+            if ($level_id && isset($mutasi_bulan_lalu[$level_id])) {
+                $mutasi_bulan_lalu[$level_id]++;
+            }
+        }
+
+        // DATA MUTASI MINGGU BERJALAN
         $mutasi = Mutasi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
             ->with(['getkaryawan.getlevel'])
             ->get();
 
-        // Kelompokkan data mutasi per tanggal dan per level
         $kelompok_per_tanggal = [];
 
         foreach ($mutasi as $row) {
@@ -404,40 +471,26 @@ class PelaporanController extends Controller
             $level_id = $row->getkaryawan->getlevel->id ?? null;
 
             if ($level_id) {
-                if (!isset($kelompok_per_tanggal[$tanggal])) {
-                    $kelompok_per_tanggal[$tanggal] = [];
-                }
-
                 $kelompok_per_tanggal[$tanggal][$level_id] =
                     ($kelompok_per_tanggal[$tanggal][$level_id] ?? 0) + 1;
             }
         }
 
-        $title = 'Karyawan Dimutasi';
-
-        $view = view('pelaporan.laporan.karyawan_dimutasi', [
-            'tanggal_awal'     => $tanggal_awal,
-            'tanggal_akhir'    => $tanggal_akhir,
-            'minggu_ke'        => $minggu_ke,
-            'karyawan'         => $kelompok_per_tanggal,
-            'karyawan_mutasi'  => $mutasi,
-            'title'            => $title,
-            'bulan'            => $data['bulan'],
-            'tahun'            => $data['tahun'],
-        ])->render();
-
-        $pdf = PDF::loadHTML($view)
-            ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-top'    => 30,
-                'margin-bottom' => 15,
-                'margin-left'   => 25,
-                'margin-right'  => 20,
-                'enable-local-file-access' => true,
-            ]);
-
-        return $pdf->stream('Karyawan Dimutasi.pdf');
+        return PDF::loadHTML(view('pelaporan.laporan.karyawan_dimutasi', [
+            'tanggal_awal'        => $tanggal_awal,
+            'tanggal_akhir'       => $tanggal_akhir,
+            'minggu_ke'           => $minggu_ke,
+            'karyawan'            => $kelompok_per_tanggal,
+            'title'               => 'Karyawan Dimutasi',
+            'bulan'               => $data['bulan'],
+            'tahun'               => $data['tahun'],
+            'mutasi_bulan_lalu'   => $mutasi_bulan_lalu,
+            'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
+        ]))
+        ->setPaper('a4', 'landscape')
+        ->stream('Karyawan Dimutasi.pdf');
     }
+
 
 
     private function karyawan_komposisi_karyawan(array $data)

@@ -83,17 +83,51 @@
         </tr>
     </thead>
     <tbody>
+
+        {{-- ====== MUTASI BULAN LALU ====== --}}
+        @php
+            $tgl_tampil_lalu = \Carbon\Carbon::parse($tanggal_bulan_lalu)->format('d-M-y');
+            $hari_lalu = Tanggal::namaHari($tanggal_bulan_lalu);
+
+            // MASUK SALDO AWAL
+            $weekly_total = $mutasi_bulan_lalu;
+            $last_week = null;
+        @endphp
+
+        <tr style="font-weight:bold;">
+            <td colspan="3">Mutasi Bulan Lalu</td>
+            @foreach ($mutasi_bulan_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>{{ $tgl_tampil_lalu }}</td>
+            <td>{{ $hari_lalu }}</td>
+            @foreach ($mutasi_bulan_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+        <tr style="font-weight:bold; background:#f0f0f0;">
+            <td colspan="3">Total</td>
+            @foreach ($mutasi_bulan_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+
+        {{-- ====== DATA MINGGU BERJALAN ====== --}}
         @foreach ($period as $date)
             @php
-                $week = $date->format('W'); // minggu ke-
+                $week = $date->format('W');
                 $tgl = $date->format('Y-m-d');
                 $tgl_tampil = $date->format('d-M-y');
                 $hari = Tanggal::namaHari($tgl);
 
-                // Ambil data per tanggal dari controller ($karyawan)
                 $harian = $karyawan[$tgl] ?? [];
 
-                // Hitung per kolom level
                 $row = [];
                 for ($i = 1; $i <= 8; $i++) {
                     $row[$i] = $harian[$i] ?? 0;
@@ -110,30 +144,30 @@
                 @endforeach
             </tr>
 
-            {{-- total tiap akhir minggu --}}
+            {{-- total akhir minggu --}}
             @if ($hari == 'Minggu')
-                <tr style="font-weight:bold; background-color:#f0f0f0;">
+                <tr style="font-weight:bold; background:#f0f0f0;">
                     <td colspan="3">Total</td>
                     @foreach ($weekly_total as $val)
                         <td>{{ $val }}</td>
                     @endforeach
                 </tr>
-                @php
-                    $weekly_total = array_fill(1, 8, 0); // reset total minggu berikutnya
-                @endphp
+                @php $weekly_total = array_fill(1, 8, 0); @endphp
             @endif
 
             @php $last_week = $week; @endphp
         @endforeach
 
-        {{-- total minggu terakhir jika tidak berakhir di Minggu --}}
+        {{-- total minggu terakhir --}}
         @if (array_sum($weekly_total) > 0)
-            <tr style="font-weight:bold; background-color:#f0f0f0;">
+            <tr style="font-weight:bold; background:#f0f0f0;">
                 <td colspan="3">Total</td>
                 @foreach ($weekly_total as $val)
                     <td>{{ $val }}</td>
                 @endforeach
             </tr>
         @endif
+
     </tbody>
+
 </table>

@@ -87,6 +87,42 @@
         </tr>
     </thead>
     <tbody>
+        {{-- ======================= TERDAFTAR BULAN LALU ======================= --}}
+        @php
+            $tgl_tampil_lalu = \Carbon\Carbon::parse($tanggal_bulan_lalu)->format('d-M-y');
+            $hari_lalu = Tanggal::namaHari($tanggal_bulan_lalu);
+        @endphp
+
+        <tr>
+            <td colspan="3"><strong>Terdaftar Bulan Lalu</strong></td>
+            @foreach ($terdaftar_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>{{ $tgl_tampil_lalu }}</td>
+            <td>{{ $hari_lalu }}</td>
+            @foreach ($terdaftar_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+        <tr style="font-weight:bold;">
+            <td colspan="3">Total</td>
+            @foreach ($terdaftar_lalu as $val)
+                <td>{{ $val }}</td>
+            @endforeach
+        </tr>
+
+        {{-- ======================= DATA MINGGU BERJALAN ======================= --}}
+
+        @php
+            $weekly_total = array_fill(1, 8, 0);
+            $last_week = null;
+        @endphp
+
         @foreach ($period as $date)
             @php
                 $week = $date->format('W');
@@ -94,7 +130,7 @@
                 $tgl_tampil = $date->format('d-M-y');
                 $hari = Tanggal::namaHari($tgl);
 
-                $harian = $karyawan[$tgl] ?? collect([]);
+                $harian = $karyawan[$tgl] ?? [];
 
                 $row = [];
                 for ($i = 1; $i <= 8; $i++) {
@@ -112,31 +148,32 @@
                 @endforeach
             </tr>
 
-            {{-- total tiap akhir minggu --}}
+            {{-- ====== TOTAL SETIAP AKHIR MINGGU ====== --}}
             @if ($hari == 'Minggu')
-                <tr style="font-weight:bold; background-color:#f0f0f0;">
+                <tr style="font-weight:bold;">
                     <td colspan="3">Total</td>
                     @foreach ($weekly_total as $val)
                         <td>{{ $val }}</td>
                     @endforeach
                 </tr>
                 @php
-                    $weekly_total = array_fill(1, 8, 0); // reset minggu berikutnya
+                    $weekly_total = array_fill(1, 8, 0);
                 @endphp
             @endif
 
             @php $last_week = $week; @endphp
         @endforeach
 
-        {{-- total untuk minggu terakhir (jika tidak berakhir di Minggu) --}}
+        {{-- ====== TOTAL MINGGU TERAKHIR JIKA BELUM DITUTUP ====== --}}
         @if (array_sum($weekly_total) > 0)
-            <tr style="font-weight:bold; background-color:#f0f0f0;">
+            <tr style="font-weight:bold;">
                 <td colspan="3">Total</td>
                 @foreach ($weekly_total as $val)
                     <td>{{ $val }}</td>
                 @endforeach
             </tr>
         @endif
-
     </tbody>
+
+
 </table>
