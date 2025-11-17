@@ -58,6 +58,11 @@
                 <div class="col-md-8 mb-4">
                     <div class="card h-100 w-100">
                         <div class="card-body" style="height:220px;">
+                            <div id="progress" class="progress" style="height:8px; display:none;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                                    role="progressbar" style="width:10%" aria-valuenow="0" aria-valuemin="0"
+                                    aria-valuemax="100"></div>
+                            </div>
                             <canvas id="chart" style="width:100%; height:100%;"></canvas>
                         </div>
                     </div>
@@ -469,15 +474,9 @@
         // Chart.js Initialization
         const ctx = document.getElementById('chart');
         let chartInstance = null;
-        const progressContainer = $(`
-                <div class="progress mt-3" style="height:8px; display:none;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
-                        role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            `);
+        const progressContainer = $(`#progress`);
         const cardBody = $('#chart').closest('.card-body');
-        $('#chart').css('height', '215px');
-        $('#chart').after(progressContainer);
+        $('#chart').before(progressContainer);
 
         function buatChart(labels, d1, d2, d3, d4, d5, judul) {
             const data = {
@@ -624,14 +623,14 @@
             });
         }
         $(document).on('change', 'input[name="periode"]', function() {
-            $('input[name="periode"]').each(function() {
-                $(`label[for="${this.id}"]`)
-                    .removeClass('btn-warning')
-                    .addClass('btn-outline-warning');
-            });
-            $(`label[for="${this.id}"]`)
-                .removeClass('btn-outline-warning')
-                .addClass('btn-warning');
+            var id = $(this).attr('id');
+
+            if (id === 'mingguan') {
+                $('.btn-switch .background').removeClass('switch')
+            } else {
+                $('.btn-switch .background').addClass('switch')
+            }
+
             gantiChart($(this).attr('id'));
         });
         $('input[name="periode"]:checked').trigger('change');

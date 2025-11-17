@@ -180,6 +180,62 @@
            .select2-selection__choice:first-child {
                margin-left: 12px !important;
            }
+
+           .btn-switch {
+               position: relative;
+               width: fit-content;
+               height: fit-content;
+               padding: 2px;
+               background-color: #e9ecef;
+
+               display: grid;
+               grid-template-columns: repeat(2, 1fr);
+           }
+
+           .btn-switch label {
+               position: relative;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               padding: 6px 16px;
+               user-select: none;
+               z-index: 1;
+           }
+
+           .btn-switch label input {
+               position: absolute;
+               opacity: 0;
+               width: 0;
+               height: 0;
+           }
+
+           .btn-switch .background {
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               z-index: 0;
+               padding: 2px;
+           }
+
+           .btn-switch .background::before {
+               content: "";
+               display: block;
+               position: relative;
+               width: 50%;
+               height: 100%;
+               background-color: var(--bs-primary);
+               top: 0;
+               left: 0;
+               transition: transform 0.3s ease;
+               border-radius: var(--bs-border-radius-pill) !important;
+           }
+
+           .btn-switch .background.switch::before {
+               transform: translateX(100%);
+           }
        </style>
 
        @yield('style')
@@ -273,24 +329,25 @@
                            <div class="col-sm-6">
                                <h3 class="mb-0">{{ $title }}</h3>
                            </div>
-                           <div class="col-sm-6">
+                           <div class="col-sm-6 d-flex justify-content-end">
                                @php
                                    $currentPath = request()->path();
                                @endphp
                                @if ($currentPath == '/' || strtolower($currentPath) == 'inspeksi')
-                                   <div class="col-sm-12 d-flex justify-content-end align-items-center pe-0">
-                                       <div class="bg-white rounded-pill p-1 d-inline-flex shadow-sm">
-                                           <div class="btn-group" role="group" aria-label="Periode Data">
-                                               <input type="radio" class="btn-check" name="periode" id="mingguan"
-                                                   autocomplete="off" checked>
-                                               <label class="btn btn-warning rounded-pill px-4"
-                                                   for="mingguan">Mingguan</label>
-                                               <input type="radio" class="btn-check" name="periode" id="bulanan"
-                                                   autocomplete="off">
-                                               <label class="btn btn-outline-warning rounded-pill px-4"
-                                                   for="bulanan">Bulanan</label>
-                                           </div>
-                                       </div>
+                                   <div class="btn-switch rounded-pill">
+                                       <label for="mingguan">
+                                           <input type="radio" class="position-absolute d-none" name="periode"
+                                               id="mingguan" autocomplete="off" checked>
+                                           <span>Mingguan</span>
+                                       </label>
+                                       <label for="bulanan">
+                                           <input type="radio" class="position-absolute d-none" name="periode"
+                                               id="bulanan" autocomplete="off">
+
+                                           <span>Bulanan</span>
+                                       </label>
+
+                                       <div class="background"></div>
                                    </div>
                                @else
                                    @php
