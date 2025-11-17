@@ -2,14 +2,10 @@
     use App\Utils\Tanggal;
     use Carbon\CarbonPeriod;
 
-    //     BERHENTI 1 HARI SEBELEUM TANGGAL AKHIR
-    // $start = new DateTime($tanggal_awal);
-    // $end = new DateTime($tanggal_akhir);
-    // $period = new DatePeriod($start, new DateInterval('P1D'), $end);
-
     $period = CarbonPeriod::create($tanggal_awal, '1 day', $tanggal_akhir);
     $weekly_total = array_fill(1, 8, 0);
     $last_week = null;
+
 @endphp
 <style>
     body {
@@ -124,8 +120,17 @@
 
             @php
                 $nomor = 1;
+
+                $totalTerdaftarAwal1 = 0;
+                $totalTambahBaru1 = 0;
+                $totalTambahNaikPeringkat1 = 0;
+                $totalTambahMutasi1 = 0;
+                $totalKurangNaikPeringkat1 = 0;
+                $totalKurangMutasi1 = 0;
+                $totalKurangKeluar1 = 0;
+                $totalTerdaftarAkhir1 = 0;
             @endphp
-            @foreach ($levels as $level)
+            @foreach ($levels[1] as $level)
                 @foreach ($peringkat as $key => $value)
                     @php
                         $terdaftarAwal = 0;
@@ -151,6 +156,15 @@
                         $jumlahPengurangan = $kurangNaikPeringkat + $kurangMutasi + $kurangKeluar;
 
                         $terdaftarAkhir = $terdaftarAwal + $jumlahPenambahan - $jumlahPengurangan;
+
+                        $totalTerdaftarAwal1 += $terdaftarAwal;
+                        $totalTambahBaru1 += $tambahBaru;
+                        $totalTambahNaikPeringkat1 += $tambahNaikPeringkat;
+                        $totalTambahMutasi1 += $tambahMutasi;
+                        $totalKurangNaikPeringkat1 += $kurangNaikPeringkat;
+                        $totalKurangMutasi1 += $kurangMutasi;
+                        $totalKurangKeluar1 += $kurangKeluar;
+                        $totalTerdaftarAkhir1 += $terdaftarAkhir;
                     @endphp
                     <tr>
                         @if ($loop->first)
@@ -180,15 +194,15 @@
 
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Borongan</strong></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td></td>
+                <td align="center">{{ $totalTerdaftarAwal1 }}</td>
+                <td align="center">{{ $totalTambahBaru1 }}</td>
+                <td align="center">{{ $totalTambahNaikPeringkat1 }}</td>
+                <td align="center">{{ $totalTambahMutasi1 }}</td>
+                <td align="center">{{ $totalKurangNaikPeringkat1 }}</td>
+                <td align="center">{{ $totalKurangMutasi1 }}</td>
+                <td align="center">{{ $totalKurangKeluar1 }}</td>
+                <td align="center">{{ $totalTerdaftarAkhir1 }}</td>
+                <td align="center"></td>
             </tr>
         </tbody>
         <tbody>
@@ -199,49 +213,79 @@
 
             @php
                 $no = 1;
-                $kategori_non_struktual = [
-                    'Mandor Inspeksi Giling/Gunting & BOM',
-                    'Mandor Kelompok Giling & Gunting',
-                    'Mandor Kelompok Pak',
-                    'Mandor Kelompok BOM',
-                    'Distribusi (Pasok)',
-                    'Tobacco Distribusi (Urai Tembakau)',
-                    'Baller',
-                    'Maintenance',
-                    'Kebersihan & Umum',
-                    'Petugas Sortir Emboss',
-                ];
+
+                $totalTerdaftarAwal2 = 0;
+                $totalTambahBaru2 = 0;
+                $totalTambahNaikPeringkat2 = 0;
+                $totalTambahMutasi2 = 0;
+                $totalKurangNaikPeringkat2 = 0;
+                $totalKurangMutasi2 = 0;
+                $totalKurangKeluar2 = 0;
+                $totalTerdaftarAkhir2 = 0;
             @endphp
 
-            @foreach ($kategori_non_struktual as $jabatan)
+            @foreach ($levels[2] as $level)
+                @php
+                    $terdaftarAwal = 0;
+                    $tambahBaru = 0;
+                    $tambahNaikPeringkat = 0;
+                    $tambahMutasi = 0;
+                    $kurangNaikPeringkat = 0;
+                    $kurangMutasi = 0;
+                    $kurangKeluar = 0;
+
+                    if (isset($level['data']['K'])) {
+                        $data = $level['data']['K'];
+                        $terdaftarAwal = $data['terdaftar_awal'] ?? 0;
+                        $tambahBaru = $data['baru'] ?? 0;
+                        $tambahNaikPeringkat = $data['penambahan']['naik peringkat'] ?? 0;
+                        $tambahMutasi = $data['penambahan']['mutasi'] ?? 0;
+                        $kurangNaikPeringkat = $data['pengurangan']['naik peringkat'] ?? 0;
+                        $kurangMutasi = $data['pengurangan']['mutasi'] ?? 0;
+                        $kurangKeluar = $data['pengurangan']['keluar'] ?? 0;
+                    }
+
+                    $jumlahPenambahan = $tambahBaru + $tambahNaikPeringkat + $tambahMutasi;
+                    $jumlahPengurangan = $kurangNaikPeringkat + $kurangMutasi + $kurangKeluar;
+
+                    $terdaftarAkhir = $terdaftarAwal + $jumlahPenambahan - $jumlahPengurangan;
+
+                    $totalTerdaftarAwal2 += $terdaftarAwal;
+                    $totalTambahBaru2 += $tambahBaru;
+                    $totalTambahNaikPeringkat2 += $tambahNaikPeringkat;
+                    $totalTambahMutasi2 += $tambahMutasi;
+                    $totalKurangNaikPeringkat2 += $kurangNaikPeringkat;
+                    $totalKurangMutasi2 += $kurangMutasi;
+                    $totalKurangKeluar2 += $kurangKeluar;
+                    $totalTerdaftarAkhir2 += $terdaftarAkhir;
+                @endphp
                 <tr>
                     <td>{{ $no++ }}</td>
-                    {{-- Gabungkan kolom Jabatan + Peringkat --}}
-                    <td colspan="2" class="text-left">{{ $jabatan }}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td></td>
+                    <td colspan="2" class="text-left">{{ $level['nama'] }}</td>
+                    <td align="center">{{ $terdaftarAwal }}</td>
+                    <td align="center">{{ $tambahBaru }}</td>
+                    <td align="center">{{ $tambahNaikPeringkat }}</td>
+                    <td align="center">{{ $tambahMutasi }}</td>
+                    <td align="center">{{ $kurangNaikPeringkat }}</td>
+                    <td align="center">{{ $kurangMutasi }}</td>
+                    <td align="center">{{ $kurangKeluar }}</td>
+                    <td align="center">{{ $terdaftarAkhir }}</td>
+                    <td align="center"></td>
                 </tr>
             @endforeach
 
             {{-- Total Bulanan Struktural --}}
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Bulanan Struktural</strong></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td></td>
+                <td align="center">{{ $totalTerdaftarAwal2 }}</td>
+                <td align="center">{{ $totalTambahBaru2 }}</td>
+                <td align="center">{{ $totalTambahNaikPeringkat2 }}</td>
+                <td align="center">{{ $totalTambahMutasi2 }}</td>
+                <td align="center">{{ $totalKurangNaikPeringkat2 }}</td>
+                <td align="center">{{ $totalKurangMutasi2 }}</td>
+                <td align="center">{{ $totalKurangKeluar2 }}</td>
+                <td align="center">{{ $totalTerdaftarAkhir2 }}</td>
+                <td align="center"></td>
             </tr>
         </tbody>
 
@@ -253,77 +297,106 @@
 
             @php
                 $no = 1;
-                $kategori_non_struktual = [
-                    'Kepala Pabrik',
-                    'Supervisor Giling & Gunting',
-                    'Supervisor Pak & BOM',
-                    'Supervisor Logistik & Admin.Produksi',
-                    'Supervisor  PA, Umum & Keuangan',
-                    'Staff Keuangan ( Payroll )',
-                    'Staff Keuangan ( Accounting )',
-                    'Staff Personalia & Umum',
-                    'Administrasi Produksi',
-                    'Satpam Wanita',
-                    'Satpam Pria',
-                    'Paramedic',
-                    'Driver  Forklift',
-                    'Driver',
-                ];
+
+                $totalTerdaftarAwal3 = 0;
+                $totalTambahBaru3 = 0;
+                $totalTambahNaikPeringkat3 = 0;
+                $totalTambahMutasi3 = 0;
+                $totalKurangNaikPeringkat3 = 0;
+                $totalKurangMutasi3 = 0;
+                $totalKurangKeluar3 = 0;
+                $totalTerdaftarAkhir3 = 0;
             @endphp
 
-            @foreach ($kategori_non_struktual as $jabatan)
+            @foreach ($levels[3] as $level)
+                @php
+                    $terdaftarAwal = 0;
+                    $tambahBaru = 0;
+                    $tambahNaikPeringkat = 0;
+                    $tambahMutasi = 0;
+                    $kurangNaikPeringkat = 0;
+                    $kurangMutasi = 0;
+                    $kurangKeluar = 0;
+
+                    if (isset($level['data']['K'])) {
+                        $data = $level['data']['K'];
+                        $terdaftarAwal = $data['terdaftar_awal'] ?? 0;
+                        $tambahBaru = $data['baru'] ?? 0;
+                        $tambahNaikPeringkat = $data['penambahan']['naik peringkat'] ?? 0;
+                        $tambahMutasi = $data['penambahan']['mutasi'] ?? 0;
+                        $kurangNaikPeringkat = $data['pengurangan']['naik peringkat'] ?? 0;
+                        $kurangMutasi = $data['pengurangan']['mutasi'] ?? 0;
+                        $kurangKeluar = $data['pengurangan']['keluar'] ?? 0;
+                    }
+
+                    $jumlahPenambahan = $tambahBaru + $tambahNaikPeringkat + $tambahMutasi;
+                    $jumlahPengurangan = $kurangNaikPeringkat + $kurangMutasi + $kurangKeluar;
+
+                    $terdaftarAkhir = $terdaftarAwal + $jumlahPenambahan - $jumlahPengurangan;
+
+                    $totalTerdaftarAwal3 += $terdaftarAwal;
+                    $totalTambahBaru3 += $tambahBaru;
+                    $totalTambahNaikPeringkat3 += $tambahNaikPeringkat;
+                    $totalTambahMutasi3 += $tambahMutasi;
+                    $totalKurangNaikPeringkat3 += $kurangNaikPeringkat;
+                    $totalKurangMutasi3 += $kurangMutasi;
+                    $totalKurangKeluar3 += $kurangKeluar;
+                    $totalTerdaftarAkhir3 += $terdaftarAkhir;
+                @endphp
                 <tr>
                     <td>{{ $no++ }}</td>
-                    {{-- Gabungkan kolom Jabatan + Peringkat --}}
-                    <td colspan="2" class="text-left">{{ $jabatan }}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td></td>
+                    <td colspan="2" class="text-left">{{ $level['nama'] }}</td>
+                    <td align="center">{{ $terdaftarAwal }}</td>
+                    <td align="center">{{ $tambahBaru }}</td>
+                    <td align="center">{{ $tambahNaikPeringkat }}</td>
+                    <td align="center">{{ $tambahMutasi }}</td>
+                    <td align="center">{{ $kurangNaikPeringkat }}</td>
+                    <td align="center">{{ $kurangMutasi }}</td>
+                    <td align="center">{{ $kurangKeluar }}</td>
+                    <td align="center">{{ $terdaftarAkhir }}</td>
+                    <td align="center"></td>
                 </tr>
             @endforeach
 
             {{-- Total Bulanan non Struktural --}}
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Bulanan Non Struktural</strong></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td></td>
+                <td align="center">{{ $totalTerdaftarAwal3 }}</td>
+                <td align="center">{{ $totalTambahBaru3 }}</td>
+                <td align="center">{{ $totalTambahNaikPeringkat3 }}</td>
+                <td align="center">{{ $totalTambahMutasi3 }}</td>
+                <td align="center">{{ $totalKurangNaikPeringkat3 }}</td>
+                <td align="center">{{ $totalKurangMutasi3 }}</td>
+                <td align="center">{{ $totalKurangKeluar3 }}</td>
+                <td align="center">{{ $totalTerdaftarAkhir3 }}</td>
+                <td align="center"></td>
             </tr>
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Bulanan</strong></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td></td>
+                <td align="center">{{ $totalTerdaftarAwal3 + $totalTerdaftarAwal2 }}</td>
+                <td align="center">{{ $totalTambahBaru3 + $totalTambahBaru2 }}</td>
+                <td align="center">{{ $totalTambahNaikPeringkat3 + $totalTambahNaikPeringkat2 }}</td>
+                <td align="center">{{ $totalTambahMutasi3 + $totalTambahMutasi2 }}</td>
+                <td align="center">{{ $totalKurangNaikPeringkat3 + $totalKurangNaikPeringkat2 }}</td>
+                <td align="center">{{ $totalKurangMutasi3 + $totalKurangMutasi2 }}</td>
+                <td align="center">{{ $totalKurangKeluar3 + $totalKurangKeluar2 }}</td>
+                <td align="center">{{ $totalTerdaftarAkhir3 + $totalTerdaftarAkhir2 }}</td>
+                <td align="center"></td>
             </tr>
             <tr style="background-color:#e0e0e0;">
                 <td colspan="3" class="text-right"><strong>Total Karyawan (Borongan + Bulanan)</strong></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td></td>
+                <td align="center">{{ $totalTerdaftarAwal3 + $totalTerdaftarAwal2 + $totalTerdaftarAwal1 }}</td>
+                <td align="center">{{ $totalTambahBaru3 + $totalTambahBaru2 + $totalTambahBaru1 }}</td>
+                <td align="center">
+                    {{ $totalTambahNaikPeringkat3 + $totalTambahNaikPeringkat2 + $totalTambahNaikPeringkat1 }}</td>
+                <td align="center">{{ $totalTambahMutasi3 + $totalTambahMutasi2 + $totalTambahMutasi1 }}</td>
+                <td align="center">
+                    {{ $totalKurangNaikPeringkat3 + $totalKurangNaikPeringkat2 + $totalKurangNaikPeringkat1 }}</td>
+                <td align="center">{{ $totalKurangMutasi3 + $totalKurangMutasi2 + $totalKurangMutasi1 }}</td>
+                <td align="center">{{ $totalKurangKeluar3 + $totalKurangKeluar2 + $totalKurangKeluar1 }}</td>
+                <td align="center">
+                    {{ $totalTerdaftarAkhir3 + $totalTerdaftarAkhir2 + $totalTerdaftarAkhir1 }}</td>
+                <td align="center"></td>
             </tr>
         </tbody>
     </table>
