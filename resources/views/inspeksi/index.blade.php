@@ -471,11 +471,9 @@
 @endsection
 @section('script')
     <script>
-        // Chart.js Initialization
         const ctx = document.getElementById('chart');
         let chartInstance = null;
-        const progressContainer = $(`#progress`);
-        const cardBody = $('#chart').closest('.card-body');
+        const progressContainer = $('#progress');
         $('#chart').before(progressContainer);
 
         function buatChart(labels, d1, d2, d3, d4, d5, judul) {
@@ -573,11 +571,14 @@
             chartInstance = new Chart(ctx, config);
         }
 
-        function gantiChart(mode) {
+        function gantiChart(kategori, periode) {
             let progress = 0;
             const bar = progressContainer.find('.progress-bar');
+
             progressContainer.show();
+            bar.removeClass('bg-danger');
             bar.css('width', '0%').attr('aria-valuenow', 0);
+
             const interval = setInterval(() => {
                 progress = Math.min(progress + 10, 90);
                 bar.css('width', progress + '%').attr('aria-valuenow', progress);
@@ -587,7 +588,8 @@
                 url: '/inspeksi/chart',
                 method: 'GET',
                 data: {
-                    periode: mode
+                    kategori: kategori,
+                    periode: periode
                 },
                 beforeSend: function() {
                     if (chartInstance) chartInstance.destroy();
@@ -598,16 +600,28 @@
                     clearInterval(interval);
                     bar.css('width', '100%').attr('aria-valuenow', 100);
 
-                    const labels = res.labels;
-                    const d1 = res.datasets.gtgl || [];
-                    const d2 = res.datasets.pack || [];
-                    const d3 = res.datasets.banderol || [];
-                    const d4 = res.datasets.opp || [];
-                    const d5 = res.datasets.mop || [];
+                    let labels = res.labels || [];
+                    const d1 = res.datasets?.gtgl || [];
+                    const d2 = res.datasets?.pack || [];
+                    const d3 = res.datasets?.banderol || [];
+                    const d4 = res.datasets?.opp || [];
+                    const d5 = res.datasets?.mop || [];
 
-                    const judul = mode === 'mingguan' ?
-                        'Data Aktual Mingguan' :
-                        'Data Aktual Bulanan';
+                    if (kategori === 'bulanan') {
+                        labels = labels.map((_, i) => 'Minggu ' + (i + 1));
+                    }
+
+                    let judul = '';
+                    if (kategori === 'mingguan') {
+                        judul = (periode === 'periode_ini') ?
+                            'Data Aktual Mingguan - Minggu Ini' :
+                            'Data Aktual Mingguan - Minggu Terakhir Bulan Lalu';
+                    } else {
+                        judul = (periode === 'periode_ini') ?
+                            'Data Aktual Bulanan - Bulan Ini' :
+                            'Data Aktual Bulanan - Bulan Lalu';
+                    }
+
                     setTimeout(() => {
                         buatChart(labels, d1, d2, d3, d4, d5, judul);
                         progressContainer.fadeOut(400);
@@ -615,26 +629,61 @@
                 },
                 error: function(err) {
                     clearInterval(interval);
-                    bar.addClass('bg-danger').css('width', '100%');
+                    bar.addClass('bg-danger').css('width', '100%').attr('aria-valuenow', 100);
                     console.error(err);
                     alert('Gagal memuat data chart.');
                     setTimeout(() => progressContainer.fadeOut(400), 800);
                 }
             });
         }
-        $(document).on('change', 'input[name="periode"]', function() {
-            var id = $(this).attr('id');
 
-            if (id === 'mingguan') {
-                $('.btn-switch .background').removeClass('switch')
+        $(document).on('change', 'input[name="kategori"]', function() {
+            const kategori = $(this).attr('id');
+            const periode = $('input[name="periode"]:checked').attr('id');
+
+            if (kategori === 'mingguan') {
+                $('.switch-periode .background').removeClass('switch');
             } else {
-                $('.btn-switch .background').addClass('switch')
+                $('.switch-periode .background').addClass('switch');
             }
 
-            gantiChart($(this).attr('id'));
+            gantiChart(kategori, periode);
         });
-        $('input[name="periode"]:checked').trigger('change');
+
+        $(document).on('change', 'input[name="periode"]', function() {
+            const periode = $(this).attr('id');
+            const kategori = $('input[name="kategori"]:checked').attr('id');
+
+            if (periode === 'periode_ini') {
+                $('.switch-range .background').removeClass('switch');
+            } else {
+                $('.switch-range .background').addClass('switch');
+            }
+
+            gantiChart(kategori, periode);
+        });
+
+        $(function() {
+            const kategoriAwal = $('input[name="kategori"]:checked').attr('id') || 'mingguan';
+            const periodeAwal = $('input[name="periode"]:checked').attr('id') || 'periode_ini';
+
+            if (kategoriAwal === 'mingguan') {
+                $('.switch-periode .background').removeClass('switch');
+            } else {
+                $('.switch-periode .background').addClass('switch');
+            }
+
+            if (periodeAwal === 'periode_ini') {
+                $('.switch-range .background').removeClass('switch');
+            } else {
+                $('.switch-range .background').addClass('switch');
+            }
+
+            gantiChart(kategoriAwal, periodeAwal);
+        });
     </script>
+
+
     <script>
         // Modal GL/GT
         $(document).on('click', '#ModalGTGL', function(e) {

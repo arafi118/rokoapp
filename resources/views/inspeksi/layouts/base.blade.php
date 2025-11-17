@@ -181,15 +181,27 @@
                margin-left: 12px !important;
            }
 
+           .card-switch {
+               position: relative;
+               width: fit-content;
+               height: fit-content;
+               padding: 5px;
+               background-color: #ffffff;
+               display: grid;
+               grid-template-columns: repeat(2, 1fr);
+               border-radius: 10px;
+               border: 1px solid #dee2e6;
+               box-shadow: 0 2px 6px rgba(0, 0, 0, 0.162);
+           }
+
            .btn-switch {
                position: relative;
                width: fit-content;
                height: fit-content;
-               padding: 2px;
-               background-color: #e9ecef;
-
+               background-color: #ede9e9;
                display: grid;
                grid-template-columns: repeat(2, 1fr);
+               border-radius: 10px;
            }
 
            .btn-switch label {
@@ -226,11 +238,18 @@
                position: relative;
                width: 50%;
                height: 100%;
-               background-color: var(--bs-primary);
                top: 0;
                left: 0;
                transition: transform 0.3s ease;
-               border-radius: var(--bs-border-radius-pill) !important;
+               border-radius: 10px;
+           }
+
+           .switch-periode .background::before {
+               background-color: #9fa0a1;
+           }
+
+           .switch-range .background::before {
+               background-color: var(--bs-primary);
            }
 
            .btn-switch .background.switch::before {
@@ -326,28 +345,41 @@
                <div class="app-content-header">
                    <div class="container-fluid">
                        <div class="row">
-                           <div class="col-sm-6">
-                               <h3 class="mb-0">{{ $title }}</h3>
+                           <div class="col-sm-4">
+                               <h4 class="mb-4">{{ $title }}</h4>
                            </div>
-                           <div class="col-sm-6 d-flex justify-content-end">
+                           <div class="col-sm-8 d-flex justify-content-end">
                                @php
                                    $currentPath = request()->path();
                                @endphp
                                @if ($currentPath == '/' || strtolower($currentPath) == 'inspeksi')
-                                   <div class="btn-switch rounded-pill">
-                                       <label for="mingguan">
-                                           <input type="radio" class="position-absolute d-none" name="periode"
-                                               id="mingguan" autocomplete="off" checked>
-                                           <span>Mingguan</span>
-                                       </label>
-                                       <label for="bulanan">
-                                           <input type="radio" class="position-absolute d-none" name="periode"
-                                               id="bulanan" autocomplete="off">
-
-                                           <span>Bulanan</span>
-                                       </label>
-
-                                       <div class="background"></div>
+                                   <div class="card-switch">
+                                       <div class="btn-switch switch-periode">
+                                           <label for="mingguan">
+                                               <input type="radio" class="position-absolute d-none" name="kategori"
+                                                   id="mingguan" autocomplete="off" checked>
+                                               <span>Mingguan</span>
+                                           </label>
+                                           <label for="bulanan">
+                                               <input type="radio" class="position-absolute d-none" name="kategori"
+                                                   id="bulanan" autocomplete="off">
+                                               <span>Bulanan</span>
+                                           </label>
+                                           <div class="background"></div>
+                                       </div>
+                                       <div class="btn-switch switch-range">
+                                           <label for="periode_ini">
+                                               <input type="radio" class="position-absolute d-none" name="periode"
+                                                   id="periode_ini" autocomplete="off" checked>
+                                               <span>Periode ini</span>
+                                           </label>
+                                           <label for="periode_lalu">
+                                               <input type="radio" class="position-absolute d-none" name="periode"
+                                                   id="periode_lalu" autocomplete="off">
+                                               <span>Periode lalu</span>
+                                           </label>
+                                           <div class="background"></div>
+                                       </div>
                                    </div>
                                @else
                                    @php

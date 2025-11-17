@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 class InspeksiController extends Controller
 {
-    public function index()
+      public function index()
     {
         $today = date('Y-m-d');
 
@@ -60,70 +60,109 @@ class InspeksiController extends Controller
         $data['title'] = "Dashboard";
         return view('inspeksi.index')->with($data);
     }
+
     public function chart(Request $request)
     {
-        $periode = $request->input('periode', 'mingguan');
+        // kategori: mingguan / bulanan, periode: periode_ini / periode_lalu
+        $kategori = $request->input('kategori', 'mingguan');
+        $periode  = $request->input('periode', 'periode_ini');
 
-        $today = now();
+        $today  = now()->startOfDay();
+        $dates  = [];
+        $labels = [];
 
-        if ($periode === 'mingguan') {
-            $startOfWeek = $today->copy()->startOfWeek();
-            $endOfWeek = $today->copy()->endOfWeek();
-
-            $dates  = [];
-            $labels = [];
-            for ($date = $startOfWeek; $date->lte($endOfWeek); $date->addDay()) {
-                $dates[] = $date->format('Y-m-d');
-                $labels[] = $date->format('D');
+        // Mingguan: periode_ini = minggu ini, periode_lalu = minggu terakhir bulan lalu
+        if ($kategori === 'mingguan') {
+            if ($periode === 'periode_lalu') {
+                $lastDayPrevMonth = $today->copy()->subMonthNoOverflow()->endOfMonth();
+                $startOfWeek      = $lastDayPrevMonth->copy()->startOfWeek();
+                $endOfWeek        = $lastDayPrevMonth->copy()->endOfWeek();
+            } else {
+                $startOfWeek = $today->copy()->startOfWeek();
+                $endOfWeek   = $today->copy()->endOfWeek();
             }
+
+            for ($date = $startOfWeek->copy(); $date->lte($endOfWeek); $date->addDay()) {
+                $dates[]  = $date->format('Y-m-d');
+                $labels[] = $date->isoFormat('ddd');
+            }
+
+        // Bulanan: ambil 4 minggu kalender terakhir dalam 1 bulan
         } else {
-            $startOfMonth   = $today->copy()->startOfMonth();
-            $endOfMonth     = $today->copy()->endOfMonth();
+            $baseDate = $periode === 'periode_lalu'
+                ? $today->copy()->subMonthNoOverflow()
+                : $today->copy();
 
-            $dates  = [];
-            $labels = [];
+            $startOfMonth = $baseDate->copy()->startOfMonth();
+            $endOfMonth   = $baseDate->copy()->endOfMonth();
 
+            $weeks     = [];
             $weekStart = $startOfMonth->copy()->startOfWeek();
+
             while ($weekStart->lte($endOfMonth)) {
                 $weekEnd    = $weekStart->copy()->endOfWeek();
-                $labels[]   = 'Minggu ' . $weekStart->weekOfMonth;
-                $dates[]    = [$weekStart->copy()->format('Y-m-d'), $weekEnd->copy()->format('Y-m-d')];
+                $rangeStart = $weekStart->lt($startOfMonth) ? $startOfMonth->copy() : $weekStart->copy();
+                $rangeEnd   = $weekEnd->gt($endOfMonth) ? $endOfMonth->copy() : $weekEnd->copy();
+
+                $weeks[] = [
+                    'label' => $rangeStart->format('d') . '-' . $rangeEnd->format('d'),
+                    'start' => $rangeStart->copy(),
+                    'end'   => $rangeEnd->copy(),
+                ];
+
                 $weekStart->addWeek();
+            }
+
+            $weeks = array_slice($weeks, -4);
+
+            foreach ($weeks as $week) {
+                $labels[] = $week['label'];
+                $dates[]  = [
+                    $week['start']->format('Y-m-d'),
+                    $week['end']->format('Y-m-d'),
+                ];
             }
         }
 
         $levels = [
-            'gtgl'      => 1,
-            'pack'      => 3,
-            'banderol'  => 4,
-            'opp'       => 5,
-            'mop'       => 6
+            'gtgl'     => 1,
+            'pack'     => 3,
+            'banderol' => 4,
+            'opp'      => 5,
+            'mop'      => 6,
         ];
 
         $datasets = [];
+
         foreach ($levels as $key => $level) {
             $data = [];
-            if ($periode === 'mingguan') {
+
+            if ($kategori === 'mingguan') {
                 foreach ($dates as $date) {
                     $jumlah = Produksi::whereDate('tanggal', $date)
                         ->whereIn('karyawan_id', Karyawan::where('level', $level)->pluck('id'))
                         ->sum('jumlah_baik');
+
                     $data[] = $jumlah;
                 }
             } else {
                 foreach ($dates as $range) {
-                    $jumlah = Produksi::whereBetween('tanggal', $range)
+                    [$startDate, $endDate] = $range;
+
+                    $jumlah = Produksi::whereBetween('tanggal', [$startDate, $endDate])
                         ->whereIn('karyawan_id', Karyawan::where('level', $level)->pluck('id'))
                         ->sum('jumlah_baik');
+
                     $data[] = $jumlah;
                 }
             }
+
             $datasets[$key] = $data;
         }
 
         return response()->json([
-            'labels'    => $labels,
-            'datasets'  => $datasets
+            'labels'   => $labels,
+            'datasets' => $datasets,
         ]);
     }
 
