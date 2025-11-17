@@ -308,7 +308,7 @@ class AbsensiController extends Controller
                     ];
                 }
 
-                $kodeKaryawan = !is_numeric(substr($kodeKaryawan, 0, 1)) ? $kodeKaryawan : 'K. ' . $kodeKaryawan;
+                $kodeKaryawan = !is_numeric(substr($kodeKaryawan, 0, 1)) ? $kodeKaryawan : 'K. ' . intval($kodeKaryawan);
                 $absensi[] = [
                     'kode_karyawan' => $kodeKaryawan,
                     'nama' => $namaKaryawan,

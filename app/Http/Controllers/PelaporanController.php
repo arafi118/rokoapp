@@ -59,8 +59,7 @@ class PelaporanController extends Controller
                 ['value' => 'index_kapasitas', 'title' => 'Index Kapasitas'],
 
             ];
-        } 
-        elseif ($file == 'produksi') {
+        } elseif ($file == 'produksi') {
             // 🔹 ambil semua kelompok dari tabel group
             $groups = Group::select('id', 'nama')->orderBy('nama')->get();
 
@@ -71,8 +70,7 @@ class PelaporanController extends Controller
                     'title' => $g->nama
                 ];
             })->toArray();
-        }
-        else {
+        } else {
             $sub_laporan = [
                 ['value' => '', 'title' => '---']
             ];
@@ -94,7 +92,7 @@ class PelaporanController extends Controller
         $data['bulan'] = $data['bulan'] ?? date('m');
         $data['hari']  = $data['hari'] ?? null;
 
-        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas','kapasitas','produksi']) && $sub) {
+        if (in_array($laporan, ['karyawan', 'jam_kerja', 'produktifitas', 'kapasitas', 'produksi']) && $sub) {
             $method = "{$sub}";
             if (method_exists($this, $method)) {
                 return $this->$method($data);
@@ -251,7 +249,7 @@ class PelaporanController extends Controller
             'bulan'             => $data['bulan'],
             'tahun'             => $data['tahun'],
             'terdaftar_lalu'    => $terdaftar_lalu,
-            'tanggal_bulan_lalu'=> $tanggal_bulan_lalu,
+            'tanggal_bulan_lalu' => $tanggal_bulan_lalu,
         ])->render();
 
         return PDF::loadHTML($view)
@@ -346,7 +344,7 @@ class PelaporanController extends Controller
         }
 
         // DATA DIREKRUT BULAN LALU
-        
+
         $tanggal_bulan_lalu = \Carbon\Carbon::parse($tanggal_awal)->subDay()->format('Y-m-d');
 
         $rekruit_lalu_raw = Karyawan::where('tanggal_masuk', $tanggal_bulan_lalu)
@@ -432,8 +430,8 @@ class PelaporanController extends Controller
             'keluar_bulan_lalu'   => $keluar_bulan_lalu,
             'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
         ]))
-        ->setPaper('a4', 'landscape')
-        ->stream('Karyawan Keluar.pdf');
+            ->setPaper('a4', 'landscape')
+            ->stream('Karyawan Keluar.pdf');
     }
 
 
@@ -487,8 +485,8 @@ class PelaporanController extends Controller
             'mutasi_bulan_lalu'   => $mutasi_bulan_lalu,
             'tanggal_bulan_lalu'  => $tanggal_bulan_lalu,
         ]))
-        ->setPaper('a4', 'landscape')
-        ->stream('Karyawan Dimutasi.pdf');
+            ->setPaper('a4', 'landscape')
+            ->stream('Karyawan Dimutasi.pdf');
     }
 
 
@@ -565,7 +563,7 @@ class PelaporanController extends Controller
             $periode_label = 'Mingguan';
         }
 
-        $levels = Level::where('level_karyawan', '1')->get()->pluck([], 'id')->toArray();
+        $levels = Level::get()->pluck([], 'id')->toArray();
         $peringkat = [
             'P' => 'Pemula',
             'T' => 'Terampil',
@@ -647,6 +645,9 @@ class PelaporanController extends Controller
                 $mutasiRef['penambahan'][$jenis] = ($mutasiRef['penambahan'][$jenis] ?? 0) + 1;
             }
         }
+
+        $grouped = collect($levels)->groupBy('level_karyawan');
+        $levels = $grouped->toArray();
 
         $title = "Data Monitoring Karyawan Periode {$periode_label}";
         $view = view('pelaporan.laporan.monitoring_karyawan', [
@@ -1111,94 +1112,94 @@ class PelaporanController extends Controller
 
     private function stick_hours(array $data, $return_raw = false)
     {
-            $minggu_ke = explode('#', request()->get('minggu_ke'));
-            $tanggal_awal = trim($minggu_ke[0]);
-            $tanggal_akhir = trim($minggu_ke[1]);
+        $minggu_ke = explode('#', request()->get('minggu_ke'));
+        $tanggal_awal = trim($minggu_ke[0]);
+        $tanggal_akhir = trim($minggu_ke[1]);
 
-            $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
-                ->with(['karyawan.getlevel', 'karyawan.getabsensi'])
-                ->get();
+        $produksi = Produksi::whereBetween('tanggal', [$tanggal_awal, $tanggal_akhir])
+            ->with(['karyawan.getlevel', 'karyawan.getabsensi'])
+            ->get();
 
-            $produksi_stick = [];
+        $produksi_stick = [];
 
-            foreach ($produksi as $p) {
-                $tanggal = $p->tanggal;
-                $karyawan = $p->karyawan;
-                $level = $karyawan->getlevel->nama ?? null;
+        foreach ($produksi as $p) {
+            $tanggal = $p->tanggal;
+            $karyawan = $p->karyawan;
+            $level = $karyawan->getlevel->nama ?? null;
 
-                if ($level) {
-                    $absen = $karyawan->getabsensi
-                        ->where('tanggal', $tanggal)
-                        ->first();
+            if ($level) {
+                $absen = $karyawan->getabsensi
+                    ->where('tanggal', $tanggal)
+                    ->first();
 
-                    $jam_kerja = 8;
-                    if ($absen && $absen->jam_masuk && $absen->jam_keluar) {
-                        $jam_masuk = \Carbon\Carbon::parse($absen->jam_masuk);
-                        $jam_keluar = \Carbon\Carbon::parse($absen->jam_keluar);
-                        $jam_kerja = $jam_keluar->diffInHours($jam_masuk);
-                    }
+                $jam_kerja = 8;
+                if ($absen && $absen->jam_masuk && $absen->jam_keluar) {
+                    $jam_masuk = \Carbon\Carbon::parse($absen->jam_masuk);
+                    $jam_keluar = \Carbon\Carbon::parse($absen->jam_keluar);
+                    $jam_kerja = $jam_keluar->diffInHours($jam_masuk);
+                }
 
-                    if (!isset($produksi_stick[$tanggal])) {
-                        $produksi_stick[$tanggal] = [];
-                    }
+                if (!isset($produksi_stick[$tanggal])) {
+                    $produksi_stick[$tanggal] = [];
+                }
 
-                    $jumlah_baik = $p->jumlah_baik ?? 0;
+                $jumlah_baik = $p->jumlah_baik ?? 0;
 
-                    if (isset($produksi_stick[$tanggal][$level])) {
-                        $produksi_stick[$tanggal][$level]['total'] += $jumlah_baik;
-                        $produksi_stick[$tanggal][$level]['jam_kerja'] += $jam_kerja;
-                    } else {
-                        $produksi_stick[$tanggal][$level] = [
-                            'total' => $jumlah_baik,
-                            'jam_kerja' => $jam_kerja,
-                        ];
-                    }
+                if (isset($produksi_stick[$tanggal][$level])) {
+                    $produksi_stick[$tanggal][$level]['total'] += $jumlah_baik;
+                    $produksi_stick[$tanggal][$level]['jam_kerja'] += $jam_kerja;
+                } else {
+                    $produksi_stick[$tanggal][$level] = [
+                        'total' => $jumlah_baik,
+                        'jam_kerja' => $jam_kerja,
+                    ];
                 }
             }
+        }
 
-            // Hitung produksi per jam (stick/hours)
-            foreach ($produksi_stick as $tanggal => &$levels) {
-                foreach ($levels as $level => &$data_level) {
-                    $jam_kerja = $data_level['jam_kerja'] ?: 1;
-                    $data_level['per_jam'] = $data_level['total'] / $jam_kerja;
+        // Hitung produksi per jam (stick/hours)
+        foreach ($produksi_stick as $tanggal => &$levels) {
+            foreach ($levels as $level => &$data_level) {
+                $jam_kerja = $data_level['jam_kerja'] ?: 1;
+                $data_level['per_jam'] = $data_level['total'] / $jam_kerja;
+            }
+        }
+
+        // Jika hanya ingin data mentah
+        if ($return_raw) {
+            // Kembalikan hanya nilai per jam per level
+            $hasil = [];
+            foreach ($produksi_stick as $tanggal => $levels) {
+                foreach ($levels as $level => $data_level) {
+                    $hasil[$tanggal][$level] = $data_level['per_jam'];
                 }
             }
+            return $hasil;
+        }
 
-            // Jika hanya ingin data mentah
-            if ($return_raw) {
-                // Kembalikan hanya nilai per jam per level
-                $hasil = [];
-                foreach ($produksi_stick as $tanggal => $levels) {
-                    foreach ($levels as $level => $data_level) {
-                        $hasil[$tanggal][$level] = $data_level['per_jam'];
-                    }
-                }
-                return $hasil;
-            }
+        $title = 'Stick / Hours';
 
-            $title = 'Stick / Hours';
+        $view = view('pelaporan.laporan.kapasitas_stick_hours', [
+            'tanggal_awal'  => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'minggu_ke'     => $minggu_ke,
+            'produksi_stick' => $produksi_stick,
+            'title'         => $title,
+            'bulan'         => $data['bulan'],
+            'tahun'         => $data['tahun'],
+        ])->render();
 
-            $view = view('pelaporan.laporan.kapasitas_stick_hours', [
-                'tanggal_awal'  => $tanggal_awal,
-                'tanggal_akhir' => $tanggal_akhir,
-                'minggu_ke'     => $minggu_ke,
-                'produksi_stick'=> $produksi_stick,
-                'title'         => $title,
-                'bulan'         => $data['bulan'],
-                'tahun'         => $data['tahun'],
-            ])->render();
+        $pdf = PDF::loadHTML($view)
+            ->setPaper('a4', 'landscape')
+            ->setOptions([
+                'margin-top'    => 30,
+                'margin-bottom' => 15,
+                'margin-left'   => 25,
+                'margin-right'  => 20,
+                'enable-local-file-access' => true,
+            ]);
 
-            $pdf = PDF::loadHTML($view)
-                ->setPaper('a4', 'landscape')
-                ->setOptions([
-                    'margin-top'    => 30,
-                    'margin-bottom' => 15,
-                    'margin-left'   => 25,
-                    'margin-right'  => 20,
-                    'enable-local-file-access' => true,
-                ]);
-
-            return $pdf->stream('Produksi_per_Jam.pdf');
+        return $pdf->stream('Produksi_per_Jam.pdf');
     }
 
 
@@ -1278,7 +1279,7 @@ class PelaporanController extends Controller
             // Total = 1, hanya untuk pengecekan
             $index[$tanggal]['Total'] = 1;
         }
-  
+
         $title = 'Index Kapasitas';
 
         $view = view('pelaporan.laporan.kapasitas_index_kapasitas', [
@@ -1304,6 +1305,4 @@ class PelaporanController extends Controller
 
         return $pdf->stream('Index_Kapasitas.pdf');
     }
-
-
 }
