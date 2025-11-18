@@ -39,8 +39,13 @@ class KaryawanController extends Controller
                 'getmeja',
                 'getlevel'
             )->select('karyawan.*', 'level.nama as level_nama')
-                ->join('level', 'karyawan.level', '=', 'level.id')
-                ->where('level.level_karyawan', $level_karyawan);
+                ->join('level', 'karyawan.level', '=', 'level.id');
+
+            if ($level_karyawan == 1) {
+                $data = $data->where('level.level_karyawan', $level_karyawan);
+            } else {
+                $data = $data->where('level.level_karyawan', '!=', '1');
+            }
 
             if (request()->get('status') && request()->get('status') !== 'all') {
                 $data = $data->where('karyawan.status', request()->get('status'));

@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\Anggota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -25,39 +26,35 @@ class AuthController extends Controller
         $anggota = Anggota::where('username', $request->username)->first();
 
         if ($anggota) {
-            if (password_verify($request->password, $anggota->password)) {
+            $karyawan = Karyawan::where('anggota_id', $anggota->id)
+                ->where('status', 'aktif')
+                ->first();
 
-                $karyawan = Karyawan::where('anggota_id', $anggota->id)
-                    ->where('status', 'aktif')
-                    ->first();
+            if ($karyawan) {
+                $absen = false;
+                if (strtolower($karyawan->status) == 'aktif') {
+                    $sudahAbsenMasuk = Absensi::where('karyawan_id', $karyawan->id)
+                        ->whereDate('tanggal', date('Y-m-d'))
+                        ->whereIn('status', ['H', 'T'])
+                        ->first();
 
-                if ($karyawan) {
-                    $absen = false;
-                    if (strtolower($karyawan->status) == 'aktif') {
-                        $sudahAbsenMasuk = Absensi::where('karyawan_id', $karyawan->id)
-                            ->whereDate('tanggal', date('Y-m-d'))
-                            ->whereIn('status', ['H', 'T'])
-                            ->first();
-
-                        if ($sudahAbsenMasuk) {
-                            $absen = true;
-                        }
-                    }
-
-                    if ($absen == false) {
-                        return back()->with('error', 'Karyawan Belum Absen');
+                    if ($sudahAbsenMasuk) {
+                        $absen = true;
                     }
                 }
 
-                $redirect = '/' . strtolower($anggota->getjabatan->nama);
-
-                if (Auth::attempt($request->only('username', 'password'))) {
-
-                    // 🔹 Tambahan: simpan data anggota ke session
-                    session(['anggota' => $anggota]);
-
-                    return redirect($redirect)->with('success', 'Selamat Datang ' . $anggota->nama);
+                if ($absen == false) {
+                    return back()->with('error', 'Karyawan Belum Absen');
                 }
+            }
+
+            $redirect = '/' . strtolower($anggota->getjabatan->nama);
+            if (Auth::attempt($request->only('username', 'password'))) {
+
+                // 🔹 Tambahan: simpan data anggota ke session
+                session(['anggota' => $anggota]);
+
+                return redirect($redirect)->with('success', 'Selamat Datang ' . $anggota->nama);
             }
         }
 
