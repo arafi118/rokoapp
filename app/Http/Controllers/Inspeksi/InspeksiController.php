@@ -10,60 +10,165 @@ use App\Models\Produksi;
 use App\Models\Group;
 use App\Models\Level;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class InspeksiController extends Controller
+{   
+    public function index(Request $request)
 {
-      public function index()
-    {
-        $today = date('Y-m-d');
+    $kategori = $request->get('kategori', 'mingguan'); // mingguan / bulanan
+    $periode  = $request->get('periode', 'periode_ini'); // periode_ini / periode_lalu
+    $today    = Carbon::today();
 
-        $data['aktual_guntinggiling'] = Produksi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [1])->pluck('id'))
-            ->sum('jumlah_baik');
+    // ================================
+    // Tentukan range tanggal
+    // ================================
+    if ($kategori == 'mingguan') {
 
-        $data['target_guntinggiling'] = Absensi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [1])->pluck('id'))
-            ->sum('target_harian');
+        if ($periode == 'periode_ini') {
+            // Minggu berjalan (Senin - Minggu dari hari ini)
+            $start = $today->copy()->startOfWeek(Carbon::MONDAY);
+            $end   = $today->copy()->endOfWeek(Carbon::SUNDAY);
 
-        $data['aktual_pack'] = Produksi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [3])->pluck('id'))
-            ->sum('jumlah_baik');
+        } else { // periode_lalu
+            // Minggu terakhir bulan lalu
+            $lastMonthEnd = $today->copy()->subMonthNoOverflow()->endOfMonth();
+            $start = $lastMonthEnd->copy()->startOfWeek(Carbon::MONDAY);
+            $end   = $lastMonthEnd; // pastikan tidak melebihi akhir bulan lalu
+        }
 
-        $data['target_pack'] = Absensi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [3])->pluck('id'))
-            ->sum('target_harian');
+    } else { // bulanan
 
-        $data['aktual_banderol'] = Produksi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [4])->pluck('id'))
-            ->sum('jumlah_baik');
+        if ($periode == 'periode_ini') {
+            // Bulan berjalan
+            $start = $today->copy()->startOfMonth();
+            $end   = $today->copy()->endOfMonth();
 
-        $data['target_banderol'] = Absensi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [4])->pluck('id'))
-            ->sum('target_harian');
+        } else { // periode_lalu
+            // Bulan lalu penuh
+            $lastMonth = $today->copy()->subMonthNoOverflow();
+            $start     = $lastMonth->copy()->startOfMonth();
+            $end       = $lastMonth->copy()->endOfMonth();
+        }
 
-        $data['aktual_opp'] = Produksi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [5])->pluck('id'))
-            ->sum('jumlah_baik');
-
-        $data['target_opp'] = Absensi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [5])->pluck('id'))
-            ->sum('target_harian');
-
-        $data['aktual_mop'] = Produksi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [6])->pluck('id'))
-            ->sum('jumlah_baik');
-
-        $data['target_mop'] = Absensi::whereDate('tanggal', $today)
-            ->whereIn('karyawan_id', Karyawan::whereIn('level', [6])->pluck('id'))
-            ->sum('target_harian');
-
-        $data['title'] = "Dashboard";
-        return view('inspeksi.index')->with($data);
     }
+
+    // ================================
+    // Ambil ID karyawan per level
+    // ================================
+    $levels = [
+        'guntinggiling' => 1,
+        'pack'          => 3,
+        'banderol'      => 4,
+        'opp'           => 5,
+        'mop'           => 6,
+    ];
+
+    $karyawan_ids = [];
+    foreach ($levels as $key => $level) {
+        $karyawan_ids[$key] = Karyawan::where('level', $level)->pluck('id')->toArray();
+    }
+
+    // ================================
+    // Hitung total aktual & target
+    // ================================
+    $totals = [];
+    foreach ($levels as $key => $level) {
+
+        // Jumlah produksi aktual
+        $aktual = Produksi::whereIn('karyawan_id', $karyawan_ids[$key])
+            ->whereDate('tanggal', '>=', $start)
+            ->whereDate('tanggal', '<=', $end)
+            ->sum('jumlah_baik');
+
+        // Jumlah target dari absensi
+        $target = Absensi::whereIn('karyawan_id', $karyawan_ids[$key])
+            ->whereDate('tanggal', '>=', $start)
+            ->whereDate('tanggal', '<=', $end)
+            ->sum('target_harian');
+
+        $totals['aktual_'.$key] = $aktual;
+
+        // Selisih aktual - target
+        $selisih = $aktual - $target;
+        if ($selisih >= 0) {
+            $totals['target_'.$key] = '<span style="color:green">+'. $selisih .'</span>';
+        } else {
+            $totals['target_'.$key] = '<span style="color:red">'. $selisih .'</span>';
+        }
+    }
+
+    // ================================
+    // Jika request AJAX untuk DataTables
+    // ================================
+    if ($request->ajax()) {
+
+        $query = Produksi::query()
+            ->join('karyawan', 'karyawan.id', '=', 'produksi.karyawan_id')
+            ->selectRaw("
+                DATE(produksi.tanggal) as tanggal,
+                SUM(CASE WHEN karyawan.level = 1 THEN produksi.jumlah_baik ELSE 0 END) as guntinggiling,
+                SUM(CASE WHEN karyawan.level = 3 THEN produksi.jumlah_baik ELSE 0 END) as pack,
+                SUM(CASE WHEN karyawan.level = 4 THEN produksi.jumlah_baik ELSE 0 END) as banderol,
+                SUM(CASE WHEN karyawan.level = 5 THEN produksi.jumlah_baik ELSE 0 END) as opp,
+                SUM(CASE WHEN karyawan.level = 6 THEN produksi.jumlah_baik ELSE 0 END) as mop
+            ")
+            ->whereDate('produksi.tanggal', '>=', $start)
+            ->whereDate('produksi.tanggal', '<=', $end)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'asc');
+
+        return DataTables::of($query)
+            ->filter(function ($instance) {
+                $search = request('search.value');
+                if (!empty($search)) {
+                    $search = strtolower($search);
+                    $instance->havingRaw('
+                        LOWER(DATE_FORMAT(tanggal, "%Y-%m-%d")) LIKE ?
+                        OR LOWER(DATE_FORMAT(tanggal, "%d-%m-%Y")) LIKE ?
+                        OR LOWER(DATE_FORMAT(tanggal, "%d/%m/%Y")) LIKE ?
+                        OR LOWER(DAYNAME(tanggal)) LIKE ?
+                    ', [
+                        "%{$search}%",
+                        "%{$search}%",
+                        "%{$search}%",
+                        "%{$search}%",
+                    ]);
+                }
+            })
+            ->editColumn('tanggal', fn($row) => Carbon::parse($row->tanggal)->format('Y-m-d'))
+            ->with('totals', $totals)
+            ->toJson();
+    }
+
+    // ================================
+    // Return view dengan totals & target awal
+    // ================================
+    return view('inspeksi.index', [
+        'title'    => 'Dashboard Inspeksi',
+        'start'    => $start,
+        'end'      => $end,
+        'kategori' => $kategori,
+        'periode'  => $periode,
+        'totals'   => $totals,
+        'aktual_guntinggiling' => $totals['aktual_guntinggiling'] ?? 0,
+        'target_guntinggiling' => $totals['target_guntinggiling'] ?? 0,
+        'aktual_pack'          => $totals['aktual_pack'] ?? 0,
+        'target_pack'          => $totals['target_pack'] ?? 0,
+        'aktual_banderol'      => $totals['aktual_banderol'] ?? 0,
+        'target_banderol'      => $totals['target_banderol'] ?? 0,
+        'aktual_opp'           => $totals['aktual_opp'] ?? 0,
+        'target_opp'           => $totals['target_opp'] ?? 0,
+        'aktual_mop'           => $totals['aktual_mop'] ?? 0,
+        'target_mop'           => $totals['target_mop'] ?? 0,
+    ]);
+}
+
 
     public function chart(Request $request)
     {
-        // kategori: mingguan / bulanan, periode: periode_ini / periode_lalu
         $kategori = $request->input('kategori', 'mingguan');
         $periode  = $request->input('periode', 'periode_ini');
 
@@ -71,7 +176,6 @@ class InspeksiController extends Controller
         $dates  = [];
         $labels = [];
 
-        // Mingguan: periode_ini = minggu ini, periode_lalu = minggu terakhir bulan lalu
         if ($kategori === 'mingguan') {
             if ($periode === 'periode_lalu') {
                 $lastDayPrevMonth = $today->copy()->subMonthNoOverflow()->endOfMonth();
@@ -86,8 +190,6 @@ class InspeksiController extends Controller
                 $dates[]  = $date->format('Y-m-d');
                 $labels[] = $date->isoFormat('ddd');
             }
-
-        // Bulanan: ambil 4 minggu kalender terakhir dalam 1 bulan
         } else {
             $baseDate = $periode === 'periode_lalu'
                 ? $today->copy()->subMonthNoOverflow()
@@ -165,7 +267,6 @@ class InspeksiController extends Controller
             'datasets' => $datasets,
         ]);
     }
-
     public function modalGLGT()
     {
         $today = now()->toDateString();

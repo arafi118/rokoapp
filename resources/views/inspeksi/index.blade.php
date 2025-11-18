@@ -2,141 +2,168 @@
 
 @section('content')
     <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-4 order-first">
-                    <div class="row">
-                        <div class="col-12 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
-                                        <div class="card-title fw-bold">Gunting/Giling</div>
-                                        <div>{{ $target_guntinggiling }}</div>
+        <div class="row">
+            <div class="col-md-4 order-first">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
+                                    <div class="card-title fw-bold">Gunting/Giling</div>
+                                    <div id="target_guntinggiling">{!! $target_guntinggiling !!}</div>
+                                </div>
+                                <div class="mt-4 d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h2 class="h2 text-primary d-inline" id="aktual_guntinggiling">
+                                            {{ $aktual_guntinggiling }}</h2>
+                                        <span>btg</span>
                                     </div>
-
-                                    <div class="mt-4 d-flex justify-content-between align-items-end">
-                                        <div>
-                                            <h2 class="h2 text-primary d-inline">{{ $aktual_guntinggiling }}</h2>
-                                            <span>btg</span>
-                                        </div>
-                                        <div>
-                                            <button type="button" id="ModalGTGL"
-                                                class="btn btn-primary btn-icon rounded-circle -rotate-45"
-                                                data-bs-toggle="modal" data-bs-target="#modalGLGT">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                        </div>
+                                    <div>
+                                        <button type="button" id="ModalGTGL"
+                                            class="btn btn-primary btn-icon rounded-circle -rotate-45"
+                                            data-bs-toggle="modal" data-bs-target="#modalGLGT">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
-                                        <div class="card-title fw-bold">PACK</div>
-                                        <div>{{ $target_pack }}</div>
-                                    </div>
+                    </div>
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
+                                    <div class="card-title fw-bold">PACK</div>
+                                    <div id="target_pack">{!! $target_pack !!}</div>
+                                </div>
 
-                                    <div class="mt-4 d-flex justify-content-between align-items-end">
-                                        <div>
-                                            <h2 class="h2 text-primary d-inline">{{ $aktual_pack }}</h2> <span>btg</span>
-                                        </div>
-                                        <div>
-                                            <button type="button" id="ModalPACK"
-                                                class="btn btn-primary btn-icon rounded-circle -rotate-45"
-                                                data-bs-toggle="modal" data-bs-target="#modalPACK">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                        </div>
+                                <div class="mt-4 d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h2 class="h2 text-primary d-inline" id="aktual_pack">{{ $aktual_pack }}</h2>
+                                        <span>btg</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="ModalPACK"
+                                            class="btn btn-primary btn-icon rounded-circle -rotate-45"
+                                            data-bs-toggle="modal" data-bs-target="#modalPACK">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8 mb-4">
-                    <div class="card h-100 w-100">
-                        <div class="card-body" style="height:220px;">
-                            <div id="progress" class="progress" style="height:8px; display:none;">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
-                                    role="progressbar" style="width:10%" aria-valuenow="0" aria-valuemin="0"
-                                    aria-valuemax="100"></div>
+            </div>
+            <div class="col-md-8 mb-4">
+                <div class="card h-100 w-100">
+                    <div class="card-body" style="height:220px;">
+                        <div id="progress" class="progress" style="height:8px; display:none;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                                role="progressbar" style="width:10%" aria-valuenow="0" aria-valuemin="0"
+                                aria-valuemax="100"></div>
+                        </div>
+                        <canvas id="chart" style="width:100%; height:100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
+                                    <div class="card-title fw-bold">BANDEROL</div>
+                                    <div id="target_banderol">{!! $target_banderol !!}</div>
+                                </div>
+
+                                <div class="mt-4 d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h2 class="h2 text-primary d-inline" id="aktual_banderol">{{ $aktual_banderol }}
+                                        </h2>
+                                        <span>btg</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="ModalBDL"
+                                            class="btn btn-primary btn-icon rounded-circle -rotate-45"
+                                            data-bs-toggle="modal" data-bs-target="#modalBanderol">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <canvas id="chart" style="width:100%; height:100%;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
+                                    <div class="card-title fw-bold">OPP</div>
+                                    <div id="target_opp">{!! $target_opp !!}</div>
+                                </div>
+                                <div class="mt-4 d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h2 class="h2 text-primary d-inline" id="aktual_opp">{{ $aktual_opp }}</h2>
+                                        <span>btg</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="ModalOPP"
+                                            class="btn btn-primary btn-icon rounded-circle -rotate-45"
+                                            data-bs-toggle="modal" data-bs-target="#modalOPP">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
+                                    <div class="card-title fw-bold">MOP</div>
+                                    <div id="target_mop">{!! $target_mop !!}</div>
+                                </div>
+
+                                <div class="mt-4 d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h2 class="h2 text-primary d-inline" id="aktual_mop">{{ $aktual_mop }}</h2>
+                                        <span>btg</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="ModalMOP"
+                                            class="btn btn-primary btn-icon rounded-circle -rotate-45"
+                                            data-bs-toggle="modal" data-bs-target="#modalMOP">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
-                                        <div class="card-title fw-bold">BANDEROL</div>
-                                        <div>{{ $target_banderol }}</div>
-                                    </div>
-
-                                    <div class="mt-4 d-flex justify-content-between align-items-end">
-                                        <div>
-                                            <h2 class="h2 text-primary d-inline">{{ $aktual_banderol }}</h2>
-                                            <span>btg</span>
-                                        </div>
-                                        <div>
-                                            <button type="button" id="ModalBDL"
-                                                class="btn btn-primary btn-icon rounded-circle -rotate-45"
-                                                data-bs-toggle="modal" data-bs-target="#modalBanderol">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
-                                        <div class="card-title fw-bold">OPP</div>
-                                        <div>{{ $target_opp }}</div>
-                                    </div>
-                                    <div class="mt-4 d-flex justify-content-between align-items-end">
-                                        <div>
-                                            <h2 class="h2 text-primary d-inline">{{ $aktual_opp }}</h2> <span>btg</span>
-                                        </div>
-                                        <div>
-                                            <button type="button" id="ModalOPP"
-                                                class="btn btn-primary btn-icon rounded-circle -rotate-45"
-                                                data-bs-toggle="modal" data-bs-target="#modalOPP">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center fs-7 text-secondary">
-                                        <div class="card-title fw-bold">MOP</div>
-                                        <div>{{ $target_mop }}</div>
-                                    </div>
-
-                                    <div class="mt-4 d-flex justify-content-between align-items-end">
-                                        <div>
-                                            <h2 class="h2 text-primary d-inline">{{ $aktual_mop }}</h2> <span>btg</span>
-                                        </div>
-                                        <div>
-                                            <button type="button" id="ModalMOP"
-                                                class="btn btn-primary btn-icon rounded-circle -rotate-45"
-                                                data-bs-toggle="modal" data-bs-target="#modalMOP">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="ITable" class="table table-hover table-striped table-bordered"
+                                style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Hari & Tanggal</th>
+                                        <th>Gunting/Giling</th>
+                                        <th>Pack</th>
+                                        <th>Banderol</th>
+                                        <th>OPP</th>
+                                        <th>MOP</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -471,6 +498,107 @@
 @endsection
 @section('script')
     <script>
+        $(document).ready(function() {
+            const table = $('#ITable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '/inspeksi',
+                    data: function(d) {
+                        d.kategori = $('input[name="kategori"]:checked').attr('id');
+                        d.periode = $('input[name="periode"]:checked').attr('id');
+                    },
+                    dataSrc: function(json) {
+                        if (json.totals) {
+                            $('#aktual_guntinggiling').text(json.totals.aktual_guntinggiling);
+                            $('#target_guntinggiling').html(json.totals.target_guntinggiling);
+
+                            $('#aktual_pack').text(json.totals.aktual_pack);
+                            $('#target_pack').html(json.totals.target_pack);
+
+                            $('#aktual_banderol').text(json.totals.aktual_banderol);
+                            $('#target_banderol').html(json.totals.target_banderol);
+
+                            $('#aktual_opp').text(json.totals.aktual_opp);
+                            $('#target_opp').html(json.totals.target_opp);
+
+                            $('#aktual_mop').text(json.totals.aktual_mop);
+                            $('#target_mop').html(json.totals.target_mop);
+                        }
+
+                        return json.data;
+                    }
+                },
+                columns: [{
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                        data: 'tanggal',
+                        name: 'produksi.tanggal',
+                        render: function(data, type, row) {
+                            const date = new Date(data);
+                            const dayName = date.toLocaleDateString('id-ID', {
+                                weekday: 'long'
+                            });
+                            const dateText = date.toLocaleDateString('id-ID', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            });
+                            if (type === 'display') {
+                                return `
+                        <div class="d-flex justify-content-between w-100">
+                            <span class="badge bg-light text-dark text-capitalize">
+                                ${dayName}
+                            </span>
+                            <span class="text-end">${dateText}</span>
+                        </div>`;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'guntinggiling',
+                        name: 'guntinggiling',
+                        searchable: false
+                    },
+                    {
+                        data: 'pack',
+                        name: 'pack',
+                        searchable: false
+                    },
+                    {
+                        data: 'banderol',
+                        name: 'banderol',
+                        searchable: false
+                    },
+                    {
+                        data: 'opp',
+                        name: 'opp',
+                        searchable: false
+                    },
+                    {
+                        data: 'mop',
+                        name: 'mop',
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('input[name="kategori"], input[name="periode"]').change(function() {
+                table.ajax.reload();
+            });
+        });
+    </script>
+
+
+    </script>
+    <script>
         const ctx = document.getElementById('chart');
         let chartInstance = null;
         const progressContainer = $('#progress');
@@ -682,8 +810,6 @@
             gantiChart(kategoriAwal, periodeAwal);
         });
     </script>
-
-
     <script>
         // Modal GL/GT
         $(document).on('click', '#ModalGTGL', function(e) {
