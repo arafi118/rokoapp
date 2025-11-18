@@ -498,6 +498,7 @@
 @endsection
 @section('script')
     <script>
+        //table dan kartu card
         $(document).ready(function() {
             const table = $('#ITable').DataTable({
                 processing: true,
@@ -594,11 +595,8 @@
                 table.ajax.reload();
             });
         });
-    </script>
 
-
-    </script>
-    <script>
+        //chart mode
         const ctx = document.getElementById('chart');
         let chartInstance = null;
         const progressContainer = $('#progress');
@@ -809,8 +807,7 @@
 
             gantiChart(kategoriAwal, periodeAwal);
         });
-    </script>
-    <script>
+
         // Modal GL/GT
         $(document).on('click', '#ModalGTGL', function(e) {
             e.preventDefault();

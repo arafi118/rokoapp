@@ -17,155 +17,126 @@ use Carbon\Carbon;
 class InspeksiController extends Controller
 {   
     public function index(Request $request)
-{
-    $kategori = $request->get('kategori', 'mingguan'); // mingguan / bulanan
-    $periode  = $request->get('periode', 'periode_ini'); // periode_ini / periode_lalu
-    $today    = Carbon::today();
+    {
+        $kategori = $request->get('kategori', 'mingguan'); 
+        $periode  = $request->get('periode', 'periode_ini'); 
+        $today    = Carbon::today();
+        if ($kategori == 'mingguan') {
 
-    // ================================
-    // Tentukan range tanggal
-    // ================================
-    if ($kategori == 'mingguan') {
+            if ($periode == 'periode_ini') {
+                $start = $today->copy()->startOfWeek(Carbon::MONDAY);
+                $end   = $today->copy()->endOfWeek(Carbon::SUNDAY);
 
-        if ($periode == 'periode_ini') {
-            // Minggu berjalan (Senin - Minggu dari hari ini)
-            $start = $today->copy()->startOfWeek(Carbon::MONDAY);
-            $end   = $today->copy()->endOfWeek(Carbon::SUNDAY);
-
-        } else { // periode_lalu
-            // Minggu terakhir bulan lalu
-            $lastMonthEnd = $today->copy()->subMonthNoOverflow()->endOfMonth();
-            $start = $lastMonthEnd->copy()->startOfWeek(Carbon::MONDAY);
-            $end   = $lastMonthEnd; // pastikan tidak melebihi akhir bulan lalu
-        }
-
-    } else { // bulanan
-
-        if ($periode == 'periode_ini') {
-            // Bulan berjalan
-            $start = $today->copy()->startOfMonth();
-            $end   = $today->copy()->endOfMonth();
-
-        } else { // periode_lalu
-            // Bulan lalu penuh
-            $lastMonth = $today->copy()->subMonthNoOverflow();
-            $start     = $lastMonth->copy()->startOfMonth();
-            $end       = $lastMonth->copy()->endOfMonth();
-        }
-
-    }
-
-    // ================================
-    // Ambil ID karyawan per level
-    // ================================
-    $levels = [
-        'guntinggiling' => 1,
-        'pack'          => 3,
-        'banderol'      => 4,
-        'opp'           => 5,
-        'mop'           => 6,
-    ];
-
-    $karyawan_ids = [];
-    foreach ($levels as $key => $level) {
-        $karyawan_ids[$key] = Karyawan::where('level', $level)->pluck('id')->toArray();
-    }
-
-    // ================================
-    // Hitung total aktual & target
-    // ================================
-    $totals = [];
-    foreach ($levels as $key => $level) {
-
-        // Jumlah produksi aktual
-        $aktual = Produksi::whereIn('karyawan_id', $karyawan_ids[$key])
-            ->whereDate('tanggal', '>=', $start)
-            ->whereDate('tanggal', '<=', $end)
-            ->sum('jumlah_baik');
-
-        // Jumlah target dari absensi
-        $target = Absensi::whereIn('karyawan_id', $karyawan_ids[$key])
-            ->whereDate('tanggal', '>=', $start)
-            ->whereDate('tanggal', '<=', $end)
-            ->sum('target_harian');
-
-        $totals['aktual_'.$key] = $aktual;
-
-        // Selisih aktual - target
-        $selisih = $aktual - $target;
-        if ($selisih >= 0) {
-            $totals['target_'.$key] = '<span style="color:green">+'. $selisih .'</span>';
+            } else { 
+                $lastMonthEnd = $today->copy()->subMonthNoOverflow()->endOfMonth();
+                $start = $lastMonthEnd->copy()->startOfWeek(Carbon::MONDAY);
+                $end   = $lastMonthEnd;
+            }
         } else {
-            $totals['target_'.$key] = '<span style="color:red">'. $selisih .'</span>';
+            if ($periode == 'periode_ini') {
+                $start = $today->copy()->startOfMonth();
+                $end   = $today->copy()->endOfMonth();
+            } else {
+                $lastMonth = $today->copy()->subMonthNoOverflow();
+                $start     = $lastMonth->copy()->startOfMonth();
+                $end       = $lastMonth->copy()->endOfMonth();
+            }
         }
+
+        $levels = [
+            'guntinggiling' => 1,
+            'pack'          => 3,
+            'banderol'      => 4,
+            'opp'           => 5,
+            'mop'           => 6,
+        ];
+
+        $karyawan_ids = [];
+        foreach ($levels as $key => $level) {
+            $karyawan_ids[$key] = Karyawan::where('level', $level)->pluck('id')->toArray();
+        }
+
+        // Hitung total aktual & target
+        $totals = [];
+        foreach ($levels as $key => $level) {
+            $aktual = Produksi::whereIn('karyawan_id', $karyawan_ids[$key])
+                ->whereDate('tanggal', '>=', $start)
+                ->whereDate('tanggal', '<=', $end)
+                ->sum('jumlah_baik');
+            $target = Absensi::whereIn('karyawan_id', $karyawan_ids[$key])
+                ->whereDate('tanggal', '>=', $start)
+                ->whereDate('tanggal', '<=', $end)
+                ->sum('target_harian');
+
+            $totals['aktual_'.$key] = $aktual;
+
+            $selisih = $aktual - $target;
+            if ($selisih >= 0) {
+                $totals['target_'.$key] = '<span style="color:green">+'. $selisih .'</span>';
+            } else {
+                $totals['target_'.$key] = '<span style="color:red">'. $selisih .'</span>';
+            }
+        }
+
+        // Jika request AJAX untuk DataTables
+        if ($request->ajax()) {
+
+            $query = Produksi::query()
+                ->join('karyawan', 'karyawan.id', '=', 'produksi.karyawan_id')
+                ->selectRaw("
+                    DATE(produksi.tanggal) as tanggal,
+                    SUM(CASE WHEN karyawan.level = 1 THEN produksi.jumlah_baik ELSE 0 END) as guntinggiling,
+                    SUM(CASE WHEN karyawan.level = 3 THEN produksi.jumlah_baik ELSE 0 END) as pack,
+                    SUM(CASE WHEN karyawan.level = 4 THEN produksi.jumlah_baik ELSE 0 END) as banderol,
+                    SUM(CASE WHEN karyawan.level = 5 THEN produksi.jumlah_baik ELSE 0 END) as opp,
+                    SUM(CASE WHEN karyawan.level = 6 THEN produksi.jumlah_baik ELSE 0 END) as mop
+                ")
+                ->whereDate('produksi.tanggal', '>=', $start)
+                ->whereDate('produksi.tanggal', '<=', $end)
+                ->groupBy('tanggal')
+                ->orderBy('tanggal', 'asc');
+
+            return DataTables::of($query)
+                ->filter(function ($instance) {
+                    $search = request('search.value');
+                    if (!empty($search)) {
+                        $search = strtolower($search);
+                        $instance->havingRaw('
+                            LOWER(DATE_FORMAT(tanggal, "%Y-%m-%d")) LIKE ?
+                            OR LOWER(DATE_FORMAT(tanggal, "%d-%m-%Y")) LIKE ?
+                            OR LOWER(DATE_FORMAT(tanggal, "%d/%m/%Y")) LIKE ?
+                            OR LOWER(DAYNAME(tanggal)) LIKE ?
+                        ', [
+                            "%{$search}%",
+                            "%{$search}%",
+                            "%{$search}%",
+                            "%{$search}%",
+                        ]);
+                    }
+                })
+                ->editColumn('tanggal', fn($row) => Carbon::parse($row->tanggal)->format('Y-m-d'))
+                ->with('totals', $totals)
+                ->toJson();
+        }
+        return view('inspeksi.index', [
+            'title'    => 'Dashboard Inspeksi',
+            'start'    => $start,
+            'end'      => $end,
+            'kategori' => $kategori,
+            'periode'  => $periode,
+            'totals'   => $totals,
+            'aktual_guntinggiling' => $totals['aktual_guntinggiling'] ?? 0,
+            'target_guntinggiling' => $totals['target_guntinggiling'] ?? 0,
+            'aktual_pack'          => $totals['aktual_pack'] ?? 0,
+            'target_pack'          => $totals['target_pack'] ?? 0,
+            'aktual_banderol'      => $totals['aktual_banderol'] ?? 0,
+            'target_banderol'      => $totals['target_banderol'] ?? 0,
+            'aktual_opp'           => $totals['aktual_opp'] ?? 0,
+            'target_opp'           => $totals['target_opp'] ?? 0,
+            'aktual_mop'           => $totals['aktual_mop'] ?? 0,
+            'target_mop'           => $totals['target_mop'] ?? 0,
+        ]);
     }
-
-    // ================================
-    // Jika request AJAX untuk DataTables
-    // ================================
-    if ($request->ajax()) {
-
-        $query = Produksi::query()
-            ->join('karyawan', 'karyawan.id', '=', 'produksi.karyawan_id')
-            ->selectRaw("
-                DATE(produksi.tanggal) as tanggal,
-                SUM(CASE WHEN karyawan.level = 1 THEN produksi.jumlah_baik ELSE 0 END) as guntinggiling,
-                SUM(CASE WHEN karyawan.level = 3 THEN produksi.jumlah_baik ELSE 0 END) as pack,
-                SUM(CASE WHEN karyawan.level = 4 THEN produksi.jumlah_baik ELSE 0 END) as banderol,
-                SUM(CASE WHEN karyawan.level = 5 THEN produksi.jumlah_baik ELSE 0 END) as opp,
-                SUM(CASE WHEN karyawan.level = 6 THEN produksi.jumlah_baik ELSE 0 END) as mop
-            ")
-            ->whereDate('produksi.tanggal', '>=', $start)
-            ->whereDate('produksi.tanggal', '<=', $end)
-            ->groupBy('tanggal')
-            ->orderBy('tanggal', 'asc');
-
-        return DataTables::of($query)
-            ->filter(function ($instance) {
-                $search = request('search.value');
-                if (!empty($search)) {
-                    $search = strtolower($search);
-                    $instance->havingRaw('
-                        LOWER(DATE_FORMAT(tanggal, "%Y-%m-%d")) LIKE ?
-                        OR LOWER(DATE_FORMAT(tanggal, "%d-%m-%Y")) LIKE ?
-                        OR LOWER(DATE_FORMAT(tanggal, "%d/%m/%Y")) LIKE ?
-                        OR LOWER(DAYNAME(tanggal)) LIKE ?
-                    ', [
-                        "%{$search}%",
-                        "%{$search}%",
-                        "%{$search}%",
-                        "%{$search}%",
-                    ]);
-                }
-            })
-            ->editColumn('tanggal', fn($row) => Carbon::parse($row->tanggal)->format('Y-m-d'))
-            ->with('totals', $totals)
-            ->toJson();
-    }
-
-    // ================================
-    // Return view dengan totals & target awal
-    // ================================
-    return view('inspeksi.index', [
-        'title'    => 'Dashboard Inspeksi',
-        'start'    => $start,
-        'end'      => $end,
-        'kategori' => $kategori,
-        'periode'  => $periode,
-        'totals'   => $totals,
-        'aktual_guntinggiling' => $totals['aktual_guntinggiling'] ?? 0,
-        'target_guntinggiling' => $totals['target_guntinggiling'] ?? 0,
-        'aktual_pack'          => $totals['aktual_pack'] ?? 0,
-        'target_pack'          => $totals['target_pack'] ?? 0,
-        'aktual_banderol'      => $totals['aktual_banderol'] ?? 0,
-        'target_banderol'      => $totals['target_banderol'] ?? 0,
-        'aktual_opp'           => $totals['aktual_opp'] ?? 0,
-        'target_opp'           => $totals['target_opp'] ?? 0,
-        'aktual_mop'           => $totals['aktual_mop'] ?? 0,
-        'target_mop'           => $totals['target_mop'] ?? 0,
-    ]);
-}
-
 
     public function chart(Request $request)
     {
