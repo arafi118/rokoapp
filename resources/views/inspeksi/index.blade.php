@@ -16,7 +16,7 @@
                                     <div>
                                         <h2 class="h2 text-primary d-inline" id="aktual_guntinggiling">
                                             {{ $aktual_guntinggiling }}</h2>
-                                        <span>btg</span>
+                                        <span class="fw-bold">btg</span> <br>
                                     </div>
                                     <div>
                                         <button type="button" id="ModalGTGL"

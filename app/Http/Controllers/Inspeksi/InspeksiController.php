@@ -69,13 +69,7 @@ class InspeksiController extends Controller
                 ->sum('target_harian');
 
             $totals['aktual_'.$key] = $aktual;
-
-            $selisih = $aktual - $target;
-            if ($selisih >= 0) {
-                $totals['target_'.$key] = '<span style="color:green">+'. $selisih .'</span>';
-            } else {
-                $totals['target_'.$key] = '<span style="color:red">'. $selisih .'</span>';
-            }
+            $totals['target_'.$key] = $target;
         }
 
         // Jika request AJAX untuk DataTables
@@ -135,6 +129,7 @@ class InspeksiController extends Controller
             'target_opp'           => $totals['target_opp'] ?? 0,
             'aktual_mop'           => $totals['aktual_mop'] ?? 0,
             'target_mop'           => $totals['target_mop'] ?? 0,
+            'selisih_guntinggiling'=> $totals['selisih_guntinggiling'] ?? 0,
         ]);
     }
 
