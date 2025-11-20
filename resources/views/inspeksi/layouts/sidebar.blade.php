@@ -80,12 +80,12 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a href="/" class="nav-link">
             <i class="nav-icon bi bi-calendar-event"></i>
             <p>Jadwal</p>
         </a>
-    </li>
+    </li> --}}
 
     <li class="nav-header">Absensi</li>
     <li class="nav-item">
