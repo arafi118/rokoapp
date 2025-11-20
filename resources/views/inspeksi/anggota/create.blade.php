@@ -7,31 +7,31 @@
             <div class="card-body">
                 <div class="row mb-2">
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="nama">Nama Lengkap</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="nama">Nama Lengkap</label>
                             <input type="text" class="form-control" id="nama" name="nama">
-                            <small class="text-danger" id="msg_nama"></small>
+                            <small class="invalid-feedback" id="msg_nama"></small>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="nik">NIK</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="nik">NIK</label>
                             <input type="text" maxlength="16" class="form-control" id="nik" name="nik">
-                            <small class="text-danger" id="msg_nik"></small>
+                            <small class="invalid-feedback" id="msg_nik"></small>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="no_kk">No.KK</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="no_kk">No.KK</label>
                             <input type="text" maxlength="16" class="form-control" id="no_kk" name="no_kk">
-                            <small class="text-danger" id="msg_no_kk"></small>
+                            <small class="invalid-feedback" id="msg_no_kk"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="tanggal_masuk">Tanggal Masuk</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="tanggal_masuk">Tanggal Masuk</label>
                             <input type="text" class="form-control date" value="{{ date('d/m/Y') }}" id="tanggal_masuk"
                                 name="tanggal_masuk">
                         </div>
@@ -39,66 +39,66 @@
                     <div class="col-md-5">
                         <div class="row">
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label for="jabatan">Jabatan</label>
+                                <div class="mb-3">
+                                    <label class="form-label" for="jabatan">Jabatan</label>
                                     <select name="jabatan" id="jabatan" class="form-control select2">
                                         <option value="">- Pilih Nama jabatan -</option>
                                         @foreach ($jabatan as $jab)
-                                            <option value="{{ $jab->id }}">
+                                            <option {{ $jab->id == '4' ? 'selected' : '' }} value="{{ $jab->id }}">
                                                 {{ ucwords(strtolower($jab->nama)) }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="text-danger" id="msg_provinsi"></small>
+                                    <small class="invalid-feedback" id="msg_provinsi"></small>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label for="level">Operator Produksi</label>
+                                <div class="mb-3">
+                                    <label class="form-label" for="level">Operator Produksi</label>
                                     <select name="level" id="level" class="form-control select2">
                                         <option value="">- Pilih Level -</option>
                                         @foreach ($level as $lev)
-                                            <option value="{{ $lev->id }}">
+                                            <option {{ $lev->id == '1' ? 'selected' : '' }} value="{{ $lev->id }}">
                                                 {{ ucwords(strtolower($lev->nama)) }} (
                                                 {{ ucwords(strtolower($lev->inisial)) }} )
                                             </option>
                                         @endforeach
-                                    </select><small class="text-danger" id="msg_level"></small>
+                                    </select><small class="invalid-feedback" id="msg_level"></small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="nama_ibu_kandung">Nama Ibu Kandung</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="nama_ibu_kandung">Nama Ibu Kandung</label>
                             <input type="text" class="form-control" id="nama_ibu_kandung" name="nama_ibu_kandung">
-                            <small class="text-danger" id="msg_nama_ibu_kandung"></small>
+                            <small class="invalid-feedback" id="msg_nama_ibu_kandung"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-5">
-                        <div class="form-group">
-                            <label for="tempat_lahir">Tempat & Tanggal Lahir</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="tempat_lahir">Tempat & Tanggal Lahir</label>
                             <div class="row g-0">
                                 <div class="col-6">
                                     <input type="text" class="form-control rounded-0 rounded-start" id="tempat_lahir"
                                         name="tempat_lahir" placeholder="Tempat">
-                                    <small class="text-danger" id="msg_tempat_lahir"></small>
+                                    <small class="invalid-feedback" id="msg_tempat_lahir"></small>
                                 </div>
                                 <div class="col-6">
                                     <input type="text" class="form-control date rounded-0" id="tanggal_lahir"
                                         name="tanggal_lahir" value="{{ date('d/m/Y') }}" placeholder="Tanggal">
-                                    <small class="text-danger" id="msg_tanggal_lahir"></small>
+                                    <small class="invalid-feedback" id="msg_tanggal_lahir"></small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="jenis_kelamin">Jenis Kelamin</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="jenis_kelamin">Jenis Kelamin</label>
                             <div class="btn-group d-flex" role="group">
-                                <button type="button" class="btn btn-outline-secondary flex-fill" data-value="L">
+                                <button type="button" class="btn btn-outline-secondary flex-fill active" data-value="L">
                                     Laki-laki
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary flex-fill" data-value="P">
@@ -106,15 +106,15 @@
                                 </button>
                             </div>
                             <input type="hidden" name="jenis_kelamin" id="jenis_kelamin" value="L">
-                            <small class="text-danger" id="msg_jenis_kelamin"></small>
+                            <small class="invalid-feedback" id="msg_jenis_kelamin"></small>
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="agama">Agama</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="agama">Agama</label>
                             <select class="form-control select2" id="agama" name="agama">
                                 <option value="">-- Pilih Agama --</option>
-                                <option value="islam">Islam</option>
+                                <option value="islam" selected>Islam</option>
                                 <option value="kristen_protestan">Kristen Protestan</option>
                                 <option value="katolik">Katolik</option>
                                 <option value="hindu">Hindu</option>
@@ -122,59 +122,59 @@
                                 <option value="khonghucu">Khonghucu</option>
                                 <option value="lainnya">Lainnya</option>
                             </select>
-                            <small class="text-danger" id="msg_agama"></small>
+                            <small class="invalid-feedback" id="msg_agama"></small>
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="status">Status Perkawinan</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="status">Status Perkawinan</label>
                             <select class="form-control select2" id="status" name="status">
                                 <option value="">-- Pilih Status --</option>
-                                <option value="belum menikah">Belum Menikah</option>
+                                <option value="belum menikah" selected>Belum Menikah</option>
                                 <option value="menikah">Menikah</option>
                                 <option value="cerai hidup">Cerai Hidup</option>
                                 <option value="cerai mati">Cerai Mati</option>
                             </select>
-                            <small class="text-danger" id="msg_status"></small>
+                            <small class="invalid-feedback" id="msg_status"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="ijazah">Ijazah</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="ijazah">Ijazah</label>
                             <input type="text" class="form-control" id="ijazah" name="ijazah">
-                            <small class="text-danger" id="msg_ijazah"></small>
+                            <small class="invalid-feedback" id="msg_ijazah"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="jurusan">Jurusan</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="jurusan">Jurusan</label>
                             <input type="text" class="form-control" id="jurusan" name="jurusan">
-                            <small class="text-danger" id="msg_jurusan"></small>
+                            <small class="invalid-feedback" id="msg_jurusan"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="tahun_lulus">Tahun Lulus</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="tahun_lulus">Tahun Lulus</label>
                             <input type="text" class="form-control" id="tahun_lulus" name="tahun_lulus">
-                            <small class="text-danger" id="msg_tahun_lulus"></small>
+                            <small class="invalid-feedback" id="msg_tahun_lulus"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="row">
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label for="tinggi_badan">TB</label>
+                                <div class="mb-3">
+                                    <label class="form-label" for="tinggi_badan">TB</label>
                                     <input type="text" class="form-control" id="tinggi_badan" name="tinggi_badan">
-                                    <small class="text-danger" id="msg_tinggi_badan"></small>
+                                    <small class="invalid-feedback" id="msg_tinggi_badan"></small>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label for="berat_badan">BB</label>
+                                <div class="mb-3">
+                                    <label class="form-label" for="berat_badan">BB</label>
                                     <input type="text" class="form-control" id="berat_badan" name="berat_badan">
-                                    <small class="text-danger" id="msg_berat_badan"></small>
+                                    <small class="invalid-feedback" id="msg_berat_badan"></small>
                                 </div>
                             </div>
                         </div>
@@ -182,24 +182,24 @@
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="norek">No Rekening</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="norek">No Rekening</label>
                             <input type="text" maxlength="20" class="form-control" id="norek" name="norek">
-                            <small class="text-danger" id="msg_norek"></small>
+                            <small class="invalid-feedback" id="msg_norek"></small>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="nama_bank">Nama Bank</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="nama_bank">Nama Bank</label>
                             <input type="text" class="form-control" id="nama_bank" name="nama_bank">
-                            <small class="text-danger" id="msg_nama_bank"></small>
+                            <small class="invalid-feedback" id="msg_nama_bank"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="provinsi">Provinsi</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="provinsi">Provinsi</label>
                             <select name="provinsi" id="provinsi" class="form-control select2">
                                 <option value="">- Pilih Nama Provinsi -</option>
                                 @foreach ($provinsi as $prov)
@@ -208,59 +208,59 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <small class="text-danger" id="msg_provinsi"></small>
+                            <small class="invalid-feedback" id="msg_provinsi"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="kota">Kabupaten/Kota</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="kota">Kabupaten/Kota</label>
                             <select name="kota" id="kota" class="form-control select2">
                                 <option value="">-Pilih Nama Kabupaten-</option>
                             </select>
-                            <small class="text-danger" id="msg_kota"></small>
+                            <small class="invalid-feedback" id="msg_kota"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="kecamatan">Kecamatan</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="kecamatan">Kecamatan</label>
                             <select name="kecamatan" id="kecamatan" class="form-control select2">
                                 <option value="">-Pilih Nama Kecamatan-</option>
                             </select>
-                            <small class="text-danger" id="msg_kecamatan"></small>
+                            <small class="invalid-feedback" id="msg_kecamatan"></small>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="desa">Desa/Kelurahan</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="desa">Desa/Kelurahan</label>
                             <select name="desa" id="desa" class="form-control select2">
                                 <option value="">- Pilih Nama Desa -</option>
                             </select>
-                            <small class="text-danger" id="msg_desa"></small>
+                            <small class="invalid-feedback" id="msg_desa"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="alamat">Alamat Dusun/rw/rt</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="alamat">Alamat Dusun/rw/rt</label>
                             <textarea class="form-control" id="alamat" name="alamat" rows="2" placeholder="Enter ..."></textarea>
-                            <small class="text-danger" id="msg_alamat"></small>
+                            <small class="invalid-feedback" id="msg_alamat"></small>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="username">Username</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Username</label>
                             <input type="text" class="form-control" id="username" name="username">
-                            <small class="text-danger" id="msg_username"></small>
+                            <small class="invalid-feedback" id="msg_username"></small>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="password">Password</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Password</label>
                             <input type="text" class="form-control" id="password" name="password">
-                            <small class="text-danger" id="msg_password"></small>
+                            <small class="invalid-feedback" id="msg_password"></small>
                         </div>
                     </div>
                 </div>
@@ -289,7 +289,7 @@
                 theme: 'bootstrap4',
             });
         });
-        jQuery.datetimepicker.setLocale('de');
+
         $('.date').datetimepicker({
             i18n: {
                 id: {
