@@ -29,11 +29,12 @@ class GroupController extends Controller
     public function list(Request $request)
     {
         $search = $request->get('q');
-        $query = Anggota::select('id', 'nama')
-            ->where('jabatan', 3);
+        $query = Anggota::select('anggota.id', 'anggota.nama')
+            ->join('karyawan', 'karyawan.anggota_id', '=', 'anggota.id')
+            ->where('karyawan.status', 'aktif')->where('karyawan.level', '9');
 
         if ($search) {
-            $query->where('nama', 'like', "%{$search}%");
+            $query->where('anggota.nama', 'like', "%{$search}%");
         }
 
         $anggota = $query->get();
